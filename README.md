@@ -1,4 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+# PutOnYourGenes_SecureDocAIApp
+=======
+>>>>>>> 1aa504e (Initial commit)
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
@@ -61,6 +66,10 @@ export default tseslint.config({
 - [ ] Create responsive mobile layout
 - [ ] Set up unit tests for components
 - [ ] Add dark mode toggle
+<<<<<<< HEAD
 =======
 # PutOnYourGenes_SecureDocAIApp
 >>>>>>> 466c216 (Initial commit)
+=======
+>>>>>>> 20df52f (Initial commit)
+>>>>>>> 1aa504e (Initial commit)

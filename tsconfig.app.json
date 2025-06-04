@@ -10,7 +10,11 @@
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
+<<<<<<< HEAD
     "verbatimModuleSyntax": false,
+=======
+    "verbatimModuleSyntax": true,
+>>>>>>> 1aa504e (Initial commit)
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
@@ -19,7 +23,11 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+<<<<<<< HEAD
     "erasableSyntaxOnly": false,
+=======
+    "erasableSyntaxOnly": true,
+>>>>>>> 1aa504e (Initial commit)
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
