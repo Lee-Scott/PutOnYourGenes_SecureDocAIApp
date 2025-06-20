@@ -1,9 +1,9 @@
 import React from 'react'
-import { Navigate, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { userAPI } from '../service/UserService';
 import type { IUserRequest } from '../models/ICredentials';
 
-const login = () => {
+const Login = () => {
     const location = useLocation();
     const isLoggedIn: boolean = JSON.parse(localStorage.getItem('')!) as boolean || false;
     const [loginUser, { data, error, isLoading, isSuccess }] = userAPI.useLoginUserMutation();
@@ -20,12 +20,133 @@ const login = () => {
     }
 
     if(isSuccess && (data?.data.userL.mfa)) {
-        // Todo: jsx form for mfa
+        return (
+            <div className="container mtb">
+                <div className="row justify-content-center mt-7">
+                    <div className="col-lg-5 text-center">
+                        <a href="index.html">
+                            <img src="assets/img/svg/logo.svg" alt="" />
+                        </a>
+                        <div className="card mt-5">
+                            <div className="card-body">
+                                <h4 className="mb-3">2-Step Verification</h4>
+                                {/* Error alert placeholder */}
+                                <hr />
+                                <div className="svg-icon svg-icon-xl text-purple">
+                                    <i className="bi bi-lock fs-3 text"></i>
+                                </div>
+                                <form className="needs-validation" noValidate>
+                                    <label className="form-label">Please enter QR code</label>
+                                    <div className="row mt-4 pt-2">
+                                        <input type="hidden" name='userId' id="userId" disabled={false} required />
+                                        <div className="col">
+                                            <input type="text" name='qrCode1' className="form-control text-center" id="qrCode1" disabled={false} required maxLength={1} autoFocus />
+                                        </div>
+                                        <div className="col">
+                                            <input type="text" name='qrCode2' className="form-control text-center" id="qrCode2" disabled={false} required maxLength={1} />
+                                        </div>
+                                        <div className="col">
+                                            <input type="text" name='qrCode3' className="form-control text-center" id="qrCode3" disabled={false} required maxLength={1} />
+                                        </div>
+                                        <div className="col">
+                                            <input type="text" name='qrCode4' className="form-control text-center" id="qrCode4" disabled={false} required maxLength={1} />
+                                        </div>
+                                        <div className="col">
+                                            <input type="text" name='qrCode5' className="form-control text-center" id="qrCode5" disabled={false} required maxLength={1} />
+                                        </div>
+                                        <div className="col">
+                                            <input type="text" name='qrCode6' className="form-control text-center" id="qrCode6" disabled={false} required maxLength={1} />
+                                        </div>
+                                    </div>
+                                    <div className="col mt-3">
+                                        <button className="btn btn-primary btn-block" type="submit">
+                                            <span role="status">Verify</span>
+                                        </button>
+                                    </div>
+                                </form>
+                                <hr className="my-3" />
+                                <div className="row mb-3">
+                                    <div className="col d-flex justify-content-start">
+                                        <div className="btn btn-outline-light">
+                                            <Link to="/register" style={{ textDecoration: 'none' }}>Create an Account</Link>
+                                        </div>
+                                    </div>
+                                    <div className="col d-flex justify-content-end">
+                                        <div className="link-dark">
+                                            <Link to="/resetpassword">Forgot password?</Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
     }
-
-  return (
-    <div>login</div>
-  )
+    
+    return (
+        <div className="container">
+            <div className="row justify-content-center">
+                <div className="col-lg-6 col-md-6 col-sm-12" style={{ marginTop: '150px' }}>
+                    <div className="card">
+                        <div className="card-body">
+                            <h4 className="mb-3">Login</h4>
+                            {error && <div className="alert alert-dismissible alert-danger">
+                                {'data' in error ? (error.data as any).message : 'An error occurred'}
+                            </div>}
+                            <hr />
+                            <form onSubmit={(e) => {
+                                e.preventDefault();
+                                // Add your form submission logic here
+                            }} className="needs-validation" noValidate>
+                                <div className="row g-3">
+                                    <div className="col-12">
+                                        <label htmlFor="email" className="form-label">Email address</label>
+                                        <div className="input-group has-validation">
+                                            <span className="input-group-text"><i className="bi bi-envelope"></i></span>
+                                            <input type="text" name='email' autoComplete="on"
+                                                className="form-control"
+                                                id="email" placeholder="Email address" disabled={false} required />
+                                            <div className="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12">
+                                        <label htmlFor="password" className="form-label">Password</label>
+                                        <div className="input-group has-validation">
+                                            <span className="input-group-text"><i className="bi bi-key"></i></span>
+                                            <input type="password" name='password' autoComplete="on"
+                                                className="form-control" placeholder="Password" disabled={false} required />
+                                            <div className="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col mt-3">
+                                    <button className="btn btn-primary btn-block" type="submit">
+                                        {isLoading && <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>}
+                                        <span role="status">{isLoading ? 'Loading...' : 'Login'}</span>
+                                    </button>
+                                </div>
+                            </form>
+                            <hr className="my-3" />
+                            <div className="row mb-3">
+                                <div className="col d-flex justify-content-start">
+                                    <div className="btn btn-outline-light">
+                                        <Link to="/register" style={{ textDecoration: 'none' }}>Create an Account</Link>
+                                    </div>
+                                </div>
+                                <div className="col d-flex justify-content-end">
+                                    <div className="link-dark">
+                                        <Link to="/resetpassword">Forgot password?</Link>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
 
-export default login
+export default Login;
