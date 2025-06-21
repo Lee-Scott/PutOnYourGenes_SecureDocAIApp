@@ -2,12 +2,23 @@ import React from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { userAPI } from '../service/UserService';
 import type { IUserRequest } from '../models/ICredentials';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import type { IResponse } from '../models/IResponse';
 
+
+const schema  = z.object({
+    email: z.string().min(3, 'Email is required').email("Invalid email address"),
+    password: z.string().min(4, 'Password is required').max(255), //TODO: set min to 8
+});
 const Login = () => {
     const location = useLocation();
     const isLoggedIn: boolean = JSON.parse(localStorage.getItem('')!) as boolean || false;
     const [loginUser, { data, error, isLoading, isSuccess }] = userAPI.useLoginUserMutation();
+    const { register, handleSubmit, formState: loginForm, getFieldState } = useForm<IUserRequest>( { resolver : zodResolver(schema), mode: 'onTouched' });
 
+    const isFieldValid = (fieldName: keyof IUserRequest): boolean => getFieldState(fieldName, loginForm).isTouched && !getFieldState(fieldName, loginForm).invalid;
     const handleLogin = (credentials: IUserRequest) => loginUser(credentials);
 
     if(isLoggedIn) {
@@ -93,38 +104,38 @@ const Login = () => {
                         <div className="card-body">
                             <h4 className="mb-3">Login</h4>
                             {error && <div className="alert alert-dismissible alert-danger">
-                                {'data' in error ? (error.data as any).message : 'An error occurred'}
+                                {'data' in error ? (error.data as IResponse<void>).message : 'An error occurred'}
                             </div>}
                             <hr />
-                            <form onSubmit={(e) => {
-                                e.preventDefault();
-                                // Add your form submission logic here
-                            }} className="needs-validation" noValidate>
+                            <form onSubmit={handleSubmit(handleLogin)} className="needs-validation" noValidate>
                                 <div className="row g-3">
                                     <div className="col-12">
                                         <label htmlFor="email" className="form-label">Email address</label>
                                         <div className="input-group has-validation">
                                             <span className="input-group-text"><i className="bi bi-envelope"></i></span>
-                                            <input type="text" name='email' autoComplete="on"
-                                                className="form-control"
+                                            <input type="text" {...register('email')} name='email' autoComplete="on"
+                                                className={`form-control ' ${loginForm.errors.email ? 'is-invalid' : ''}
+                                                ${isFieldValid('email') ? 'is-valid' : ''}`}
                                                 id="email" placeholder="Email address" disabled={false} required />
-                                            <div className="invalid-feedback"></div>
+                                            <div className="invalid-feedback">{loginForm.errors.email?.message}</div>
                                         </div>
                                     </div>
                                     <div className="col-12">
                                         <label htmlFor="password" className="form-label">Password</label>
                                         <div className="input-group has-validation">
                                             <span className="input-group-text"><i className="bi bi-key"></i></span>
-                                            <input type="password" name='password' autoComplete="on"
-                                                className="form-control" placeholder="Password" disabled={false} required />
-                                            <div className="invalid-feedback"></div>
+                                            <input type="password" {...register('password')} name='password' autoComplete="on"
+                                                className={`form-control ' ${loginForm.errors.email ? 'is-invalid' : ''}
+                                                 ${isFieldValid('password') ? 'is-valid' : ''}`} 
+                                                 placeholder="Password" disabled={false} required />
+                                            <div className="invalid-feedback">{loginForm.errors.password?.message}</div>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="col mt-3">
-                                    <button className="btn btn-primary btn-block" type="submit">
-                                        {isLoading && <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>}
-                                        <span role="status">{isLoading ? 'Loading...' : 'Login'}</span>
+                                    <button disabled={loginForm.isSubmitting || isLoading} className="btn btn-primary btn-block" type="submit">
+                                        {(loginForm.isSubmitting || isLoading) && <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>}
+                                        <span role="status">{isLoading || loginForm.isSubmitting? 'Loading...' : 'Login'}</span>
                                     </button>
                                 </div>
                             </form>
