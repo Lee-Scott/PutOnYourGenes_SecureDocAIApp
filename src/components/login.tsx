@@ -25,12 +25,12 @@ const Login = () => {
         return location?.state?.from?.pathname ? <Navigate to={location?.state?.from?.pathname} replace /> : <Navigate to="/" />;
     }
 
-    if(isSuccess && (!data?.data.userL.mfa)) {
+    if(isSuccess && data?.data && !data.data.user?.mfa) {
         localStorage.setItem('login', 'true');
         return location?.state?.from?.pathname ? <Navigate to={location?.state?.from?.pathname} replace /> : <Navigate to="/" />;
     }
 
-    if(isSuccess && (data?.data.userL.mfa)) {
+    if(isSuccess && (data?.data.user.mfa)) {
         return (
             <div className="container mtb">
                 <div className="row justify-content-center mt-7">

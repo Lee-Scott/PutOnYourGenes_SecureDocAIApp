@@ -1,6 +1,6 @@
 import { type IResponse } from "../models/IResponse";
 
-export const baseURL = 'https://localhost:8085/user';
+export const baseURL = 'http://localhost:8085/user';
 
 export const isJsonContentType = (headers: Headers) => 
     ['application/vnd.api+json', 'application/json', 'application/vnd.hal+json', 'application/pdf', 'multipart/form-data'] // if one of these is included in the header then thats a jsonContent type

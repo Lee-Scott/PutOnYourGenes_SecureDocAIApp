@@ -24,6 +24,8 @@ export interface IUser {
 
 export type Role = { role: string };
 
-export type User = { userL: IUser };
+export type User = {
+    user: any; userL: IUser 
+};
 
 export type Users = { userL: IUser[] };
