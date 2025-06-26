@@ -2,7 +2,7 @@ import { fetchBaseQuery } from '@reduxjs/toolkit/query';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IResponse } from '../models/IResponse';
 import { baseURL, isJsonContentType, processError, processResponse } from '../utils/requestutils';
-import type { User } from '../models/IUser';
+import type { QrCodeRequest, User } from '../models/IUser';
 import type { IUserRequest } from '../models/ICredentials';
 
 /**
@@ -60,7 +60,8 @@ export const userAPI = createApi({
         url: '/login',
         method: 'POST',
         // The credentials object will be automatically serialized as the request body
-        body: credentials
+        body: credentials,
+        //headers: you can pass headers here
       }),
       
       // Response handling
@@ -69,6 +70,18 @@ export const userAPI = createApi({
       
       // No providesTags needed for login - authentication shouldn't be cached
       // Login is a stateful operation that should always be performed fresh
+    }),
+    verifyQrCode: builder.mutation<IResponse<User>, QrCodeRequest>({ 
+      query: (qrCodeRequest) => ({ 
+        url: '/verify/qrcode',
+        method: 'POST',
+      
+        body: qrCodeRequest
+      }),
+      transformResponse: processResponse<User>, 
+      transformErrorResponse: processError, 
+      invalidatesTags: (result, error) => error ? [] : ['User'] // tag is a reference to the cache in the store
+      
     }),
   }),
   
