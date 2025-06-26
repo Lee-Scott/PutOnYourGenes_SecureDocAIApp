@@ -3,7 +3,8 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IResponse } from '../models/IResponse';
 import { baseURL, isJsonContentType, processError, processResponse } from '../utils/requestutils';
 import type { QrCodeRequest, User } from '../models/IUser';
-import type { IUserRequest } from '../models/ICredentials';
+import type { IRegisterRequest, IUserRequest } from '../models/ICredentials';
+import { Http } from '../enum/http.method';
 
 /**
  * Redux Toolkit Query API for user-related operations.
@@ -35,7 +36,7 @@ export const userAPI = createApi({
       // Request configuration
       query: () => ({
         url: '/profile',
-        method: 'GET'
+        method: Http.GET
       }),
       
       // Cache configuration: keep data for 2 minutes when not in use
@@ -58,7 +59,7 @@ export const userAPI = createApi({
       // Request configuration with credentials parameter
       query: (credentials) => ({ 
         url: '/login',
-        method: 'POST',
+        method: Http.POST,
         // The credentials object will be automatically serialized as the request body
         body: credentials,
         //headers: you can pass headers here
@@ -71,10 +72,21 @@ export const userAPI = createApi({
       // No providesTags needed for login - authentication shouldn't be cached
       // Login is a stateful operation that should always be performed fresh
     }),
+    registerUser: builder.mutation<IResponse<void>, IRegisterRequest>({ 
+      query: (registerRequest) => ({ 
+        url: '/register',
+        method: Http.POST,
+      
+        body: registerRequest
+      }),
+      transformErrorResponse: processError, 
+      
+    }),
+
     verifyQrCode: builder.mutation<IResponse<User>, QrCodeRequest>({ 
       query: (qrCodeRequest) => ({ 
         url: '/verify/qrcode',
-        method: 'POST',
+        method: Http.POST,
       
         body: qrCodeRequest
       }),

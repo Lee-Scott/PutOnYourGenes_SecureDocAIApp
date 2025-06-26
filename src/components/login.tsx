@@ -83,7 +83,9 @@ const Login = () => {
 
   /**
    * Helper: Determine if a login form field is valid (touched and not invalid)
-   */
+   * 
+   * TODO: Put all Helpers into a utility class
+   */ 
   const isFieldValid = (fieldName: keyof IUserRequest): boolean =>
     getFieldState(fieldName, form).isTouched && !getFieldState(fieldName, form).invalid;
 
