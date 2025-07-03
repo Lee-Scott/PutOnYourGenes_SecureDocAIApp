@@ -89,6 +89,7 @@ export const userAPI = createApi({
         url: `/verify?key=${key}`,
         method: Http.GET,
       }),
+      transformResponse: processResponse<void>,
       transformErrorResponse: processError,
     }),
 
