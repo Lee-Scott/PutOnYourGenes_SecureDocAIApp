@@ -10,3 +10,5 @@ export interface IRegisterRequest extends IUserRequest {
     phone?: string;
     bio?: string;
 };
+
+export type EmailAddress = Pick<IUserRequest, 'email'>;

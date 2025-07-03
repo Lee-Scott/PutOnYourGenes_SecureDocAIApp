@@ -3,7 +3,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IResponse } from '../models/IResponse';
 import { baseURL, isJsonContentType, processError, processResponse } from '../utils/requestutils';
 import type { QrCodeRequest, User } from '../models/IUser';
-import type { IRegisterRequest, IUserRequest } from '../models/ICredentials';
+import type { EmailAddress, IRegisterRequest, IUserRequest } from '../models/ICredentials';
 import { Http } from '../enum/http.method';
 
 /**
@@ -80,6 +80,7 @@ export const userAPI = createApi({
 
         body: registerRequest
       }),
+      transformResponse: processResponse<void>,
       transformErrorResponse: processError,
 
     }),
@@ -104,6 +105,17 @@ export const userAPI = createApi({
       transformErrorResponse: processError,
       invalidatesTags: (result, error) => error ? [] : ['User'] // tag is a reference to the cache in the store
 
+    }),
+
+    resetPassword: builder.mutation<IResponse<void>, EmailAddress>({
+      query: (email) => ({
+        url: '/resetPassword',
+        method: Http.POST,
+        body: email
+      }),
+      transformResponse: processResponse<void>,
+      transformErrorResponse: processError,
+      invalidatesTags: (result, error) => error ? [] : ['User']
     }),
   }),
 
