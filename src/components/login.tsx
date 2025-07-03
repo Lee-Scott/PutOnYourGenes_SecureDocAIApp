@@ -17,7 +17,7 @@ const loginSchema = z.object({
   email: z.string().min(3, 'Email is required').email('Invalid email address'),
   password: z
     .string()
-    .length(4, 'Password must be at least 4 characters'), 
+    .min(4, 'Password must be at least 4 characters').optional(), 
 });
 
 /**

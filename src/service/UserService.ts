@@ -13,7 +13,7 @@ import { Http } from '../enum/http.method';
 export const userAPI = createApi({
   // Unique identifier for this API slice in the Redux store
   reducerPath: 'userAPI',
-  
+
   // Base query configuration with common settings for all endpoints
   baseQuery: fetchBaseQuery({
     baseUrl: baseURL,
@@ -22,10 +22,10 @@ export const userAPI = createApi({
     // Custom handler for JSON content type headers
     isJsonContentType
   }),
-  
+
   // Cache tag types for invalidation strategies
   tagTypes: ['User'],
-  
+
   // Define the API endpoints
   endpoints: (builder) => ({
     /**
@@ -38,14 +38,14 @@ export const userAPI = createApi({
         url: '/profile',
         method: Http.GET
       }),
-      
+
       // Cache configuration: keep data for 2 minutes when not in use
       keepUnusedDataFor: 120,
-      
+
       // Response handling
       transformResponse: processResponse<User>,
       transformErrorResponse: processError,
-      
+
       // Cache tag association for automatic invalidation
       providesTags: () => ['User']
     }),
@@ -55,48 +55,57 @@ export const userAPI = createApi({
      * @param {IUserRequest} credentials - User login credentials
      * @returns {IResponse<User>} Response containing authenticated user data
      */
-    loginUser: builder.mutation<IResponse<User>, IUserRequest>({ 
+    loginUser: builder.mutation<IResponse<User>, IUserRequest>({
       // Request configuration with credentials parameter
-      query: (credentials) => ({ 
+      query: (credentials) => ({
         url: '/login',
         method: Http.POST,
         // The credentials object will be automatically serialized as the request body
         body: credentials,
         //headers: you can pass headers here
       }),
-      
+
       // Response handling
-      transformResponse: processResponse<User>, 
-      transformErrorResponse: processError, 
-      
+      transformResponse: processResponse<User>,
+      transformErrorResponse: processError,
+
       // No providesTags needed for login - authentication shouldn't be cached
       // Login is a stateful operation that should always be performed fresh
     }),
-    registerUser: builder.mutation<IResponse<void>, IRegisterRequest>({ 
-      query: (registerRequest) => ({ 
+
+    registerUser: builder.mutation<IResponse<void>, IRegisterRequest>({
+      query: (registerRequest) => ({
         url: '/register',
         method: Http.POST,
-      
+
         body: registerRequest
       }),
-      transformErrorResponse: processError, 
-      
+      transformErrorResponse: processError,
+
     }),
 
-    verifyQrCode: builder.mutation<IResponse<User>, QrCodeRequest>({ 
-      query: (qrCodeRequest) => ({ 
+    verifyAccount: builder.mutation<IResponse<void>, string>({
+      query: (key) => ({
+        url: `/verify?key=${key}`,
+        method: Http.GET,
+      }),
+      transformErrorResponse: processError,
+    }),
+
+    verifyQrCode: builder.mutation<IResponse<User>, QrCodeRequest>({
+      query: (qrCodeRequest) => ({
         url: '/verify/qrcode',
         method: Http.POST,
-      
+
         body: qrCodeRequest
       }),
-      transformResponse: processResponse<User>, 
-      transformErrorResponse: processError, 
+      transformResponse: processResponse<User>,
+      transformErrorResponse: processError,
       invalidatesTags: (result, error) => error ? [] : ['User'] // tag is a reference to the cache in the store
-      
+
     }),
   }),
-  
+
 });
 
 // Export the auto-generated React hook for use in components
