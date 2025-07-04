@@ -11,14 +11,17 @@ import Login from './components/login.tsx'
 import Register from './components/Register.tsx'
 import Verify from './components/VerifyAccount.tsx'
 import ResetPassword from './components/ResetPassword.tsx'
+import VerifyAccount from './components/VerifyAccount.tsx'
+import VerifyPassword from './components/VerifyPassword.tsx'
 
 const store = setupStore();
 const router = createBrowserRouter(createRoutesFromElements(
   <Route path='/' element={<App />}>
     <Route path='login' element={<Login />} />
     <Route path='register' element={<Register />} />
-    <Route path='resetPassword' element={<ResetPassword />} />
-    <Route path='user/verify' element={<Verify />} />
+    <Route path='resetpassword' element={<ResetPassword />} />
+    <Route path='user/verify' element={<VerifyAccount />} /> // Todo change to user/verify/password
+    <Route path='user/verify/password' element={<VerifyPassword />} />
     <Route element={<NavBar />}>
       <Route index path='/documents' element={<Documents />} />
       <Route path='/' element={<Navigate to={'/documents'} />} />
