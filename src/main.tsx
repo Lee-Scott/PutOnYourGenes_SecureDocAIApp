@@ -7,12 +7,13 @@ import { Provider } from 'react-redux'
 import ReactDOM from 'react-dom/client'
 import NavBar from './components/NavBar.tsx'
 import Documents from './components/documents/Documents.tsx'
-import Login from './components/login.tsx'
 import Register from './components/Register.tsx'
 import Verify from './components/VerifyAccount.tsx'
 import ResetPassword from './components/ResetPassword.tsx'
 import VerifyAccount from './components/VerifyAccount.tsx'
 import VerifyPassword from './components/VerifyPassword.tsx'
+import Login from './components/login.tsx'
+import ProtectedRoute from './components/ProtectedRoute.tsx'
 
 const store = setupStore();
 const router = createBrowserRouter(createRoutesFromElements(
@@ -20,11 +21,13 @@ const router = createBrowserRouter(createRoutesFromElements(
     <Route path='login' element={<Login />} />
     <Route path='register' element={<Register />} />
     <Route path='resetpassword' element={<ResetPassword />} />
-    <Route path='user/verify' element={<VerifyAccount />} /> // Todo change to user/verify/password
-    <Route path='user/verify/password' element={<VerifyPassword />} />
-    <Route element={<NavBar />}>
-      <Route index path='/documents' element={<Documents />} />
-      <Route path='/' element={<Navigate to={'/documents'} />} />
+    <Route path='verify/account' element={<VerifyAccount />} />
+    <Route path='verify/password' element={<VerifyPassword />} />
+    <Route element={<ProtectedRoute />} >
+      <Route element={<NavBar />}>
+        <Route index path='/documents' element={<Documents />} />
+        <Route path='/' element={<Navigate to={'/documents'} />} />
+      </Route>
     </Route>
   </Route>
 ));
