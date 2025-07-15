@@ -8,16 +8,18 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IResponse } from '../models/IResponse';
 
+
+
 const schema = z.object({
     newPassword: z.string().min(4, { message: 'New password is required' }),
     confirmNewPassword: z.string().min(4, { message: 'Confirm password is required' }),
-    userId: z.string().min(4, { message: 'User ID password is required' }),
-  }).superRefine(({ newPassword, confirmNewPassword }, ctx) => {
+    userId: z.string().min(4, { message: 'User ID password is required' }), // TODO: should be an object
+  }).superRefine(({ newPassword, confirmNewPassword }, ctx) => {  // ctx is the context object
     if(newPassword !== confirmNewPassword) {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ['confirmNewPassword'],
-            message: 'New password and confirm password do not match'
+            message: 'New password and confirm password must match'
         })
     }
   });
