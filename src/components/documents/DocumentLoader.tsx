@@ -1,9 +1,9 @@
 import React from 'react'
 
-const DDocumentLoader = () => {
+const DocumentLoader = () => {
   return (
     <div>DDocumentLoader</div>
   )
 }
 
-export default DDocumentLoader
+export default DocumentLoader

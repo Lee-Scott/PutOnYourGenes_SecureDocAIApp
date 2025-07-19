@@ -2,8 +2,8 @@ import { fetchBaseQuery } from '@reduxjs/toolkit/query';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IResponse } from '../models/IResponse';
 import { baseURL, isJsonContentType, processError, processResponse } from '../utils/requestutils';
-import type { QrCodeRequest, User } from '../models/IUser';
-import type { EmailAddress, IRegisterRequest, IUserRequest, UpdateNewPassword } from '../models/ICredentials';
+import type { QrCodeRequest, Role, User } from '../models/IUser';
+import type { EmailAddress, IRegisterRequest, IUserRequest, UpdateNewPassword, UpdatePassword } from '../models/ICredentials';
 import { Http } from '../enum/http.method';
 
 /**
@@ -30,6 +30,10 @@ export const userAPI = createApi({
   endpoints: (builder) => ({
     /**
      * Fetches the current user's profile information
+     * This query is very important because it is called every time we
+     * invalidatesTags: (result, error) => error ? [] : ['User']
+     * and refetch the data. Not very efficent if working with large 
+     * amounts of data. You may want to catch it.
      * @returns {IResponse<User>} Response containing user data
      */
     fetchUser: builder.query<IResponse<User>, void>({
@@ -100,7 +104,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<User>,
       transformErrorResponse: processError,
-        invalidatesTags: (result, error) => error ? [] : ['User'] 
+      invalidatesTags: (result, error) => error ? [] : ['User']
     }),
 
     verifyQrCode: builder.mutation<IResponse<User>, QrCodeRequest>({
@@ -136,9 +140,106 @@ export const userAPI = createApi({
       transformErrorResponse: processError,
       invalidatesTags: (result, error) => error ? [] : ['User']
     }),
+    updatePhoto: builder.mutation<IResponse<string>, FormData>({
+      query: (form) => ({
+        url: `/photo`,
+        method: Http.PATCH,
+        body: form
+      }),
+      transformResponse: processResponse<string>,
+      transformErrorResponse: processError,
+      invalidatesTags: (result, error) => error ? [] : ['User']
+    }),
+    updateUser: builder.mutation<IResponse<User>, IUserRequest>({
+      query: (user) => ({
+        url: `/update`,
+        method: Http.PATCH,
+        body: user
+      }),
+      transformResponse: processResponse<User>,
+      transformErrorResponse: processError,
+      invalidatesTags: (result, error) => error ? [] : ['User']
+    }),
+    updatePassword: builder.mutation<IResponse<void>, UpdatePassword>({
+      query: (request) => ({
+        url: `/updatePassword`,
+        method: Http.PATCH,
+        body: {
+          oldPassword: request.password,
+          newPassword: request.newPassword,
+          confirmNewPassword: request.confirmNewPassword
+        }
+      }),
+      transformResponse: processResponse<void>,
+      transformErrorResponse: processError,
+      invalidatesTags: (result, error) => error ? [] : ['User']
+    }),
+    toggleAccountExpired: builder.mutation<IResponse<void>, void>({
+      query: () => ({
+        url: `/toggleAccountExpired`,
+        method: Http.PATCH
+      }),
+      transformResponse: processResponse<void>,
+      transformErrorResponse: processError,
+      invalidatesTags: (result, error) => error ? [] : ['User']
+    }),
+    toggleAccountLocked: builder.mutation<IResponse<void>, void>({
+      query: () => ({
+        url: `/toggleAccountLocked`,
+        method: Http.PATCH
+      }),
+      transformResponse: processResponse<void>,
+      transformErrorResponse: processError,
+      invalidatesTags: (result, error) => error ? [] : ['User']
+    }),
+    toggleAccountEnabled: builder.mutation<IResponse<void>, void>({
+      query: () => ({
+        url: `/toggleAccountEnabled`,
+        method: Http.PATCH
+      }),
+      transformResponse: processResponse<void>,
+      transformErrorResponse: processError,
+      invalidatesTags: (result, error) => error ? [] : ['User']
+    }),
+    toggleCredentialsExpired: builder.mutation<IResponse<void>, void>({
+      query: () => ({
+        url: `/toggleCredentialsExpired`,
+        method: Http.PATCH
+      }),
+      transformResponse: processResponse<void>,
+      transformErrorResponse: processError,
+      invalidatesTags: (result, error) => error ? [] : ['User']
+    }),
+    updateRole: builder.mutation<IResponse<void>, Role>({
+      query: (role) => ({
+        url: `/updateRole`,
+        method: Http.PATCH,
+        body: role
+      }),
+      transformResponse: processResponse<void>,
+      transformErrorResponse: processError,
+      invalidatesTags: (result, error) => error ? [] : ['User']
+    }),
+    enableMfa: builder.mutation<IResponse<User>, void>({
+      query: () => ({
+        url: `/mfa/setup`,
+        method: Http.PATCH
+      }),
+      transformResponse: processResponse<User>,
+      transformErrorResponse: processError,
+      invalidatesTags: (result, error) => error ? [] : ['User']
+    }),
+    disableMfa: builder.mutation<IResponse<User>, void>({
+      query: () => ({
+        url: `/mfa/cancel`,
+        method: Http.PATCH
+      }),
+      transformResponse: processResponse<User>,
+      transformErrorResponse: processError,
+      invalidatesTags: (result, error) => error ? [] : ['User']
+    }),
   }),
-
 });
 
-// Export the auto-generated React hook for use in components
+// Export the auto-generated React hook for use in components 
 export const { useFetchUserQuery } = userAPI;
