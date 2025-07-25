@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { userAPI } from "../service/UserService";
 import logger from 'redux-logger';
+import { documentAPI } from "../service/DocumentService";
 
 interface User {
     id: number;
@@ -13,6 +14,7 @@ interface User {
 // to the correct path in the state tree (likely 'userAPI')
 const rootReducer = combineReducers({
     [userAPI.reducerPath]: userAPI.reducer, // set reducer to api reducer path
+    [documentAPI.reducerPath]: documentAPI.reducer 
 });
 
 /**
@@ -27,6 +29,7 @@ export const setupStore = () => {
             getDefaultMiddleware({ serializableCheck: false  })
             // Add RTK Query middleware for handling API requests, caching, etc.
             .concat(userAPI.middleware)
+            .concat(documentAPI.middleware)
             // Add logger middleware for debugging actions and state changes
             .concat(logger)
     })
