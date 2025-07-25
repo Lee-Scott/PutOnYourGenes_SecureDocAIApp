@@ -1,9 +1,49 @@
-import React from 'react'
-
+//TODO: pass in a property and loop over that number so its dynamic also column size
 const DocumentLoader = () => {
   return (
-    <div>DDocumentLoader</div>
+    <div className="container mtb">
+            <div className="row">
+                <div className="col-lg-12">
+                    <div className="candidate-list">
+                        <div className="candidate-list-box card mt-4">
+                            <div className="p-4 card-body">
+                                <p className="card-text placeholder-glow">
+                                    <span className="placeholder col-12"></span>
+                                    <span className="placeholder col-12"></span>
+                                    <span className="placeholder col-12"></span>
+                                    <span className="placeholder col-12"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="candidate-list">
+                        <div className="candidate-list-box card mt-4">
+                            <div className="p-4 card-body">
+                                <p className="card-text placeholder-glow">
+                                    <span className="placeholder col-12"></span>
+                                    <span className="placeholder col-12"></span>
+                                    <span className="placeholder col-12"></span>
+                                    <span className="placeholder col-12"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="candidate-list">
+                        <div className="candidate-list-box card mt-4">
+                            <div className="p-4 card-body">
+                                <p className="card-text placeholder-glow">
+                                    <span className="placeholder col-12"></span>
+                                    <span className="placeholder col-12"></span>
+                                    <span className="placeholder col-12"></span>
+                                    <span className="placeholder col-12"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
   )
 }
 
-export default DocumentLoader
+export default DocumentLoader;

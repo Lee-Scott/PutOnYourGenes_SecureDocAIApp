@@ -1,10 +1,10 @@
-import { fetchBaseQuery } from '@reduxjs/toolkit/query';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IResponse } from '../models/IResponse';
-import { baseURL, isJsonContentType, processError, processResponse } from '../utils/requestutils';
+import { userApiBaseUrl, isJsonContentType, processError, processResponse } from '../utils/requestutils';
 import type { QrCodeRequest, Role, User } from '../models/IUser';
 import type { EmailAddress, IRegisterRequest, IUserRequest, UpdateNewPassword, UpdatePassword } from '../models/ICredentials';
 import { Http } from '../enum/http.method';
+import { createBaseQueryWithAuth } from './baseQueryWithAuth';
 
 /**
  * Redux Toolkit Query API for user-related operations.
@@ -15,13 +15,7 @@ export const userAPI = createApi({
   reducerPath: 'userAPI',
 
   // Base query configuration with common settings for all endpoints
-  baseQuery: fetchBaseQuery({
-    baseUrl: baseURL,
-    // Include credentials (cookies) with all requests, important for authentication
-    credentials: 'include',
-    // Custom handler for JSON content type headers
-    isJsonContentType
-  }),
+  baseQuery: createBaseQueryWithAuth(userApiBaseUrl, isJsonContentType),
 
   // Cache tag types for invalidation strategies
   tagTypes: ['User'],
@@ -238,6 +232,16 @@ export const userAPI = createApi({
       transformErrorResponse: processError,
       invalidatesTags: (result, error) => error ? [] : ['User']
     }),
+    getUsers: builder.query<IResponse<{ users: User[] }>, void>({
+      query: () => ({
+        url: '/list',
+        method: Http.PATCH
+      }),
+      transformResponse: processResponse<{ users: User[] }>,
+      transformErrorResponse: processError,
+      providesTags: () => ['User']
+    }),
+    
   }),
 });
 
