@@ -241,7 +241,15 @@ export const userAPI = createApi({
       transformErrorResponse: processError,
       providesTags: () => ['User']
     }),
-    
+    logout: builder.mutation<IResponse<void>, void>({
+      query: () => ({
+        url: '/logout',
+        method: Http.POST
+      }),
+      transformResponse: processResponse<void>,
+      transformErrorResponse: processError,
+      invalidatesTags: (result, error) => error ? [] : ['User']
+    }),
   }),
 });
 

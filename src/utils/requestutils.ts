@@ -1,5 +1,6 @@
 import { Key } from "../enum/catch.key";
 import { type IResponse } from "../models/IResponse";
+import { toastError, toastSuccess } from "./ToastService";
 
 export const userApiBaseUrl = 'http://localhost:8085/user';
 export const documentsApiBaseUrl = 'http://localhost:8085/documents';
@@ -12,7 +13,8 @@ export const processResponse = <T>(response: IResponse<T>, meta: any, arg: unkno
     const { request } = meta;
     if(request.url.includes('logout')) { localStorage.removeItem(Key.LOGGEDIN); }
     if(!request.url.includes('profile')) { 
-        // show toast notification for profile update
+        toastSuccess(response.message || 'Operation successful');
+       
      }
      console.log('processResponse', response);
      return response;
@@ -22,7 +24,9 @@ export const processError = (error: { status: number; data: IResponse<void>}, me
         if(error.data.code === 401 && error.data.status === 'UNAUTHORIZED' && error.data.message === 'You are not Logged in ') { 
             localStorage.setItem(Key.LOGGEDIN, 'false');  
            }
-           // Show Message to User
+        toastError(error.data.message);
         console.log({ error: error.data  });
         return error;
     };
+
+    
