@@ -1,11 +1,11 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IResponse } from '../models/IResponse';
-import { isJsonContentType, processError, processResponse, documentsApiBaseUrl } from '../utils/requestutils';
+import { isJsonContentType, processError, processResponse, documentsApiBaseUrl } from '../utils/RequestUtils';
 import type { IRegisterRequest } from '../models/ICredentials';
 import { Http } from '../enum/http.method';
 import { Document, DocumentForm, Documents, Query } from '../models/IDocument';
 import { Page } from '../models/IPage';
-import { createBaseQueryWithAuth } from './baseQueryWithAuth';
+import { createBaseQueryWithAuth } from './BaseQueryWithAuth';
 
 export const documentAPI = createApi({
   reducerPath: 'documentAPI',
@@ -32,7 +32,7 @@ export const documentAPI = createApi({
       transformErrorResponse: processError,
       invalidatesTags: (result, error) => error ? [] : ['Documents']
     }),
-    
+
     fetchDocument: builder.query<IResponse<Document>, IRegisterRequest>({
       query: (documentId) => ({
         url: `/${documentId}`,
@@ -41,9 +41,9 @@ export const documentAPI = createApi({
       //transformResponse: processResponse<Page>,
       transformErrorResponse: processError,
       providesTags: () => ['Documents']
-        }),
+    }),
 
-        updateDocument: builder.mutation<IResponse<Document>, DocumentForm>({
+    updateDocument: builder.mutation<IResponse<Document>, DocumentForm>({
       query: (documentForm: DocumentForm): { url: string; method: Http; body: DocumentForm } => ({
         url: ``,
         method: Http.PATCH,
@@ -52,9 +52,9 @@ export const documentAPI = createApi({
       transformResponse: processResponse<Document>,
       transformErrorResponse: processError,
       invalidatesTags: (result: IResponse<Document> | undefined, error: any) => error ? [] : ['Documents']
-        }),
+    }),
 
-        downloadDocument: builder.mutation<Blob, string>({
+    downloadDocument: builder.mutation<Blob, string>({
       query: (documentName: string): { url: string; method: Http; responseHandler: (response: Response) => Promise<Blob> } => ({
         url: `/download/${documentName}`,
         method: Http.GET,
@@ -63,6 +63,17 @@ export const documentAPI = createApi({
       //transformResponse: (response: Blob) => response,
       transformErrorResponse: processError,
       //invalidatesTags: (result, error) => error ? [] : ['User']
-    })
+    }),
+  
+    deleteDocument: builder.mutation<IResponse<void>, string>({
+      query: (documentId) => ({
+        url: `/delete/${documentId}`,
+        method: Http.DELETE,
+      }),
+      transformResponse: processResponse<void>,
+      transformErrorResponse: processError,
+      invalidatesTags: (result, error) => error ? [] : ['Documents']
+    }),
+    
   })
 });

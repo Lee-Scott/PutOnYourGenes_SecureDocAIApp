@@ -17,3 +17,20 @@ export interface IDocument {
     ownerEmail: string;
     ownerPhone: string;
 }
+
+export type Document = IDocument;
+
+export type DocumentForm = {
+    name: string;
+    description: string;
+};
+
+export type Documents = {
+    documents: IDocument[];
+};
+
+export type Query = {
+    page: number;
+    size: number;
+    name: string;
+};

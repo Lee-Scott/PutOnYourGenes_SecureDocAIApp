@@ -1,4 +1,5 @@
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
+import { toastSuccess } from '../../utils/ToastUtils'; // Add this import
 
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { DocumentForm } from '../../models/IDocument';
@@ -18,14 +19,18 @@ const schema = z.object({
   updatedAt: z.string().optional()  
 });
 
+
+
 const DocumentDetails = () => {
   const { documentId } = useParams();
+  const navigate = useNavigate();
   console.log('documentId:', documentId);
   const { register, handleSubmit, formState: form, getFieldState } = useForm<DocumentForm>({ resolver: zodResolver(schema), mode: 'onTouched'});
   const { data: userData } = userAPI.useFetchUserQuery();
   const { data: documentData, isLoading, error,  isSuccess } = documentAPI.useFetchDocumentQuery(documentId ?? '');
   const [updateDocument, {data: updateData, isLoading: updateLoading, error: updateError, isSuccess: updateSuccess }] = documentAPI.useUpdateDocumentMutation();
   const [downloadDocument, {data: downloadData, isLoading: downloadLoading, error: downloadError, isSuccess: downloadSuccess }] = documentAPI.useDownloadDocumentMutation();
+  const [deleteDocument, {data: deleteData, isLoading: deleteLoading, error: deleteError, isSuccess: deleteSuccess }] = documentAPI.useDeleteDocumentMutation();
 
   const isFieldValid = (fieldName: keyof DocumentForm): boolean => getFieldState(fieldName, form).isTouched && !getFieldState(fieldName, form).invalid;
 
@@ -44,6 +49,20 @@ const DocumentDetails = () => {
     document.body.removeChild(link);
     //URL.revokeObjectURL(link.href);
   };
+
+  const onDeleteDocument = async () => {
+  if (window.confirm('Are you sure you want to delete this document? This action cannot be undone.')) {
+    try {
+      await deleteDocument(documentData.data.document.documentId).unwrap();
+      // Navigate immediately and show success message
+      navigate('/documents', { replace: true });
+      toastSuccess('Document deleted successfully');
+    } catch (error) {
+      console.error('Failed to delete document:', error);
+      toastError('Failed to delete document');
+    }
+  }
+};
 
   console.log('documentData:', documentData);
 
@@ -67,8 +86,9 @@ const DocumentDetails = () => {
                         <div className="col-md-12">
                           <button type="button" onClick={() => onDownloadDocument(documentData.data.document.name)} className="btn btn-primary downloadb"><i className="bi bi-download"></i> Download</button>
                           {userData && userData.data && userData.data.user.authorities.includes('document:delete') && (
-                            <button type="button" className="btn btn-danger">
-                              <i className="bi bi-trash"></i> Delete
+                            <button type="button" onClick={onDeleteDocument} disabled={deleteLoading} className="btn btn-danger">
+                              {deleteLoading && <span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>}
+                              <i className="bi bi-trash"></i> {deleteLoading ? 'Deleting...' : 'Delete'}
                             </button>
                           )}
                         </div>

@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import './index.css'
 import App from './App.tsx'
-import { setupStore } from './store/store.ts'
+import { setupStore } from './store/Store.ts'
 import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import ReactDOM from 'react-dom/client'
@@ -24,6 +24,8 @@ import Authentication from './components/profile/Authentication.tsx'
 import NotFound from './components/NotFound.tsx'
 import DocumentDetails from './components/documents/DocumentDetails.tsx'
 import Users from './components/users/Users.tsx'
+
+// TODO: do a second one with nextJS
 
 const store = setupStore();
 const router = createBrowserRouter(createRoutesFromElements(

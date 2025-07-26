@@ -1,6 +1,6 @@
 import { Key } from "../enum/catch.key";
 import { type IResponse } from "../models/IResponse";
-import { toastError, toastSuccess } from "./ToastService";
+import { toastError, toastSuccess } from "./ToastUtils";
 
 export const userApiBaseUrl = 'http://localhost:8085/user';
 export const documentsApiBaseUrl = 'http://localhost:8085/documents';
@@ -12,12 +12,11 @@ export const isJsonContentType = (headers: Headers) =>
 export const processResponse = <T>(response: IResponse<T>, meta: any, arg: unknown): IResponse<T> => {
     const { request } = meta;
     if(request.url.includes('logout')) { localStorage.removeItem(Key.LOGGEDIN); }
-    if(!request.url.includes('profile')) { 
+    if(!request.url.includes('profile') && !request.url.includes('delete')) { 
         toastSuccess(response.message || 'Operation successful');
-       
-     }
-     console.log('processResponse', response);
-     return response;
+    }
+    console.log('processResponse', response);
+    return response;
 };
 
 export const processError = (error: { status: number; data: IResponse<void>}, meta: unknown, arg: unknown): { status: number; data: IResponse<void>} =>{
