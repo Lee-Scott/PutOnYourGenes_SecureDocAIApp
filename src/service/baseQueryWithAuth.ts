@@ -1,5 +1,5 @@
 import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { userApiBaseUrl, documentsApiBaseUrl, isJsonContentType } from '../utils/requestutils';
+
 
 // You can pass baseUrl and isJsonContentType as arguments for flexibility
 export const createBaseQueryWithAuth = (baseUrl: string, isJsonContentType: any) =>

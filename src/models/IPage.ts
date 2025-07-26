@@ -31,4 +31,12 @@ export interface IPage {
 }
 
 // API response shape for documents page
-export type Page = { documents: IPage };
+export interface Page {
+    documents: {
+        content: import('./IDocument').IDocument[];
+        number: number;
+        size: number;
+        totalElements: number;
+        totalPages: number;
+    };
+}
