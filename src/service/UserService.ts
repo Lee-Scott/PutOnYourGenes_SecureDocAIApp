@@ -48,6 +48,17 @@ export const userAPI = createApi({
       providesTags: () => ['User']
     }),
 
+    fetchUserById: builder.query<IResponse<User>, string>({
+      query: (userId) => ({
+        url: `/profile/${userId}`,
+        method: Http.GET
+      }),
+      keepUnusedDataFor: 120,
+      transformResponse: processResponse<User>,
+      transformErrorResponse: processError,
+      providesTags: () => ['User']
+    }),
+
     /**
      * Authenticates a user with credentials
      * @param {IUserRequest} credentials - User login credentials
@@ -250,8 +261,19 @@ export const userAPI = createApi({
       transformErrorResponse: processError,
       invalidatesTags: (result, error) => error ? [] : ['User']
     }),
+    deleteUser: builder.mutation<IResponse<void>, string>({
+      query: (userId) => ({
+        url: `/delete/${userId}`,
+        method: Http.DELETE
+      }),
+      transformResponse: processResponse<void>,
+      transformErrorResponse: processError,
+      invalidatesTags: (result, error) => error ? [] : ['User']
+    }),
+
   }),
 });
 
 // Export the auto-generated React hook for use in components 
 export const { useFetchUserQuery } = userAPI;
+export const { useFetchUserByIdQuery } = userAPI;
