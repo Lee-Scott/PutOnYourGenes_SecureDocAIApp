@@ -1,9 +1,12 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { userAPI } from "../../service/UserService";
 
 // TODO: User
 
 type User = {
   id: string;
+  userId: string; // Make sure this matches your backend response
   firstName: string;
   lastName: string;
   email: string;
@@ -21,9 +24,14 @@ type UsersApiResponse = {
 };
 
 const Users = () => {
+  const navigate = useNavigate();
   const { data, error, isLoading } = userAPI.useGetUsersQuery() as UsersApiResponse;
 
   console.log("Users API data:", data);
+
+  const handleUserClick = (userId: string) => {
+    navigate(`/users/${userId}`);
+  };
 
   if (isLoading) {
     return (
@@ -86,22 +94,34 @@ const Users = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {((data as any)?.data?.users ?? []).map((user: User) => (
-                      <tr key={user.id}>
+                    {data?.data?.users?.map((user: User) => (
+                      <tr 
+                        key={user.id}
+                        onClick={() => handleUserClick(user.userId)}
+                        style={{ cursor: 'pointer' }}
+                        className="user-row"
+                      >
                         <td>{user.firstName} {user.lastName}</td>
                         <td>{user.email}</td>
-                        <td>{user.phone}</td>
-                        <td>{user.role}</td>
+                        <td>{user.phone || 'N/A'}</td>
+                        <td>
+                          <span className="badge bg-secondary">{user.role}</span>
+                        </td>
                         <td>
                           <span className={`badge ${user.enabled ? 'bg-success' : 'bg-danger'}`}>
                             {user.enabled ? 'Enabled' : 'Disabled'}
                           </span>
                         </td>
                       </tr>
-                    ))}
+                    )) || []}
                   </tbody>
                 </table>
               </div>
+              {(!data?.data?.users || data.data.users.length === 0) && (
+                <div className="text-center mt-3">
+                  <p className="text-muted">No users found.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -29,9 +29,7 @@ const UserDetails = () => {
   
   const { data: currentUser } = userAPI.useFetchUserQuery();
   
-  // For now, we'll use the current user data since there's no fetchUserById endpoint yet
-  // You can add this endpoint to your UserService later
-  const { data: userData, isLoading, error, isSuccess } = userAPI.useFetchUserQuery();
+  const { data: userData, isLoading, error, isSuccess } = userAPI.useFetchUserByIdQuery(userId ?? '');
   
   const [updateUser, { isLoading: updateLoading }] = userAPI.useUpdateUserMutation();
   const [updateRole, { isLoading: roleLoading }] = userAPI.useUpdateRoleMutation();
@@ -39,6 +37,9 @@ const UserDetails = () => {
   const [toggleAccountLocked, { isLoading: lockLoading }] = userAPI.useToggleAccountLockedMutation();
   const [toggleAccountExpired, { isLoading: expiredLoading }] = userAPI.useToggleAccountExpiredMutation();
   const [toggleCredentialsExpired, { isLoading: credentialsLoading }] = userAPI.useToggleCredentialsExpiredMutation();
+  const [deleteUser, { isLoading: deleteLoading, isSuccess: deleteSuccess }] = userAPI.useDeleteUserMutation();
+
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const isFieldValid = (fieldName: keyof IRegisterRequest): boolean => 
     getFieldState(fieldName, form).isTouched && !getFieldState(fieldName, form).invalid;
@@ -104,6 +105,27 @@ const UserDetails = () => {
     }
   };
 
+  const onDeleteUser = async () => {
+    if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      if (!userId) return;
+      
+      try {
+        setIsDeleting(true);
+        await deleteUser(userId);
+      } catch (error) {
+        setIsDeleting(false);
+        console.error('Failed to delete user:', error);
+      }
+    }
+  };
+
+  // Handle navigation after successful deletion
+  useEffect(() => {
+    if (deleteSuccess) {
+      navigate('/users', { replace: true });
+    }
+  }, [deleteSuccess, navigate]);
+
   if (isLoading) {
     return <Loader />;
   }
@@ -128,9 +150,20 @@ const UserDetails = () => {
     );
   }
 
+  if (!userId) {
+    return (
+      <div className="container mtb">
+        <div className="alert alert-warning" role="alert">
+          Invalid user ID provided.
+        </div>
+      </div>
+    );
+  }
+
   const user = userData.data.user;
   const canManageUsers = currentUser?.data?.user?.authorities?.includes('user:update');
   const canManageRoles = currentUser?.data?.user?.authorities?.includes('user:role');
+  const canDeleteUsers = currentUser?.data?.user?.authorities?.includes('user:delete');
 
   return (
     <div className="container mtb">
@@ -357,6 +390,35 @@ const UserDetails = () => {
                       <option value="MANAGER">Manager</option>
                       <option value="SUPER_ADMIN">Super Admin</option>
                     </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Danger Zone - Delete User */}
+          {canDeleteUsers && (
+            <div className="card mt-4 border-danger">
+              <div className="card-body">
+                <h4 className="mb-3 text-danger">
+                  <i className="bi bi-exclamation-triangle me-2"></i>
+                  Danger Zone
+                </h4>
+                <hr />
+                <div className="row">
+                  <div className="col-md-12">
+                    <div className="alert alert-danger" role="alert">
+                      <strong>Warning!</strong> Deleting this user will permanently remove all their data and cannot be undone.
+                    </div>
+                    <button 
+                      className="btn btn-danger"
+                      onClick={onDeleteUser}
+                      disabled={deleteLoading || isDeleting}
+                    >
+                      {(deleteLoading || isDeleting) && <span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>}
+                      <i className="bi bi-trash me-2"></i>
+                      {(deleteLoading || isDeleting) ? 'Deleting User...' : 'Delete User'}
+                    </button>
                   </div>
                 </div>
               </div>
