@@ -10,8 +10,26 @@ import { createBaseQueryWithAuth } from './BaseQueryWithAuth';
 const chatRoomApiBaseUrl = 'http://localhost:8085/api/chatrooms';
 
 /**
- * Redux Toolkit Query API for chat room-related operations.
- * This service handles chat room management and messaging operations.
+ * ChatRoom API Service
+ * 
+ * RTK Query service for managing chat room operations including:
+ * - Fetching user's chat rooms
+ * - Creating new chat rooms
+ * - Retrieving specific chat room details
+ * 
+ * Features:
+ * - Automatic caching and re-fetching
+ * - Optimistic updates for better UX
+ * - Error handling and retry logic
+ * - Authentication integration
+ * 
+ * Future Enhancements:
+ * - Real-time updates via WebSocket subscriptions
+ * - Chat room member management (add/remove participants)
+ * - Chat room settings (name, description, privacy)
+ * - Message history endpoints
+ * - File sharing capabilities
+ * - Typing indicators and presence status
  */
 export const chatRoomAPI = createApi({
   // Unique identifier for this API slice in the Redux store

@@ -30,10 +30,22 @@ function NavBar() {
           <div className="collapse navbar-collapse" id="navbarTogglerDemo02">
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <NavLink to='/documents' end className="nav-link" aria-current="page">Documents</NavLink>
+                <NavLink to='/documents' end className="nav-link" aria-current="page">
+                  <i className="bi bi-file-text me-1"></i>
+                  Documents
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink to='/chat' className="nav-link">
+                  <i className="bi bi-chat-dots me-1"></i>
+                  Chat
+                </NavLink>
               </li>
               {user?.data.user.role !== 'USER' && <li className="nav-item">
-                <NavLink to='/users' end className="nav-link">Users</NavLink>
+                <NavLink to='/users' end className="nav-link">
+                  <i className="bi bi-people me-1"></i>
+                  Users
+                </NavLink>
               </li>}
             </ul>
             <div className="flex-shrink-0 dropdown">
