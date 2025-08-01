@@ -2,19 +2,15 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { userAPI } from "../service/UserService";
 import logger from 'redux-logger';
 import { documentAPI } from "../service/DocumentService";
-
-interface User {
-    id: number;
-    name: string;
-    email: string;
-}
+import { chatRoomAPI } from "../service/ChatRoomService";
 
 // Combine all reducers into a single root reducer
 // The computed property name [userAPI.reducerPath] dynamically assigns the reducer
 // to the correct path in the state tree (likely 'userAPI')
 const rootReducer = combineReducers({
     [userAPI.reducerPath]: userAPI.reducer, // set reducer to api reducer path
-    [documentAPI.reducerPath]: documentAPI.reducer 
+    [documentAPI.reducerPath]: documentAPI.reducer,
+    [chatRoomAPI.reducerPath]: chatRoomAPI.reducer
 });
 
 /**
@@ -30,6 +26,7 @@ export const setupStore = () => {
             // Add RTK Query middleware for handling API requests, caching, etc.
             .concat(userAPI.middleware)
             .concat(documentAPI.middleware)
+            .concat(chatRoomAPI.middleware)
             // Add logger middleware for debugging actions and state changes
             .concat(logger)
     })
