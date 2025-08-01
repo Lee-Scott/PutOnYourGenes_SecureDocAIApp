@@ -26,6 +26,7 @@ import NotFound from './components/NotFound.tsx'
 import DocumentDetails from './components/documents/DocumentDetails.tsx'
 import Users from './components/users/Users.tsx'
 import UserDetails from './components/users/UserDetails.tsx'
+import { ChatRooms } from './components/chat/index.ts'
 
 // TODO: do a second one with nextJS
 
@@ -43,6 +44,10 @@ const router = createBrowserRouter(createRoutesFromElements(
         <Route index path='/documents' element={<Documents />} />
         <Route path='/' element={<Navigate to={'/documents'} />} />
         <Route path='documents/:documentId' element={<DocumentDetails />} />
+        
+        {/* Chat Routes */}
+        <Route path='chat' element={<ChatRooms />} />
+        <Route path='chat/:chatRoomId' element={<ChatRooms />} />
         
         <Route element={<Restricted />} >
           <Route path='users' element={<Users />} />
