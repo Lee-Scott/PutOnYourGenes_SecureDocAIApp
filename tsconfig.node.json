@@ -10,7 +10,6 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": false,
     "moduleDetection": "force",
-    "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "noUnusedLocals": true,

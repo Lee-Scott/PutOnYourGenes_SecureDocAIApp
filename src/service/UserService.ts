@@ -109,7 +109,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<User>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
 
     verifyQrCode: builder.mutation<IResponse<User>, QrCodeRequest>({
@@ -121,7 +121,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<User>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User'] // tag is a reference to the cache in the store
+      invalidatesTags: (_result, error) => error ? [] : ['User'] // tag is a reference to the cache in the store
 
     }),
 
@@ -133,7 +133,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<void>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     doResetPassword: builder.mutation<IResponse<void>, UpdateNewPassword>({
       query: (passwordrequest) => ({
@@ -143,7 +143,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<void>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     updatePhoto: builder.mutation<IResponse<string>, FormData>({
       query: (form) => ({
@@ -153,7 +153,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<string>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     updateUser: builder.mutation<IResponse<User>, IUserRequest>({
       query: (user) => ({
@@ -163,7 +163,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<User>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
 
     /**
@@ -179,7 +179,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<User>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     updatePassword: builder.mutation<IResponse<void>, UpdatePassword>({
       query: (request) => ({
@@ -193,7 +193,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<void>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     toggleAccountExpired: builder.mutation<IResponse<void>, void>({
       query: () => ({
@@ -202,7 +202,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<void>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     toggleAccountLocked: builder.mutation<IResponse<void>, void>({
       query: () => ({
@@ -211,7 +211,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<void>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     toggleAccountEnabled: builder.mutation<IResponse<void>, void>({
       query: () => ({
@@ -220,7 +220,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<void>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     toggleCredentialsExpired: builder.mutation<IResponse<void>, void>({
       query: () => ({
@@ -229,7 +229,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<void>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     updateRole: builder.mutation<IResponse<void>, Role>({
       query: (role) => ({
@@ -239,7 +239,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<void>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     enableMfa: builder.mutation<IResponse<User>, void>({
       query: () => ({
@@ -248,7 +248,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<User>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     disableMfa: builder.mutation<IResponse<User>, void>({
       query: () => ({
@@ -257,7 +257,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<User>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     getUsers: builder.query<IResponse<{ users: User[] }>, void>({
       query: () => ({
@@ -275,7 +275,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<void>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     deleteUser: builder.mutation<IResponse<void>, string>({
       query: (userId) => ({
@@ -284,7 +284,7 @@ export const userAPI = createApi({
       }),
       transformResponse: processResponse<void>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['User']
+      invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
 
   }),
