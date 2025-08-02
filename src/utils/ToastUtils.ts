@@ -1,5 +1,6 @@
-import { ToastOptions, toast } from "react-toastify";
-// TODO: switch the theme with th persons theam 
+import type { ToastOptions } from "react-toastify";
+import { toast } from "react-toastify";
+// TODO: switch the theme with the persons theme
 const toastConfig: ToastOptions = {
     position: 'top-right',
     autoClose: 1500,

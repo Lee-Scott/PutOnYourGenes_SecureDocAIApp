@@ -1,11 +1,34 @@
 import { useEffect, useRef } from 'react';
 import { IChatRoom } from '../../models/IChatRoom';
 
+// Message interface based on backend response
+interface IMessage {
+  id: number;
+  messageId: string;
+  chatRoomId: string;
+  sender: {
+    id: number;
+    userId: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    bio: string;
+    imageUrl: string;
+    role: string;
+    authorities: string;
+  };
+  content: string;
+  messageType: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
 interface MessageAreaProps {
   chatRoom: IChatRoom;
   currentUserId: string;
   isLoading?: boolean;
-  messages?: any[]; // Future: will be replaced with actual message interface
+  messages?: IMessage[];
 }
 
 const MessageArea = ({ chatRoom, currentUserId, isLoading = false, messages = [] }: MessageAreaProps) => {
@@ -123,7 +146,7 @@ const MessageArea = ({ chatRoom, currentUserId, isLoading = false, messages = []
     );
   }
 
-  // Future: Message list rendering (when messages are implemented)
+  // Message list rendering
   return (
     <div 
       ref={scrollContainerRef}
@@ -134,17 +157,76 @@ const MessageArea = ({ chatRoom, currentUserId, isLoading = false, messages = []
         maxHeight: '500px'
       }}
     >
-      {/* Future message rendering will go here */}
       <div className="d-flex flex-column gap-3">
-        {/* Placeholder for actual messages */}
-        {messages.map((_, index) => (
-          <div key={index} className="message-placeholder">
-            {/* Future: Individual message components will be rendered here */}
-            <div className="alert alert-info">
-              Message {index + 1} placeholder
+        {messages.map((message) => {
+          const isOwnMessage = message.sender.userId === currentUserId;
+          const messageDate = new Date(message.createdAt);
+          
+          return (
+            <div
+              key={message.id}
+              className={`d-flex ${isOwnMessage ? 'justify-content-end' : 'justify-content-start'}`}
+            >
+              <div className="d-flex align-items-end gap-2" style={{ maxWidth: '70%' }}>
+                {/* Avatar for other user's messages */}
+                {!isOwnMessage && (
+                  <img
+                    src={message.sender.imageUrl || 'https://via.placeholder.com/32'}
+                    alt={`${message.sender.firstName} ${message.sender.lastName}`}
+                    className="rounded-circle"
+                    style={{ width: '32px', height: '32px', objectFit: 'cover' }}
+                  />
+                )}
+                
+                {/* Message bubble */}
+                <div
+                  className={`p-3 rounded-3 position-relative ${
+                    isOwnMessage
+                      ? 'bg-primary text-white'
+                      : 'bg-light text-dark border'
+                  }`}
+                  style={{ wordBreak: 'break-word' }}
+                >
+                  {/* Sender name for other user's messages */}
+                  {!isOwnMessage && (
+                    <div className="fw-bold mb-1 text-primary small">
+                      {message.sender.firstName} {message.sender.lastName}
+                    </div>
+                  )}
+                  
+                  {/* Message content */}
+                  <div className="mb-1">
+                    {message.content}
+                  </div>
+                  
+                  {/* Timestamp and read status */}
+                  <div
+                    className={`small d-flex align-items-center justify-content-end gap-1 ${
+                      isOwnMessage ? 'text-white-50' : 'text-muted'
+                    }`}
+                    style={{ fontSize: '0.75rem' }}
+                  >
+                    <span>
+                      {messageDate.toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </span>
+                    {isOwnMessage && (
+                      <span>
+                        {message.isRead ? (
+                          <i className="bi bi-check2-all" title="Read"></i>
+                        ) : (
+                          <i className="bi bi-check2" title="Sent"></i>
+                        )}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Auto-scroll anchor */}

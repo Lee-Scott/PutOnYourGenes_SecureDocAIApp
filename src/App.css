@@ -340,3 +340,21 @@ input:read-only:focus {
   height: 32px;
   width: 32px;
 }
+
+.login-center {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+html, body, #root {
+  
+  margin: 0;
+  padding: 0;
+}
+body, #root {
+  display: flex;
+  flex-direction: column;
+  
+}

@@ -1,8 +1,7 @@
 import { StrictMode } from 'react'
-<<<<<<< HEAD
 import './index.css'
 import App from './App.tsx'
-import { setupStore } from './store/Store.ts'
+import { setupStore } from './store/store.ts'
 import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import ReactDOM from 'react-dom/client'
@@ -12,10 +11,8 @@ import Register from './components/Register.tsx'
 import ResetPassword from './components/ResetPassword.tsx'
 import VerifyAccount from './components/VerifyAccount.tsx'
 import VerifyPassword from './components/VerifyPassword.tsx'
-
-
 import ProtectedRoute from './components/ProtectedRoute.tsx'
-import Login from './components/Login.tsx'
+import Login from './components/login.tsx'
 import Restricted from './components/Restricted.tsx'
 import User from './components/profile/User.tsx'
 import Profile from './components/profile/Profile.tsx'
@@ -29,15 +26,13 @@ import Users from './components/users/Users.tsx'
 import UserDetails from './components/users/UserDetails.tsx'
 import { ChatRooms } from './components/chat/index.ts'
 
-// TODO: do a second one with nextJS
-
 const store = setupStore();
 const router = createBrowserRouter(createRoutesFromElements(
   <Route path='/' element={<App />}>
     <Route path='login' element={<Login />} />
     <Route path='register' element={<Register />} />
     <Route path='resetpassword' element={<ResetPassword />} />
-    <Route path='user/verify' element={<VerifyAccount />} />  {/* Changed from 'verify/account' */}
+    <Route path='user/verify' element={<VerifyAccount />} />
     <Route path='verify/password' element={<VerifyPassword />} />
 
     <Route element={<ProtectedRoute />} >
@@ -45,16 +40,13 @@ const router = createBrowserRouter(createRoutesFromElements(
         <Route index path='/documents' element={<Documents />} />
         <Route path='/' element={<Navigate to={'/documents'} />} />
         <Route path='documents/:documentId' element={<DocumentDetails />} />
-        
         {/* Chat Routes */}
         <Route path='chat' element={<ChatRooms />} />
         <Route path='chat/:chatRoomId' element={<ChatRooms />} />
-        
         <Route element={<Restricted />} >
           <Route path='users' element={<Users />} />
           <Route path='users/:userId' element={<UserDetails />} />
         </Route>
-
         <Route path='profile/:userId' element={<UserDetails />} />
         <Route path='/user' element={<User />} >
           <Route path='/user' element={<Navigate to='/user/profile' />} />
@@ -70,9 +62,7 @@ const router = createBrowserRouter(createRoutesFromElements(
   </Route>
 ));
 
-// Fix: Use createRoot instead of ReactDOM.createRoot
 const root = ReactDOM.createRoot(document.getElementById('root')!);
-
 root.render(
   <StrictMode>
     <Provider store={store}>
@@ -80,14 +70,3 @@ root.render(
     </Provider>
   </StrictMode>
 )
-=======
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
-
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
->>>>>>> 1aa504e (Initial commit)

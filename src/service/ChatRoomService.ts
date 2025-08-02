@@ -6,6 +6,29 @@ import type { IChatRoomRequest } from '../models/IChatRoomRequest';
 import { Http } from '../enum/http.method';
 import { createBaseQueryWithAuth } from './BaseQueryWithAuth';
 
+// Message interface based on your backend response
+interface IMessage {
+  id: number;
+  messageId: string;
+  chatRoomId: string;
+  sender: {
+    id: number;
+    userId: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    bio: string;
+    imageUrl: string;
+    role: string;
+    authorities: string;
+  };
+  content: string;
+  messageType: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
 // Chat room API base URL
 const chatRoomApiBaseUrl = 'http://localhost:8085/api/chatrooms';
 
@@ -39,7 +62,7 @@ export const chatRoomAPI = createApi({
   baseQuery: createBaseQueryWithAuth(chatRoomApiBaseUrl, isJsonContentType),
 
   // Cache tag types for invalidation strategies
-  tagTypes: ['ChatRoom', 'ChatRoomList'],
+  tagTypes: ['ChatRoom', 'ChatRoomList', 'Messages'],
 
   // Define the API endpoints
   endpoints: (builder) => ({
@@ -80,7 +103,7 @@ export const chatRoomAPI = createApi({
       // Cache configuration: keep data for 1 minute when not in use
       keepUnusedDataFor: 60,
 
-      // Response handling
+      // Response handling - backend now returns proper wrapped response
       transformResponse: processResponse<{ chatRooms: IChatRoom[] }>,
       transformErrorResponse: processError,
 
@@ -106,7 +129,7 @@ export const chatRoomAPI = createApi({
       // Cache configuration: keep data for 5 minutes when not in use
       keepUnusedDataFor: 300,
 
-      // Response handling
+      // Response handling - backend now returns proper wrapped response
       transformResponse: processResponse<{ chatRoom: IChatRoom }>,
       transformErrorResponse: processError,
 
@@ -136,6 +159,63 @@ export const chatRoomAPI = createApi({
       // Invalidate cache to refresh data after creation
       invalidatesTags: (_, error) => 
         error ? [] : ['ChatRoomList', { type: 'ChatRoomList', id: 'LIST' }]
+    }),
+
+    /**
+     * Fetches messages for a specific chat room
+     * @param {string} chatRoomId - The ID of the chat room to fetch messages for
+     * @returns {IMessage[]} Array of chat messages
+     */
+    getChatMessages: builder.query<IMessage[], string>({
+      // Request configuration
+      query: (chatRoomId) => ({
+        url: `/${chatRoomId}/messages`,
+        method: Http.GET
+      }),
+
+      // Cache configuration: keep data for 2 minutes when not in use
+      keepUnusedDataFor: 120,
+
+      // Response handling - backend now returns wrapped response with data.messages
+      transformResponse: (response: IResponse<{ messages: IMessage[] }>) => {
+        return response.data.messages;
+      },
+      transformErrorResponse: processError,
+
+      // Cache tag association for automatic invalidation
+      providesTags: (_, __, chatRoomId) => [
+        { type: 'Messages', id: chatRoomId },
+        'Messages'
+      ]
+    }),
+
+    /**
+     * Sends a message to a specific chat room
+     * @param {object} params - Object containing chatRoomId and message data
+     * @returns {IResponse<{ message: IMessage }>} Response containing the sent message
+     */
+    sendMessage: builder.mutation<IResponse<{ message: IMessage }>, { 
+      chatRoomId: string; 
+      content: string; 
+      messageType?: string; 
+    }>({
+      // Request configuration
+      query: ({ chatRoomId, content, messageType = 'TEXT' }) => ({
+        url: `/${chatRoomId}/messages`,
+        method: Http.POST,
+        body: { content, messageType }
+      }),
+
+      // Response handling
+      transformResponse: processResponse<{ message: IMessage }>,
+      transformErrorResponse: processError,
+
+      // Invalidate messages cache to refresh the message list after sending
+      invalidatesTags: (_, error, { chatRoomId }) => 
+        error ? [] : [
+          { type: 'Messages', id: chatRoomId },
+          'Messages'
+        ]
     })
   })
 });
@@ -145,7 +225,9 @@ export const {
   useGetChatRoomsQuery,
   useGetChatRoomsByUserIdQuery,
   useGetChatRoomByIdQuery,
-  useCreateChatRoomMutation
+  useCreateChatRoomMutation,
+  useGetChatMessagesQuery,
+  useSendMessageMutation
 } = chatRoomAPI;
 
 // Export the API for store configuration
