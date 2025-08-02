@@ -165,6 +165,22 @@ export const userAPI = createApi({
       transformErrorResponse: processError,
       invalidatesTags: (result, error) => error ? [] : ['User']
     }),
+
+    /**
+     * Updates a specific user by ID (admin function)
+     * @param {object} params - Object containing userId and user data
+     * @returns {IResponse<User>} Response containing updated user data
+     */
+    updateUserByAdmin: builder.mutation<IResponse<User>, { userId: string; userData: IUserRequest }>({
+      query: ({ userId, userData }) => ({
+        url: `/update/${userId}`,
+        method: Http.PATCH,
+        body: userData
+      }),
+      transformResponse: processResponse<User>,
+      transformErrorResponse: processError,
+      invalidatesTags: (result, error) => error ? [] : ['User']
+    }),
     updatePassword: builder.mutation<IResponse<void>, UpdatePassword>({
       query: (request) => ({
         url: `/updatePassword`,
@@ -277,3 +293,4 @@ export const userAPI = createApi({
 // Export the auto-generated React hook for use in components 
 export const { useFetchUserQuery } = userAPI;
 export const { useFetchUserByIdQuery } = userAPI;
+export const { useUpdateUserByAdminMutation } = userAPI;

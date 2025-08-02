@@ -31,7 +31,7 @@ const UserDetails = () => {
   
   const { data: userData, isLoading, error, isSuccess } = userAPI.useFetchUserByIdQuery(userId ?? '');
   
-  const [updateUser, { isLoading: updateLoading }] = userAPI.useUpdateUserMutation();
+  const [updateUser, { isLoading: updateLoading }] = userAPI.useUpdateUserByAdminMutation();
   const [updateRole, { isLoading: roleLoading }] = userAPI.useUpdateRoleMutation();
   const [toggleAccountEnabled, { isLoading: enableLoading }] = userAPI.useToggleAccountEnabledMutation();
   const [toggleAccountLocked, { isLoading: lockLoading }] = userAPI.useToggleAccountLockedMutation();
@@ -59,9 +59,15 @@ const UserDetails = () => {
 
   const onUpdateUser: SubmitHandler<IRegisterRequest> = async (formData) => {
     try {
-      await updateUser(formData);
+      if (!userId) {
+        console.error('No userId provided');
+        return;
+      }
+      await updateUser({ userId, userData: formData });
+      toastSuccess('User updated successfully');
     } catch (error) {
       console.error('Failed to update user:', error);
+      toastError('Failed to update user');
     }
   };
 

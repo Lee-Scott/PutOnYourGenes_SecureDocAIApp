@@ -1,4 +1,4 @@
-import { IChatRoom, IChatUser } from '../../models/IChatRoom';
+import type { IChatRoom, IChatUser } from '../../models/IChatRoom';
 
 interface ChatHeaderProps {
   chatRoom: IChatRoom;

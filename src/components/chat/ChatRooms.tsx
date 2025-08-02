@@ -37,16 +37,54 @@ const ChatRooms = () => {
   // RTK Query hooks for data fetching
   const { data: currentUser, isLoading: userLoading } = userAPI.useFetchUserQuery();
   
+  // Send message mutation
+  const [sendMessage, { isLoading: sendingMessage }] = chatRoomAPI.useSendMessageMutation();
+  
+  // Debug logging to help troubleshoot
+  console.log('ChatRooms Debug:', {
+    chatRoomId,
+    selectedChatRoomId,
+    currentUserId: currentUser?.data?.user?.userId
+  });
+  
   // Fetch selected chat room data (conditionally based on selection)
   const { 
     data: selectedChatRoom, 
-    isLoading: chatRoomLoading 
+    isLoading: chatRoomLoading,
+    error: chatRoomError 
   } = chatRoomAPI.useGetChatRoomByIdQuery(
     selectedChatRoomId || '', 
     {
       skip: !selectedChatRoomId // Optimize API calls - only fetch when needed
     }
   );
+
+  // Debug logging for chat room fetch
+  console.log('Chat Room API Debug:', {
+    selectedChatRoom,
+    chatRoomLoading,
+    chatRoomError,
+    selectedChatRoomId
+  });
+
+  // Fetch messages for the selected chat room
+  const { 
+    data: messages, 
+    isLoading: messagesLoading,
+    error: messagesError 
+  } = chatRoomAPI.useGetChatMessagesQuery(
+    selectedChatRoomId || '', 
+    {
+      skip: !selectedChatRoomId // Only fetch when a chat room is selected
+    }
+  );
+
+  // Debug logging for messages fetch
+  console.log('Messages API Debug:', {
+    messages,
+    messagesLoading,
+    messagesError
+  });
 
   /**
    * Handle chat room selection from sidebar
@@ -67,27 +105,31 @@ const ChatRooms = () => {
   };
 
   /**
-   * Handle sending a message (FUTURE IMPLEMENTATION)
+   * Handle sending a message
    * 
-   * This function is a placeholder for WebSocket integration.
-   * When WebSocket is implemented, this will:
-   * 1. Emit message to WebSocket server
-   * 2. Optimistically update local message state
-   * 3. Handle delivery confirmation and error states
-   * 4. Support file attachments and media messages
+   * Sends the message to the backend and automatically refreshes the message list
    * 
    * @param message - The message content to send
    */
-  const handleSendMessage = (message: string) => {
-    console.log('Message to send:', message);
-    // TODO: Implement actual message sending when backend is ready
-    // Example WebSocket implementation:
-    // websocketService.sendMessage({
-    //   chatRoomId: selectedChatRoomId,
-    //   content: message,
-    //   senderId: currentUser.data.user.userId,
-    //   timestamp: new Date().toISOString()
-    // });
+  const handleSendMessage = async (message: string) => {
+    if (!selectedChatRoomId || !message.trim()) {
+      return;
+    }
+
+    try {
+      console.log('Sending message:', { chatRoomId: selectedChatRoomId, content: message });
+      
+      await sendMessage({
+        chatRoomId: selectedChatRoomId,
+        content: message.trim(),
+        messageType: 'TEXT'
+      }).unwrap();
+      
+      console.log('Message sent successfully!');
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      // TODO: Show error toast to user
+    }
   };
 
   // Loading state for user
@@ -179,12 +221,25 @@ const ChatRooms = () => {
 
                 {/* Chat Messages Area */}
                 <div className="card-body d-flex flex-column" style={{ height: '500px' }}>
-                  {selectedChatRoom?.data?.chatRoom ? (
+                  {messagesError ? (
+                    <div className="flex-grow-1 d-flex justify-content-center align-items-center">
+                      <div className="text-center text-muted">
+                        <i className="bi bi-exclamation-triangle text-warning" style={{ fontSize: '3rem' }}></i>
+                        <p className="mt-2">Error loading chat room</p>
+                        <small className="text-muted">
+                          {chatRoomError && 'data' in chatRoomError 
+                            ? `Error: ${(chatRoomError as any).data?.message || 'Unknown error'}`
+                            : 'Failed to load chat room data'
+                          }
+                        </small>
+                      </div>
+                    </div>
+                  ) : selectedChatRoom?.data?.chatRoom ? (
                     <MessageArea
                       chatRoom={selectedChatRoom.data.chatRoom}
                       currentUserId={currentUser.data.user.userId}
-                      isLoading={false}
-                      messages={[]}
+                      isLoading={messagesLoading}
+                      messages={messages || []}
                     />
                   ) : (
                     <div className="flex-grow-1 d-flex justify-content-center align-items-center">
@@ -198,8 +253,8 @@ const ChatRooms = () => {
                   {/* Message Input Area */}
                   <MessageInput 
                     onSendMessage={handleSendMessage}
-                    disabled={true}
-                    placeholder="Type your message..."
+                    disabled={!selectedChatRoom?.data?.chatRoom?.isActive || messagesLoading || sendingMessage}
+                    placeholder={sendingMessage ? "Sending..." : "Type your message..."}
                   />
                 </div>
               </>

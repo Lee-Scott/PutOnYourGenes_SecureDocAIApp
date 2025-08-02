@@ -105,11 +105,14 @@ const CreateChatModal = ({ isOpen, onClose }: CreateChatModalProps) => {
       };
 
       const result = await createChatRoom(chatRoomRequest).unwrap();
-      
-      if (result?.data?.chatRoom) {
-        // Navigate to the new chat room
-        navigate(`/chat/${result.data.chatRoom.chatRoomId}`);
+      // Defensive: check both chatRoomId and chatRoom existence
+      const chatRoomId = result?.data?.chatRoom?.chatRoomId;
+      if (chatRoomId) {
+        navigate(`/chat/${chatRoomId}`);
         onClose();
+      } else {
+        // Optionally show error/toast if chatRoomId is missing
+        console.error('Chat room creation succeeded but no chatRoomId returned:', result);
       }
     } catch (error) {
       console.error('Failed to create chat room:', error);
