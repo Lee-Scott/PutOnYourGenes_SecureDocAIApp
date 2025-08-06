@@ -25,6 +25,12 @@ import DocumentDetails from './components/documents/DocumentDetails.tsx'
 import Users from './components/users/Users.tsx'
 import UserDetails from './components/users/UserDetails.tsx'
 import { ChatRooms } from './components/chat/index.ts'
+import { 
+  Questionnaires, 
+  QuestionnaireDetails, 
+  QuestionnaireForm, 
+  QuestionnaireResults 
+} from './components/questionnaire/index.ts'
 
 const store = setupStore();
 const router = createBrowserRouter(createRoutesFromElements(
@@ -43,6 +49,13 @@ const router = createBrowserRouter(createRoutesFromElements(
         {/* Chat Routes */}
         <Route path='chat' element={<ChatRooms />} />
         <Route path='chat/:chatRoomId' element={<ChatRooms />} />
+        
+        {/* Questionnaire Routes */}
+        <Route path='questionnaires' element={<Questionnaires />} />
+        <Route path='questionnaires/:id' element={<QuestionnaireDetails />} />
+        <Route path='questionnaires/:id/form' element={<QuestionnaireForm />} />
+        <Route path='questionnaires/results' element={<QuestionnaireResults />} />
+        
         <Route element={<Restricted />} >
           <Route path='users' element={<Users />} />
           <Route path='users/:userId' element={<UserDetails />} />

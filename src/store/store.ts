@@ -3,6 +3,7 @@ import { userAPI } from "../service/UserService";
 import logger from 'redux-logger';
 import { documentAPI } from "../service/DocumentService";
 import { chatRoomAPI } from "../service/ChatRoomService";
+import { questionnaireAPI } from "../service/QuestionnaireService";
 
 // Combine all reducers into a single root reducer
 // The computed property name [userAPI.reducerPath] dynamically assigns the reducer
@@ -10,7 +11,8 @@ import { chatRoomAPI } from "../service/ChatRoomService";
 const rootReducer = combineReducers({
     [userAPI.reducerPath]: userAPI.reducer, // set reducer to api reducer path
     [documentAPI.reducerPath]: documentAPI.reducer,
-    [chatRoomAPI.reducerPath]: chatRoomAPI.reducer
+    [chatRoomAPI.reducerPath]: chatRoomAPI.reducer,
+    [questionnaireAPI.reducerPath]: questionnaireAPI.reducer
 });
 
 /**
@@ -27,6 +29,7 @@ export const setupStore = () => {
             .concat(userAPI.middleware)
             .concat(documentAPI.middleware)
             .concat(chatRoomAPI.middleware)
+            .concat(questionnaireAPI.middleware)
             // Add logger middleware for debugging actions and state changes
             .concat(logger)
     })
