@@ -47,6 +47,12 @@ function NavBar() {
                   Users
                 </NavLink>
               </li>}
+              <li className="nav-item">
+                <NavLink to='/questionnaires' end className="nav-link">
+                  <i className="bi bi-clipboard-check me-1"></i>
+                  Questionnaires
+                </NavLink>
+              </li>
             </ul>
             <div className="flex-shrink-0 dropdown">
               <a className="d-block link-body-emphasis text-decoration-none dropdown-toggle profile-dropdown" style={{cursor: 'pointer'}}
