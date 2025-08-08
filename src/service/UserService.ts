@@ -287,10 +287,23 @@ export const userAPI = createApi({
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
 
+    getHealthcareProviders: builder.query<IResponse<User[]>, void>({
+      query: () => ({
+        url: '/healthcare-providers',
+        method: Http.GET
+      }),
+      transformResponse: processResponse<User[]>,
+      transformErrorResponse: processError,
+      providesTags: () => ['User']
+    }),
+
   }),
 });
 
 // Export the auto-generated React hook for use in components 
-export const { useFetchUserQuery } = userAPI;
-export const { useFetchUserByIdQuery } = userAPI;
-export const { useUpdateUserByAdminMutation } = userAPI;
+export const { 
+  useFetchUserQuery,
+  useFetchUserByIdQuery,
+  useUpdateUserByAdminMutation,
+  useGetHealthcareProvidersQuery 
+} = userAPI;

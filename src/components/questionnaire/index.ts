@@ -6,6 +6,7 @@ export { default as QuestionPage } from './QuestionPage';
 export { default as QuestionItem } from './QuestionItem';
 export { default as ProgressIndicator } from './ProgressIndicator';
 export { default as QuestionnaireResults } from './QuestionnaireResults';
+export { default as QuestionnaireBuilder } from './QuestionnaireBuilder';
 
 // Re-export types for convenience
 export type { IQuestionnaire, IQuestionnaireRequest, IQuestionnaireList } from '../../models/IQuestionnaire';

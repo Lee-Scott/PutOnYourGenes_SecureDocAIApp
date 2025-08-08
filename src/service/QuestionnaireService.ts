@@ -20,7 +20,10 @@ const transformQuestionnaireListResponse = (response: any): IResponse<IQuestionn
     status: response.status,
     data: response.data, // Backend already returns the correct structure
     message: response.message,
-    timestamp: response.time
+    timeStamp: response.time,
+    time: response.time,
+    code: response.code ?? 200,
+    path: response.path ?? '',
   };
 };
 
@@ -49,7 +52,10 @@ const transformQuestionnaireResponse = (response: any): IResponse<IQuestionnaire
     status: response.status,
     data: transformedQuestionnaire,
     message: response.message,
-    timestamp: response.time
+    timeStamp: response.time,
+    time: response.time,
+    code: response.code ?? 200,
+    path: response.path ?? '',
   };
 };
 
@@ -58,7 +64,10 @@ const transformQuestionnaireResponseData = (response: any): IResponse<IQuestionn
     status: response.status,
     data: response.data.response,
     message: response.message,
-    timestamp: response.time
+    timeStamp: response.time,
+    time: response.time,
+    code: response.code ?? 200,
+    path: response.path ?? '',
   };
 };
 
@@ -67,7 +76,10 @@ const transformQuestionnaireResponseListData = (response: any): IResponse<IQuest
     status: response.status,
     data: response.data.responses,
     message: response.message,
-    timestamp: response.time
+    timeStamp: response.time,
+    time: response.time,
+    code: response.code ?? 200,
+    path: response.path ?? '',
   };
 };
 
@@ -76,7 +88,10 @@ const transformAnalyticsResponse = (response: any): IResponse<IQuestionnaireAnal
     status: response.status,
     data: response.data.analytics,
     message: response.message,
-    timestamp: response.time
+    timeStamp: response.time,
+    time: response.time,
+    code: response.code ?? 200,
+    path: response.path ?? '',
   };
 };
 

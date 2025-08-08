@@ -1,0 +1,206 @@
+/* Admin Questionnaire Builder Styles */
+.questionnaire-builder-container {
+  max-width: 900px;
+  margin: 40px auto 0 auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 2.5rem 2rem 2rem 2rem;
+  border: 1px solid #e9ecef;
+}
+
+.questionnaire-builder-container h2 {
+  text-align: center;
+  color: #1976d2;
+  font-weight: 700;
+  margin-bottom: 2rem;
+}
+
+.questionnaire-builder-container form > div,
+.questionnaire-builder-container .page-section {
+  margin-bottom: 1.5rem;
+}
+
+/* Ensure all labels in the builder have proper contrast */
+.questionnaire-builder-container label {
+  background: #fff !important;
+  color: #222 !important;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  display: block;
+  padding: 0.25rem;
+  border-radius: 4px;
+}
+
+/* Fix specific styling for page and question labels */
+.questionnaire-builder-container .page-content > div > label,
+.questionnaire-builder-container .question-section > div > label {
+  background: #fff !important;
+  color: #222 !important;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.questionnaire-builder-container .question-section div label {
+  background: #fff !important;
+  color: #222 !important;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+/* Force all builder inputs and labels to have proper visibility */
+.questionnaire-builder-container input[type="text"],
+.questionnaire-builder-container input[type="number"],
+.questionnaire-builder-container textarea,
+.questionnaire-builder-container select {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  border: 1.5px solid #e0e3e7;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  background: #fff !important;
+  color: #222 !important;
+  transition: border-color 0.2s;
+}
+
+.questionnaire-builder-container input:focus,
+.questionnaire-builder-container textarea:focus,
+.questionnaire-builder-container select:focus {
+  border-color: #1976d2;
+  outline: none;
+}
+
+.questionnaire-builder-container input[type="checkbox"] {
+  width: auto;
+  margin-left: 0.5rem;
+}
+
+.questionnaire-builder-container .page-section {
+  background: #f6fafd;
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  margin-bottom: 2rem;
+  border: 1px solid #e3e8ee;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.04);
+}
+
+.questionnaire-builder-container .page-content h3 {
+  color: #1976d2;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.questionnaire-builder-container .question-section {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem 0.75rem 0.75rem 0.75rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid #e0e3e7;
+  box-shadow: 0 1px 4px rgba(25, 118, 210, 0.03);
+}
+
+.questionnaire-builder-container .question-section h4 {
+  background: #fff !important;
+  color: #222 !important;
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+/* Additional overrides for text visibility in builder */
+.questionnaire-builder-container .question-section div {
+  background: transparent !important;
+}
+
+.questionnaire-builder-container .question-section input[type="text"],
+.questionnaire-builder-container .question-section input[type="checkbox"],
+.questionnaire-builder-container .question-section select,
+.questionnaire-builder-container .question-section textarea {
+  background: #fff !important;
+  color: #222 !important;
+}
+
+.questionnaire-builder-container .options-section {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.questionnaire-builder-container .options-section label {
+  background: #fff !important;
+  color: #222 !important;
+  font-size: 0.98rem;
+  font-weight: 500;
+  padding: 0.25rem;
+  border-radius: 4px;
+}
+
+.questionnaire-builder-container .options-section input[type="text"] {
+  width: 70%;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.questionnaire-builder-container button {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.45rem 1.1rem;
+  font-size: 0.98rem;
+  font-weight: 500;
+  margin-right: 0.5rem;
+  margin-top: 0.2rem;
+  transition: background 0.18s, box-shadow 0.18s;
+  box-shadow: 0 1px 4px rgba(25, 118, 210, 0.08);
+  cursor: pointer;
+}
+
+.questionnaire-builder-container button[type="button"] {
+  background: #e3e8ee;
+  color: #1976d2;
+  border: 1px solid #b6c2d2;
+  margin-bottom: 0.2rem;
+}
+
+.questionnaire-builder-container button[type="button"]:hover {
+  background: #d0e2ff;
+  color: #0d47a1;
+}
+
+.questionnaire-builder-container button[type="submit"] {
+  background: #1976d2;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  margin-top: 1rem;
+  width: 100%;
+  padding: 0.7rem 0;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+}
+
+.questionnaire-builder-container button[type="submit"]:hover {
+  background: #1565c0;
+}
+
+.questionnaire-builder-container .message {
+  margin-top: 1.2rem;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  background: #e3f2fd;
+  color: #1976d2;
+  font-weight: 500;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(25, 118, 210, 0.06);
+}

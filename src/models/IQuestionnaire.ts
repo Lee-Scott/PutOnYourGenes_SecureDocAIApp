@@ -37,6 +37,8 @@ export interface IQuestionnaireList {
   totalCount: number;
   currentPage: number;
   totalPages: number;
+  timeStamp?: string;
+  
 }
 
 /**

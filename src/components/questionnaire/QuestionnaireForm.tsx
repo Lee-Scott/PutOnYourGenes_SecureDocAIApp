@@ -4,6 +4,7 @@ import { useGetQuestionnaireByIdQuery, useSubmitQuestionnaireResponseMutation } 
 import QuestionPage from './QuestionPage';
 import ProgressIndicator from './ProgressIndicator';
 import type { IQuestionResponseRequest } from '../../models/IQuestionnaireResponse';
+import { toastSuccess, toastError, toastWarning } from '../../utils/ToastUtils';
 
 /**
  * QuestionnaireForm Component
@@ -22,6 +23,7 @@ const QuestionnaireForm: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [responses, setResponses] = useState<Map<string, IQuestionResponseRequest>>(new Map());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
 
   const { 
     data: questionnaire, 
@@ -35,10 +37,33 @@ const QuestionnaireForm: React.FC = () => {
     setResponses(prev => new Map(prev.set(questionId, response)));
   }, []);
 
-  const handleNextPage = () => {
-    if (questionnaire && currentPage < questionnaire.data.pages.length - 1) {
-      setCurrentPage(prev => prev + 1);
+  // Validate if current page has all required questions answered
+  const validateCurrentPage = (): boolean => {
+    if (!questionnaire) return false;
+    
+    const currentPageData = questionnaire.data.pages[currentPage];
+    const requiredQuestions = currentPageData.questions.filter(q => q.isRequired);
+    
+    for (const question of requiredQuestions) {
+      const response = responses.get(question.id);
+      if (!response || response.isSkipped || !response.answerValue || response.answerValue.toString().trim() === '') {
+        return false;
+      }
     }
+    
+    return true;
+  };
+
+  const handleNextPage = () => {
+    if (!questionnaire || currentPage >= questionnaire.data.pages.length - 1) return;
+    
+    // Validate current page before proceeding
+    if (!validateCurrentPage()) {
+      toastWarning('Please answer all required questions before proceeding to the next page.');
+      return;
+    }
+    
+    setCurrentPage(prev => prev + 1);
   };
 
   const handlePreviousPage = () => {
@@ -50,6 +75,12 @@ const QuestionnaireForm: React.FC = () => {
   const handleSubmit = async () => {
     if (!questionnaire || !id) return;
 
+    // Final validation before submission
+    if (!validateCurrentPage()) {
+      toastWarning('Please answer all required questions before submitting.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const responseData = {
@@ -59,9 +90,11 @@ const QuestionnaireForm: React.FC = () => {
       };
 
       await submitResponse(responseData).unwrap();
+      toastSuccess('Questionnaire submitted successfully!');
       navigate('/questionnaires/results');
     } catch (error) {
       console.error('Failed to submit questionnaire:', error);
+      toastError('Failed to submit questionnaire. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -70,6 +103,7 @@ const QuestionnaireForm: React.FC = () => {
   const handleSaveDraft = async () => {
     if (!questionnaire || !id) return;
 
+    setIsSavingDraft(true);
     try {
       const responseData = {
         questionnaireId: id,
@@ -78,9 +112,12 @@ const QuestionnaireForm: React.FC = () => {
       };
 
       await submitResponse(responseData).unwrap();
-      // TODO: Show success message
+      toastSuccess('Draft saved successfully!');
     } catch (error) {
       console.error('Failed to save draft:', error);
+      toastError('Failed to save draft. Please try again.');
+    } finally {
+      setIsSavingDraft(false);
     }
   };
 
@@ -146,8 +183,9 @@ const QuestionnaireForm: React.FC = () => {
         <button 
           className="btn btn-outline save-draft-btn"
           onClick={handleSaveDraft}
+          disabled={isSavingDraft}
         >
-          Save Draft
+          {isSavingDraft ? 'Saving...' : 'Save Draft'}
         </button>
       </div>
     </div>
