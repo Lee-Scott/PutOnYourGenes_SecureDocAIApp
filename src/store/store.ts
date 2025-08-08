@@ -1,4 +1,5 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import type { Reducer } from "redux";
 import { userAPI } from "../service/UserService";
 import logger from 'redux-logger';
 import { documentAPI } from "../service/DocumentService";
@@ -13,7 +14,7 @@ const rootReducer = combineReducers({
     [documentAPI.reducerPath]: documentAPI.reducer,
     [chatRoomAPI.reducerPath]: chatRoomAPI.reducer,
     [questionnaireAPI.reducerPath]: questionnaireAPI.reducer
-});
+}) as unknown as Reducer;
 
 /**
  * Creates and configures the Redux store

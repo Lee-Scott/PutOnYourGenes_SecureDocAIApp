@@ -29,7 +29,8 @@ import {
   Questionnaires, 
   QuestionnaireDetails, 
   QuestionnaireForm, 
-  QuestionnaireResults 
+  QuestionnaireResults, 
+  QuestionnaireBuilder 
 } from './components/questionnaire/index.ts'
 
 const store = setupStore();
@@ -52,6 +53,7 @@ const router = createBrowserRouter(createRoutesFromElements(
         
         {/* Questionnaire Routes */}
         <Route path='questionnaires' element={<Questionnaires />} />
+        <Route path='questionnaires/builder' element={<QuestionnaireBuilder />} />
         <Route path='questionnaires/:id' element={<QuestionnaireDetails />} />
         <Route path='questionnaires/:id/form' element={<QuestionnaireForm />} />
         <Route path='questionnaires/results' element={<QuestionnaireResults />} />

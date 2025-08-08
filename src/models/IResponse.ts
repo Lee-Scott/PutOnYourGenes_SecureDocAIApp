@@ -5,4 +5,5 @@ export interface IResponse<T> {
     status: string; // enum in backend
     message: string;
     data: T; // replaced with actual type
+    timeStamp?: string;
 }
