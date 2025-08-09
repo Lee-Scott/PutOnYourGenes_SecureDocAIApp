@@ -52,7 +52,7 @@ describe('ResetPassword', () => {
     );
 
     fireEvent.input(screen.getByLabelText(/Email address/i), { target: { value: 'test@example.com' } });
-    fireEvent.click(screen.getByRole('button', { name: /Reset Password/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Reset/i }));
 
     await waitFor(() => {
       expect(resetPasswordFn).toHaveBeenCalledWith({

@@ -94,16 +94,16 @@ const QuestionnaireBuilder: React.FC = () => {
       <h2>Create New Questionnaire</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Title:</label>
-          <input value={title} onChange={e => setTitle(e.target.value)} required style={{ background: '#fff', color: '#222' }} />
+          <label htmlFor="title">Title:</label>
+          <input id="title" value={title} onChange={e => setTitle(e.target.value)} required style={{ background: '#fff', color: '#222' }} />
         </div>
         <div>
-          <label>Description:</label>
-          <textarea value={description} onChange={e => setDescription(e.target.value)} required style={{ background: '#fff', color: '#222' }} />
+          <label htmlFor="description">Description:</label>
+          <textarea id="description" value={description} onChange={e => setDescription(e.target.value)} required style={{ background: '#fff', color: '#222' }} />
         </div>
         <div>
-          <label>Category:</label>
-          <select value={category} onChange={e => setCategory(e.target.value)} required style={{ background: '#fff', color: '#222' }}>
+          <label htmlFor="category">Category:</label>
+          <select id="category" value={category} onChange={e => setCategory(e.target.value)} required style={{ background: '#fff', color: '#222' }}>
             <option value="HEALTHCARE">Healthcare</option>
             <option value="EDUCATION">Education</option>
             <option value="BUSINESS">Business</option>
@@ -113,12 +113,12 @@ const QuestionnaireBuilder: React.FC = () => {
           </select>
         </div>
         <div>
-          <label>Estimated Time (minutes):</label>
-          <input type="number" value={estimatedTimeMinutes} onChange={e => setEstimatedTimeMinutes(Number(e.target.value))} min={1} required style={{ background: '#fff', color: '#222' }} />
+          <label htmlFor="estimatedTime">Estimated Time (minutes):</label>
+          <input id="estimatedTime" type="number" value={estimatedTimeMinutes} onChange={e => setEstimatedTimeMinutes(Number(e.target.value))} min={1} required style={{ background: '#fff', color: '#222' }} />
         </div>
         <div>
-          <label>Active:</label>
-          <input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} />
+          <label htmlFor="isActive">Active:</label>
+          <input id="isActive" type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} />
         </div>
         <hr />
         {pages.map((page, pageIdx) => (
@@ -127,12 +127,12 @@ const QuestionnaireBuilder: React.FC = () => {
               <h3>Page {pageIdx + 1}</h3>
               <button type="button" onClick={() => removePage(pageIdx)} disabled={pages.length === 1}>Remove Page</button>
               <div>
-                <label>Page Title:</label>
-                <input value={page.title} onChange={e => handlePageChange(pageIdx, 'title', e.target.value)} required style={{ background: '#fff', color: '#222' }} />
+                <label htmlFor={`page-title-${pageIdx}`}>Page Title:</label>
+                <input id={`page-title-${pageIdx}`} value={page.title} onChange={e => handlePageChange(pageIdx, 'title', e.target.value)} required style={{ background: '#fff', color: '#222' }} />
               </div>
               <div>
-                <label>Page Description:</label>
-                <input value={page.description} onChange={e => handlePageChange(pageIdx, 'description', e.target.value)} required style={{ background: '#fff', color: '#222' }} />
+                <label htmlFor={`page-description-${pageIdx}`}>Page Description:</label>
+                <input id={`page-description-${pageIdx}`} value={page.description} onChange={e => handlePageChange(pageIdx, 'description', e.target.value)} required style={{ background: '#fff', color: '#222' }} />
               </div>
               <div>
                 <label>Questions:</label>
@@ -141,22 +141,22 @@ const QuestionnaireBuilder: React.FC = () => {
                     <h4>Question {qIdx + 1}</h4>
                     <button type="button" onClick={() => removeQuestion(pageIdx, qIdx)} disabled={page.questions.length === 1}>Remove Question</button>
                     <div>
-                      <label>Text:</label>
-                      <input value={q.questionText} onChange={e => handleQuestionChange(pageIdx, qIdx, 'questionText', e.target.value)} required style={{ background: '#fff', color: '#222' }} />
+                      <label htmlFor={`question-text-${pageIdx}-${qIdx}`}>Text:</label>
+                      <input id={`question-text-${pageIdx}-${qIdx}`} value={q.questionText} onChange={e => handleQuestionChange(pageIdx, qIdx, 'questionText', e.target.value)} required style={{ background: '#fff', color: '#222' }} />
                     </div>
                     <div>
-                      <label>Type:</label>
-                      <select value={q.questionType} onChange={e => handleQuestionChange(pageIdx, qIdx, 'questionType', e.target.value as QuestionType)} style={{ background: '#fff', color: '#222' }}>
+                      <label htmlFor={`question-type-${pageIdx}-${qIdx}`}>Type:</label>
+                      <select id={`question-type-${pageIdx}-${qIdx}`} value={q.questionType} onChange={e => handleQuestionChange(pageIdx, qIdx, 'questionType', e.target.value as QuestionType)} style={{ background: '#fff', color: '#222' }}>
                         {QUESTION_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label>Required:</label>
-                      <input type="checkbox" checked={q.isRequired} onChange={e => handleQuestionChange(pageIdx, qIdx, 'isRequired', e.target.checked)} />
+                      <label htmlFor={`question-required-${pageIdx}-${qIdx}`}>Required:</label>
+                      <input id={`question-required-${pageIdx}-${qIdx}`} type="checkbox" checked={q.isRequired} onChange={e => handleQuestionChange(pageIdx, qIdx, 'isRequired', e.target.checked)} />
                     </div>
                     <div>
-                      <label>Help Text:</label>
-                      <input value={q.helpText} onChange={e => handleQuestionChange(pageIdx, qIdx, 'helpText', e.target.value)} style={{ background: '#fff', color: '#222' }} />
+                      <label htmlFor={`question-help-${pageIdx}-${qIdx}`}>Help Text:</label>
+                      <input id={`question-help-${pageIdx}-${qIdx}`} value={q.helpText} onChange={e => handleQuestionChange(pageIdx, qIdx, 'helpText', e.target.value)} style={{ background: '#fff', color: '#222' }} />
                     </div>
                     {/* Options for SINGLE_CHOICE and MULTIPLE_CHOICE */}
                     {(q.questionType === 'SINGLE_CHOICE' || q.questionType === 'MULTIPLE_CHOICE') && (
