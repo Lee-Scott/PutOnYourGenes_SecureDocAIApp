@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGetQuestionnairesQuery } from '../../service/QuestionnaireService';
+import { useGetQuestionnairesQuery, useGetUserResponsesQuery } from '../../service/QuestionnaireService';
 import './Questionnaire.css';
 
 /**
@@ -14,11 +14,22 @@ import './Questionnaire.css';
  */
 const Questionnaires: React.FC = () => {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('available');
+
   const { 
     data: response, 
-    isLoading, 
-    error 
+    isLoading: isLoadingQuestionnaires, 
+    error: errorQuestionnaires 
   } = useGetQuestionnairesQuery({ page: 0, size: 10 });
+
+  const {
+    data: userResponses,
+    isLoading: isLoadingUserResponses,
+    error: errorUserResponses,
+  } = useGetUserResponsesQuery();
+
+  const isLoading = isLoadingQuestionnaires || isLoadingUserResponses;
+  const error = errorQuestionnaires || errorUserResponses;
 
   if (isLoading) {
     return (
@@ -54,6 +65,61 @@ const Questionnaires: React.FC = () => {
     navigate(`/questionnaires/${questionnaireId}/form`);
   };
 
+  const handleViewResults = (responseId: string) => {
+    navigate(`/questionnaires/results/${responseId}`);
+  };
+
+  const renderAvailableQuestionnaires = () => (
+    <div className="questionnaire-grid">
+      {questionnaires.map((questionnaire) => (
+        <div key={questionnaire.id} className="questionnaire-card">
+          <div className="questionnaire-card-header">
+            <div className="questionnaire-category">{questionnaire.category}</div>
+            <h3 className="questionnaire-title">{questionnaire.title}</h3>
+          </div>
+          <p className="questionnaire-description">{questionnaire.description}</p>
+          <div className="questionnaire-meta">
+            <div className="questionnaire-info">
+              <span><i className="bi bi-clock"></i> {questionnaire.estimatedTimeMinutes} min</span>
+              <span><i className="bi bi-question-circle"></i> {questionnaire.totalQuestions} questions</span>
+            </div>
+            <div className="questionnaire-actions">
+              <button className="btn-questionnaire btn-outline" onClick={() => handleStartQuestionnaire(questionnaire.id)}>
+                <i className="bi bi-info-circle me-1"></i> View Details
+              </button>
+              <button className="btn-questionnaire" onClick={() => handleViewForm(questionnaire.id)} disabled={!questionnaire.isActive}>
+                <i className="bi bi-play-fill me-1"></i> Start
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderCompletedQuestionnaires = () => (
+    <div className="questionnaire-grid">
+      {userResponses?.data?.map((response) => {
+        const questionnaire = questionnaires.find(q => q.id === response.questionnaireId);
+        return (
+          <div key={response.id} className="questionnaire-card">
+            <div className="questionnaire-card-header">
+              <h3 className="questionnaire-title">{questionnaire ? questionnaire.title : 'Completed Questionnaire'}</h3>
+            </div>
+            <p className="questionnaire-description">
+              Completed on: {response.completedAt ? new Date(response.completedAt).toLocaleDateString() : 'N/A'}
+            </p>
+            <div className="questionnaire-actions">
+              <button className="btn-questionnaire" onClick={() => handleViewResults(response.id)}>
+                <i className="bi bi-eye-fill me-1"></i> View Results
+              </button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
   return (
     <div className="questionnaire-container">
       <div className="questionnaire-header">
@@ -64,63 +130,18 @@ const Questionnaires: React.FC = () => {
         <p>Complete your health assessments to help us provide better care</p>
       </div>
 
+      <div className="questionnaire-tabs">
+        <button className={`tab-button ${activeTab === 'available' ? 'active' : ''}`} onClick={() => setActiveTab('available')}>
+          Available
+        </button>
+        <button className={`tab-button ${activeTab === 'completed' ? 'active' : ''}`} onClick={() => setActiveTab('completed')}>
+          Completed
+        </button>
+      </div>
+
       <div className="questionnaires-content">
-        {questionnaires.length > 0 ? (
-          <div className="questionnaire-grid">
-            {questionnaires.map((questionnaire) => (
-              <div key={questionnaire.id} className="questionnaire-card">
-                <div className="questionnaire-card-header">
-                  <div className="questionnaire-category">
-                    {questionnaire.category}
-                  </div>
-                  <h3 className="questionnaire-title">
-                    {questionnaire.title}
-                  </h3>
-                </div>
-
-                <p className="questionnaire-description">
-                  {questionnaire.description}
-                </p>
-
-                <div className="questionnaire-meta">
-                  <div className="questionnaire-info">
-                    <span>
-                      <i className="bi bi-clock"></i>
-                      {questionnaire.estimatedTimeMinutes} min
-                    </span>
-                    <span>
-                      <i className="bi bi-question-circle"></i>
-                      {questionnaire.totalQuestions} questions
-                    </span>
-                  </div>
-                  
-                  <div className="questionnaire-actions">
-                    <button 
-                      className="btn-questionnaire btn-outline"
-                      onClick={() => handleStartQuestionnaire(questionnaire.id)}
-                    >
-                      <i className="bi bi-info-circle me-1"></i>
-                      View Details
-                    </button>
-                    <button 
-                      className="btn-questionnaire"
-                      onClick={() => handleViewForm(questionnaire.id)}
-                      disabled={!questionnaire.isActive}
-                    >
-                      <i className="bi bi-play-fill me-1"></i>
-                      Start
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="error-container">
-            <i className="bi bi-inbox" style={{ fontSize: '2rem', color: '#6c757d', marginBottom: '1rem' }}></i>
-            <p>No questionnaires available at this time.</p>
-          </div>
-        )}
+        {activeTab === 'available' && (questionnaires.length > 0 ? renderAvailableQuestionnaires() : <p>No questionnaires available at this time.</p>)}
+        {activeTab === 'completed' && (userResponses?.data && userResponses.data.length > 0 ? renderCompletedQuestionnaires() : <p>No completed questionnaires.</p>)}
       </div>
     </div>
   );

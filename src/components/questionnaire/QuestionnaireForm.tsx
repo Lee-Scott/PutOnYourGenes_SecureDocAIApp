@@ -46,12 +46,30 @@ const QuestionnaireForm: React.FC = () => {
     
     for (const question of requiredQuestions) {
       const response = responses.get(question.id);
-      if (!response || response.isSkipped || !response.answerValue || response.answerValue.toString().trim() === '') {
+      if (!response || response.isSkipped || response.answerValue == null || (typeof response.answerValue === 'string' && response.answerValue.trim() === '')) {
         return false;
       }
     }
     
     return true;
+  };
+
+  const validateAllPages = (): { isValid: boolean; firstInvalidPage?: number } => {
+    if (!questionnaire) return { isValid: false };
+
+    for (let i = 0; i < questionnaire.data.pages.length; i++) {
+      const page = questionnaire.data.pages[i];
+      const requiredQuestions = page.questions.filter(q => q.isRequired);
+
+      for (const question of requiredQuestions) {
+        const response = responses.get(question.id);
+        if (!response || response.isSkipped || response.answerValue == null || (typeof response.answerValue === 'string' && response.answerValue.trim() === '')) {
+          return { isValid: false, firstInvalidPage: i };
+        }
+      }
+    }
+
+    return { isValid: true };
   };
 
   const handleNextPage = () => {
@@ -76,16 +94,25 @@ const QuestionnaireForm: React.FC = () => {
     if (!questionnaire || !id) return;
 
     // Final validation before submission
-    if (!validateCurrentPage()) {
+    const { isValid, firstInvalidPage } = validateAllPages();
+    if (!isValid) {
       toastWarning('Please answer all required questions before submitting.');
+      if (firstInvalidPage !== undefined) {
+        setCurrentPage(firstInvalidPage);
+      }
       return;
     }
 
     setIsSubmitting(true);
     try {
+      const formattedResponses = Array.from(responses.values()).map(r => ({
+        ...r,
+        answerValue: Array.isArray(r.answerValue) ? r.answerValue.join(', ') : r.answerValue,
+      }));
+
       const responseData = {
         questionnaireId: id,
-        responses: Array.from(responses.values()),
+        responses: formattedResponses,
         isCompleted: true
       };
 

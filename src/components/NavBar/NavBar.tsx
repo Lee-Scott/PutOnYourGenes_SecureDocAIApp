@@ -1,8 +1,8 @@
 import React from 'react'
-import { userAPI } from '../service/UserService'
+import { userAPI } from '../../service/UserService'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import logo from '../assets/logo.png'
-import { Key } from '../enum/catch.key';
+import logo from '../../assets/logo.png'
+import { Key } from '../../enum/catch.key';
 
 //TODO: user refetch
 function NavBar() {

@@ -2,11 +2,11 @@ import { Link, Navigate, useLocation } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Key } from '../enum/catch.key';
-import type { IUserRequest } from '../models/ICredentials';
-import type { IResponse } from '../models/IResponse';
-import type { QrCodeRequest } from '../models/IUser';
-import { userAPI } from '../service/UserService';
+import { Key } from '../../enum/catch.key';
+import type { IUserRequest } from '../../models/ICredentials';
+import type { IResponse } from '../../models/IResponse';
+import type { QrCodeRequest } from '../../models/IUser';
+import { userAPI } from '../../service/UserService';
 
 
 
@@ -199,6 +199,7 @@ const Login = () => {
                             ${qrCodeForm.errors[`qrCode${i}` as keyof QrCodeRequest] ? 'is-invalid' : ''}
                             ${isQrCodeFieldValid(`qrCode${i}` as keyof QrCodeRequest) ? 'is-valid' : ''}`}
                           id={`qrCode${i}`}
+                          data-testid={`qrCode${i}`}
                           maxLength={1}
                           required
                           autoFocus={i === 1}
@@ -310,6 +311,7 @@ const Login = () => {
                         autoComplete="on"
                         className={`form-control ${form.errors.password ? 'is-invalid' : ''} 
                           ${isFieldValid('password') ? 'is-valid' : ''}`}
+                        id="password"
                         placeholder="Password"
                         required
                       />
