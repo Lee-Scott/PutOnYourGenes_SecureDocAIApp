@@ -32,7 +32,7 @@ const UserDetails = () => {
   const { data: userData, isLoading, error, isSuccess } = userAPI.useFetchUserByIdQuery(userId ?? '');
   
   const [updateUser, { isLoading: updateLoading }] = userAPI.useUpdateUserByAdminMutation();
-  const [updateRole, { isLoading: roleLoading }] = userAPI.useUpdateRoleMutation();
+  const [updateRole, { isLoading: roleLoading }] = userAPI.useUpdateRoleByAdminMutation();
   const [toggleAccountEnabled, { isLoading: enableLoading }] = userAPI.useToggleAccountEnabledMutation();
   const [toggleAccountLocked, { isLoading: lockLoading }] = userAPI.useToggleAccountLockedMutation();
   const [toggleAccountExpired, { isLoading: expiredLoading }] = userAPI.useToggleAccountExpiredMutation();
@@ -73,9 +73,14 @@ const UserDetails = () => {
 
   const onUpdateRole = async (newRole: string) => {
     try {
-      await updateRole({ role: newRole });
+      if (!userId) {
+        toastError('User ID is not available.');
+        return;
+      }
+      await updateRole({ userId, role: newRole });
     } catch (error) {
       console.error('Failed to update role:', error);
+      toastError('Failed to update user role');
     }
   };
 
@@ -168,7 +173,7 @@ const UserDetails = () => {
 
   const user = userData.data.user;
   const canManageUsers = currentUser?.data?.user?.authorities?.includes('user:update');
-  const canManageRoles = currentUser?.data?.user?.authorities?.includes('user:role');
+  const canManageRoles = currentUser?.data?.user?.authorities?.includes('user:update') || currentUser?.data?.user?.role === 'SUPER_ADMIN';
   const canDeleteUsers = currentUser?.data?.user?.authorities?.includes('user:delete');
 
   return (
@@ -392,9 +397,10 @@ const UserDetails = () => {
                       disabled={roleLoading}
                     >
                       <option value="USER">User</option>
-                      <option value="ADMIN">Admin</option>
                       <option value="MANAGER">Manager</option>
                       <option value="SUPER_ADMIN">Super Admin</option>
+                      <option value="AI_AGENT">AI Agent</option>
+                      <option value="DOCTOR">Doctor</option>
                     </select>
                   </div>
                 </div>

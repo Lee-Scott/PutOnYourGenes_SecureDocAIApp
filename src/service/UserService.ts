@@ -181,6 +181,16 @@ export const userAPI = createApi({
       transformErrorResponse: processError,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
+    updateRoleByAdmin: builder.mutation<IResponse<void>, { userId: string; role: string }>({
+      query: ({ userId, role }) => ({
+        url: `/updateRole/${userId}`,
+        method: Http.PATCH,
+        body: { role }
+      }),
+      transformResponse: processResponse<void>,
+      transformErrorResponse: processError,
+      invalidatesTags: (_result, error) => error ? [] : ['User']
+    }),
     updatePassword: builder.mutation<IResponse<void>, UpdatePassword>({
       query: (request) => ({
         url: `/updatePassword`,
@@ -226,16 +236,6 @@ export const userAPI = createApi({
       query: () => ({
         url: `/toggleCredentialsExpired`,
         method: Http.PATCH
-      }),
-      transformResponse: processResponse<void>,
-      transformErrorResponse: processError,
-      invalidatesTags: (_result, error) => error ? [] : ['User']
-    }),
-    updateRole: builder.mutation<IResponse<void>, Role>({
-      query: (role) => ({
-        url: `/updateRole`,
-        method: Http.PATCH,
-        body: role
       }),
       transformResponse: processResponse<void>,
       transformErrorResponse: processError,
@@ -301,9 +301,11 @@ export const userAPI = createApi({
 });
 
 // Export the auto-generated React hook for use in components 
-export const { 
+export const {
   useFetchUserQuery,
   useFetchUserByIdQuery,
   useUpdateUserByAdminMutation,
-  useGetHealthcareProvidersQuery 
+  useGetHealthcareProvidersQuery,
+  useGetUsersQuery,
+  useUpdateRoleByAdminMutation
 } = userAPI;

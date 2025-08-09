@@ -5,14 +5,14 @@ import { setupStore } from './store/store.ts'
 import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import ReactDOM from 'react-dom/client'
-import NavBar from './components/NavBar.tsx'
+import NavBar from './components/NavBar/NavBar.tsx'
 import Documents from './components/documents/Documents.tsx'
 import Register from './components/Register.tsx'
 import ResetPassword from './components/ResetPassword.tsx'
 import VerifyAccount from './components/VerifyAccount.tsx'
 import VerifyPassword from './components/VerifyPassword.tsx'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
-import Login from './components/login.tsx'
+import Login from './components/login/login.tsx'
 import Restricted from './components/Restricted.tsx'
 import User from './components/profile/User.tsx'
 import Profile from './components/profile/Profile.tsx'
@@ -56,7 +56,7 @@ const router = createBrowserRouter(createRoutesFromElements(
         <Route path='questionnaires/builder' element={<QuestionnaireBuilder />} />
         <Route path='questionnaires/:id' element={<QuestionnaireDetails />} />
         <Route path='questionnaires/:id/form' element={<QuestionnaireForm />} />
-        <Route path='questionnaires/results' element={<QuestionnaireResults />} />
+        <Route path='questionnaires/results/:responseId' element={<QuestionnaireResults />} />
         
         <Route element={<Restricted />} >
           <Route path='users' element={<Users />} />

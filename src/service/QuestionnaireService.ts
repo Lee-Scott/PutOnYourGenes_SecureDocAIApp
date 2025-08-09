@@ -301,6 +301,16 @@ export const questionnaireAPI = createApi({
         { type: 'Questionnaire', id: questionnaireId },
         'QuestionnaireList'
       ]
+    }),
+
+    deleteQuestionnaireResponse: builder.mutation<IResponse<void>, string>({
+      query: (responseId) => ({
+        url: `/${responseId}`,
+        method: Http.DELETE
+      }),
+      transformResponse: processResponse<void>,
+      transformErrorResponse: processError,
+      invalidatesTags: ['QuestionnaireResponse']
     })
   })
 });
@@ -316,7 +326,8 @@ export const {
   useGetUserResponsesQuery,
   useGetQuestionnaireResponseQuery,
   useGetQuestionnaireAnalyticsQuery,
-  useDeleteQuestionnaireMutation
+  useDeleteQuestionnaireMutation,
+  useDeleteQuestionnaireResponseMutation
 } = questionnaireAPI;
 
 // Export the API for store configuration

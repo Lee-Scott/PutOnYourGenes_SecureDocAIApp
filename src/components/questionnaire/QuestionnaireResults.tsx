@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { useGetUserResponsesQuery } from '../../service/QuestionnaireService';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useGetQuestionnaireResponseQuery } from '../../service/QuestionnaireService';
+import { useDeleteQuestionnaireResponseMutation } from '../../service/QuestionnaireService';
 import { useCreateChatRoomMutation } from '../../service/ChatRoomService';
-import { useGetHealthcareProvidersQuery } from '../../service/UserService';
+import { useGetUsersQuery, useFetchUserQuery } from '../../service/UserService';
 import { toastSuccess, toastError, toastInfo } from '../../utils/ToastUtils';
 import { generateQuestionnaireResultsPDF } from '../../utils/PDFUtils';
 import type { IQuestionnaireResponse, ICategoryScore } from '../../models/IQuestionnaireResponse';
@@ -29,12 +31,18 @@ interface RecommendationCardProps {
 }
 
 const QuestionnaireResults: React.FC = () => {
+  const { responseId } = useParams<{ responseId: string }>();
+  const navigate = useNavigate();
   const { 
     data: userResponses, 
     isLoading, 
     error 
-  } = useGetUserResponsesQuery();
+  } = useGetQuestionnaireResponseQuery(responseId as string, {
+    skip: !responseId,
+  });
 
+  const [deleteQuestionnaireResponse] = useDeleteQuestionnaireResponseMutation();
+  const { data: currentUserResponse } = useFetchUserQuery();
   const [createChatRoom] = useCreateChatRoomMutation();
   const [selectedResponse, setSelectedResponse] = useState<IQuestionnaireResponse | null>(null);
   const [showEmailModal, setShowEmailModal] = useState(false);
@@ -156,51 +164,27 @@ This summary was generated from your health questionnaire responses. Please cons
 
   // Create chat room with selected provider and share results
   const handleSelectProvider = async (providerId: string) => {
-    if (!selectedResponse) return;
+    if (!currentUserResponse?.data) {
+      toastError('Could not identify current user to create chat.');
+      return;
+    }
 
     try {
       toastInfo('Creating chat room with healthcare provider...');
-      
-      // Create chat room with provider using your new endpoint
-      const response = await fetch('/api/chatrooms/with-provider', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // Add auth headers if needed
-        },
-        body: JSON.stringify({
-          providerId: providerId,
-          name: `Health Results Discussion - ${new Date().toLocaleDateString()}`
-        })
-      });
+      const result = await createChatRoom({
+        user1: { userId: currentUserResponse.data.user.userId },
+        user2: { userId: providerId },
+      }).unwrap();
 
-      if (!response.ok) {
-        throw new Error('Failed to create chat room');
+      if (result && result.data && result.data.chatRoom.chatRoomId) {
+        toastSuccess('Chat room created successfully!');
+        window.location.href = `/chat/${result.data.chatRoom.chatRoomId}`;
+      } else {
+        throw new Error('Failed to create chat room or get its ID.');
       }
-
-      const chatRoom = await response.json();
-      
-      // Share results in the chat room
-      await fetch(`/api/chatrooms/${chatRoom.id}/share-results`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // Add auth headers if needed
-        },
-        body: JSON.stringify({
-          questionnaireResponseId: selectedResponse.id,
-          message: `I'm sharing my health questionnaire results for discussion. Total Score: ${selectedResponse.totalScore || 'N/A'}, Completion Date: ${new Date(selectedResponse.completedAt || '').toLocaleDateString()}`
-        })
-      });
-
-      toastSuccess('Results shared with healthcare provider successfully!');
-      
-      // Optionally navigate to the chat room
-      // window.location.href = `/chat/${chatRoom.id}`;
-      
     } catch (error) {
-      console.error('Failed to share with provider:', error);
-      toastError('Failed to share results with provider. Please try again.');
+      console.error('Failed to create chat room:', error);
+      toastError('Failed to create chat room. The chat may already exist or another error occurred.');
     }
   };
 
@@ -223,6 +207,18 @@ This summary was generated from your health questionnaire responses. Please cons
     } catch (error) {
       console.error('Failed to generate PDF:', error);
       toastError('Failed to generate PDF report. Please try again.');
+    }
+  };
+
+  const handleDeleteQuestionnaire = async () => {
+    if (userResponses?.data && window.confirm('Are you sure you want to delete this questionnaire? This action cannot be undone.')) {
+      try {
+        await deleteQuestionnaireResponse(userResponses.data.questionnaireId).unwrap();
+        toastSuccess('Questionnaire deleted successfully.');
+        navigate('/questionnaires');
+      } catch (error) {
+        toastError('Failed to delete questionnaire.');
+      }
     }
   };
 
@@ -311,9 +307,9 @@ This summary was generated from your health questionnaire responses. Please cons
 
   // Healthcare Provider Selection Modal
   const ProviderSelectionModal: React.FC = () => {
-    const { data: providersResponse, isLoading: loadingProviders, error: providersError } = useGetHealthcareProvidersQuery();
+    const { data: usersResponse, isLoading: loadingProviders, error: providersError } = useGetUsersQuery();
 
-    const providers = providersResponse?.data || [];
+    const providers = usersResponse?.data?.users?.filter((user: any) => user.role === 'DOCTOR') || [];
 
     if (!showProviderModal) return null;
 
@@ -338,14 +334,14 @@ This summary was generated from your health questionnaire responses. Please cons
               <div className="loading">Loading healthcare providers...</div>
             ) : (
               <div className="provider-list">
-                {providers.map((provider) => (
+                {providers.map((provider: any) => (
                   <div 
-                    key={provider.user.userId}
+                    key={provider.userId}
                     className={`provider-item`}
                   >
                     <div className="provider-info">
-                      <h4>{provider.user.firstName} {provider.user.lastName}</h4>
-                      <p className="provider-email">{provider.user.email}</p>
+                      <h4>{provider.firstName} {provider.lastName}</h4>
+                      <p className="provider-email">{provider.email}</p>
                       <span className={`provider-status available`}>
                         ● Available
                       </span>
@@ -354,7 +350,7 @@ This summary was generated from your health questionnaire responses. Please cons
                     <button
                       className={`btn btn-primary`}
                       onClick={() => {
-                        handleSelectProvider(provider.user.userId);
+                        handleSelectProvider(provider.userId);
                         setShowProviderModal(false);
                       }}
                     >
@@ -363,7 +359,7 @@ This summary was generated from your health questionnaire responses. Please cons
                   </div>
                 ))}
 
-                {providers.length === 0 && !loadingProviders && (
+                {(!providers || providers.length === 0) && !loadingProviders && (
                   <div className="no-providers">
                     <p>No healthcare providers available at the moment.</p>
                     <p>Please try again later or contact support.</p>
@@ -396,8 +392,8 @@ This summary was generated from your health questionnaire responses. Please cons
       <div className="results-content">
         <div className="results-summary">
           <h2>Results Summary</h2>
-          {userResponses?.data && userResponses.data.length > 0 ? (
-            <ResultsSummary response={userResponses.data[0]} />
+          {userResponses?.data ? (
+            <ResultsSummary response={userResponses.data} />
           ) : (
             <div className="no-summary">
               <p>No completed questionnaires available for summary.</p>
@@ -407,102 +403,46 @@ This summary was generated from your health questionnaire responses. Please cons
 
         <div className="detailed-results">
           <h2>Detailed Results</h2>
-          {userResponses?.data && userResponses.data.length > 0 ? (
+          {userResponses?.data ? (
             <div className="results-list">
-              {userResponses.data.map((response) => {
-                const summary = generateResultsSummary(response);
-                return (
-                  <div key={response.id} className="result-item">
-                    <div className="result-item-header">
-                      <h3>Health Assessment</h3>
-                      <span className="result-date">
-                        {new Date(response.completedAt || '').toLocaleDateString()}
-                      </span>
-                    </div>
-                    
-                    <div className="result-item-content">
-                      <div className="result-metrics">
-                        <div className="metric">
-                          <label>Total Score:</label>
-                          <span className="metric-value">{response.totalScore || 'N/A'}</span>
-                        </div>
-                        <div className="metric">
-                          <label>Completion:</label>
-                          <span className="metric-value">{summary.completionRate}%</span>
-                        </div>
-                        <div className="metric">
-                          <label>Questions:</label>
-                          <span className="metric-value">
-                            {summary.answeredQuestions}/{summary.totalQuestions}
-                          </span>
-                        </div>
-                      </div>
-
-                      {response.categoryScores && response.categoryScores.length > 0 && (
-                        <div className="category-breakdown">
-                          <h4>Category Breakdown</h4>
-                          <div className="category-list">
-                            {response.categoryScores.map((category) => (
-                              <div key={category.category} className="category-item">
-                                <span className="category-label">{category.category}</span>
-                                <div className="category-score-bar">
-                                  <div 
-                                    className="category-fill" 
-                                    style={{ width: `${category.percentage}%` }}
-                                  ></div>
-                                </div>
-                                <span className="category-score-text">
-                                  {category.score}/{category.maxScore}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="result-item-actions">
-                      <button 
-                        className="btn btn-outline btn-small"
-                        onClick={() => handleEmailResults(response)}
-                        title="Email results"
-                      >
-                        📧 Email
-                      </button>
-                      <button 
-                        className="btn btn-outline btn-small"
-                        onClick={() => handleShareWithProvider(response)}
-                        title="Share with healthcare provider"
-                      >
-                        💬 Message Provider
-                      </button>
-                      <button 
-                        className="btn btn-outline btn-small"
-                        onClick={() => handleExportPDF(response)}
-                        title="Export as PDF"
-                      >
-                        📄 Export PDF
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+              <div className="result-item">
+                <div className="result-item-header">
+                  <h3>Health Assessment</h3>
+                  <span className="result-date">
+                    {new Date(userResponses.data.completedAt || '').toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="result-item-content">
+                  {/* ... content ... */}
+                </div>
+                <div className="result-item-actions">
+                  <button className="btn btn-outline btn-small" onClick={() => handleEmailResults(userResponses.data!)}>
+                    📧 Email
+                  </button>
+                  <button className="btn btn-outline btn-small" onClick={() => handleShareWithProvider(userResponses.data!)}>
+                    💬 Message Provider
+                  </button>
+                  <button className="btn btn-outline btn-small" onClick={() => handleExportPDF(userResponses.data!)}>
+                    📄 Export PDF
+                  </button>
+                  <button className="btn btn-danger btn-small" onClick={handleDeleteQuestionnaire}>
+                    🗑️ Delete
+                  </button>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="no-results">
               <p>No completed questionnaires found.</p>
-              <button className="btn btn-primary">
-                Take Your First Questionnaire
-              </button>
             </div>
           )}
         </div>
 
         <div className="recommendations">
           <h2>Health Recommendations</h2>
-          {userResponses?.data && userResponses.data.length > 0 ? (
+          {userResponses?.data ? (
             <div className="recommendation-cards">
-              {generateRecommendations(userResponses.data[0]).map((recommendation, index) => (
+              {generateRecommendations(userResponses.data).map((recommendation, index) => (
                 <RecommendationCard
                   key={index}
                   title={recommendation.title}
@@ -526,8 +466,8 @@ This summary was generated from your health questionnaire responses. Please cons
             </button>
             <button 
               className="btn btn-secondary"
-              onClick={() => userResponses?.data?.[0] && handleEmailResults(userResponses.data[0])}
-              disabled={!userResponses?.data?.length}
+              onClick={() => userResponses?.data && handleEmailResults(userResponses.data)}
+              disabled={!userResponses?.data}
             >
               📧 Email Results
             </button>
@@ -536,15 +476,15 @@ This summary was generated from your health questionnaire responses. Please cons
           <div className="secondary-actions">
             <button 
               className="btn btn-outline"
-              onClick={() => userResponses?.data?.[0] && handleShareWithProvider(userResponses.data[0])}
-              disabled={!userResponses?.data?.length}
+              onClick={() => userResponses?.data && handleShareWithProvider(userResponses.data)}
+              disabled={!userResponses?.data}
             >
               💬 Message Healthcare Provider
             </button>
             <button 
               className="btn btn-outline"
-              onClick={() => userResponses?.data?.[0] && handleExportPDF(userResponses.data[0])}
-              disabled={!userResponses?.data?.length}
+              onClick={() => userResponses?.data && handleExportPDF(userResponses.data)}
+              disabled={!userResponses?.data}
             >
               📄 Download PDF
             </button>

@@ -37,10 +37,19 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
   const handleValueChange = (value: string | number | boolean | string[]) => {
     setLocalValue(value);
     
+    let textValue: string | undefined;
+    if (typeof value === 'boolean') {
+      textValue = value ? 'Yes' : 'No';
+    } else if (typeof value === 'string') {
+      textValue = value;
+    } else if (Array.isArray(value)) {
+      textValue = value.join(', ');
+    }
+
     onResponse({
       questionId: question.id,
       answerValue: value,
-      answerText: typeof value === 'string' ? value : undefined,
+      answerText: textValue,
       isSkipped: false
     });
   };
