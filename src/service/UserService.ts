@@ -166,6 +166,17 @@ export const userAPI = createApi({
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
 
+    updateRole: builder.mutation<IResponse<void>, Role>({
+      query: (role) => ({
+        url: `/update/role`,
+        method: Http.PATCH,
+        body: role
+      }),
+      transformResponse: processResponse<void>,
+      transformErrorResponse: processError,
+      invalidatesTags: (_result, error) => error ? [] : ['User']
+    }),
+
     /**
      * Updates a specific user by ID (admin function)
      * @param {object} params - Object containing userId and user data
@@ -307,5 +318,6 @@ export const {
   useUpdateUserByAdminMutation,
   useGetHealthcareProvidersQuery,
   useGetUsersQuery,
-  useUpdateRoleByAdminMutation
+  useUpdateRoleByAdminMutation,
+  useUpdateRoleMutation
 } = userAPI;
