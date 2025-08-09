@@ -131,7 +131,7 @@ const VerifyPassword = () => {
                                     <input type="hidden" {...register('userId')} defaultValue={data.data.user.userId} name='userId' id="userId" required />
                                     <div className="row g-3">
                                         <div className="col-12">
-                                            <label htmlFor="qrCode" className="form-label">New Password</label>
+                                            <label htmlFor="newPassword" className="form-label">New Password</label>
                                             <div className="input-group has-validation">
                                                 <span className="input-group-text"><i className="bi bi-key"></i></span>
                                                 <input type="password" {...register('newPassword')} name='newPassword' className={`form-control ' ${formState.errors.newPassword ? 'is-invalid' : ''} ${isFieldValid('newPassword') ? 'is-valid' : ''}`} id="newPassword" placeholder="New password" disabled={isLoading} required />
@@ -139,7 +139,7 @@ const VerifyPassword = () => {
                                             </div>
                                         </div>
                                         <div className="col-12">
-                                            <label htmlFor="qrCode" className="form-label">Confirm New Password</label>
+                                            <label htmlFor="confirmNewPassword" className="form-label">Confirm New Password</label>
                                             <div className="input-group has-validation">
                                                 <span className="input-group-text"><i className="bi bi-key"></i></span>
                                                 <input type="password" {...register('confirmNewPassword')} name='confirmNewPassword' className={`form-control ' ${formState.errors.confirmNewPassword ? 'is-invalid' : ''} ${isFieldValid('confirmNewPassword') ? 'is-valid' : ''}`} id="confirmNewPassword" placeholder="Confirm new password" disabled={isLoading} required />
