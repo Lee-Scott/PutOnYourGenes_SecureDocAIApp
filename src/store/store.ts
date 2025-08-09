@@ -32,7 +32,7 @@ export const setupStore = () => {
             .concat(chatRoomAPI.middleware)
             .concat(questionnaireAPI.middleware)
             // Add logger middleware for debugging actions and state changes
-            .concat(logger)
+            // .concat(logger)
     })
 };
 
