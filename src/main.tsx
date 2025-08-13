@@ -32,39 +32,42 @@ import {
   QuestionnaireResults, 
   QuestionnaireBuilder 
 } from './components/questionnaire/index.ts'
+import Homepage from './components/Homepage/Homepage.tsx'
+import PatientDashboard from './components/PatientDashboard/PatientDashboard.tsx'
+import IntegrationHub from './components/IntegrationHub/IntegrationHub.tsx'
 
 const store = setupStore();
 const router = createBrowserRouter(createRoutesFromElements(
   <Route path='/' element={<App />}>
+    {/* Public Routes */}
+    <Route index element={<Homepage />} />
     <Route path='login' element={<Login />} />
     <Route path='register' element={<Register />} />
     <Route path='resetpassword' element={<ResetPassword />} />
     <Route path='user/verify' element={<VerifyAccount />} />
     <Route path='verify/password' element={<VerifyPassword />} />
+    <Route path='integrations' element={<IntegrationHub />} />
+    <Route path='questionnaires' element={<Questionnaires />} />
+    <Route path='questionnaires/builder' element={<QuestionnaireBuilder />} />
+    <Route path='questionnaires/:id' element={<QuestionnaireDetails />} />
+    <Route path='questionnaires/:id/form' element={<QuestionnaireForm />} />
+    <Route path='questionnaires/results/:responseId' element={<QuestionnaireResults />} />
 
-    <Route element={<ProtectedRoute />} >
+    {/* Protected Routes */}
+    <Route element={<ProtectedRoute />}>
       <Route element={<NavBar />}>
-        <Route index path='/documents' element={<Documents />} />
-        <Route path='/' element={<Navigate to={'/documents'} />} />
+        <Route path='dashboard' element={<PatientDashboard />} />
+        <Route path='documents' element={<Documents />} />
         <Route path='documents/:documentId' element={<DocumentDetails />} />
-        {/* Chat Routes */}
         <Route path='chat' element={<ChatRooms />} />
         <Route path='chat/:chatRoomId' element={<ChatRooms />} />
-        
-        {/* Questionnaire Routes */}
-        <Route path='questionnaires' element={<Questionnaires />} />
-        <Route path='questionnaires/builder' element={<QuestionnaireBuilder />} />
-        <Route path='questionnaires/:id' element={<QuestionnaireDetails />} />
-        <Route path='questionnaires/:id/form' element={<QuestionnaireForm />} />
-        <Route path='questionnaires/results/:responseId' element={<QuestionnaireResults />} />
-        
-        <Route element={<Restricted />} >
+        <Route element={<Restricted />}>
           <Route path='users' element={<Users />} />
           <Route path='users/:userId' element={<UserDetails />} />
         </Route>
         <Route path='profile/:userId' element={<UserDetails />} />
-        <Route path='/user' element={<User />} >
-          <Route path='/user' element={<Navigate to='/user/profile' />} />
+        <Route path='user' element={<User />}>
+          <Route path='' element={<Navigate to='profile' />} />
           <Route path='profile' element={<Profile />} />
           <Route path='password' element={<Password />} />
           <Route path='settings' element={<Settings />} />
@@ -73,6 +76,7 @@ const router = createBrowserRouter(createRoutesFromElements(
         </Route>
       </Route>
     </Route>
+    
     <Route path='*' element={<NotFound />} />
   </Route>
 ));

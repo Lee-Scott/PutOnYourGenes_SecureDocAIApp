@@ -5,6 +5,8 @@ import logger from 'redux-logger';
 import { documentAPI } from "../service/DocumentService";
 import { chatRoomAPI } from "../service/ChatRoomService";
 import { questionnaireAPI } from "../service/QuestionnaireService";
+import homepageReducer from './slices/homepageSlice';
+import integrationReducer from './slices/integrationSlice';
 
 // Combine all reducers into a single root reducer
 // The computed property name [userAPI.reducerPath] dynamically assigns the reducer
@@ -13,7 +15,9 @@ const rootReducer = combineReducers({
     [userAPI.reducerPath]: userAPI.reducer, // set reducer to api reducer path
     [documentAPI.reducerPath]: documentAPI.reducer,
     [chatRoomAPI.reducerPath]: chatRoomAPI.reducer,
-    [questionnaireAPI.reducerPath]: questionnaireAPI.reducer
+    [questionnaireAPI.reducerPath]: questionnaireAPI.reducer,
+    homepage: homepageReducer,
+    integration: integrationReducer,
 }) as unknown as Reducer;
 
 /**

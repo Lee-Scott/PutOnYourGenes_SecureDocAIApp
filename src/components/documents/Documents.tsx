@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import { documentAPI } from '../../service/DocumentService';
 import { Query } from '../../models/IDocument';
 import DocumentLoader from './DocumentLoader';
@@ -10,8 +10,8 @@ const Documents = () => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [query, setQuery] = React.useState<Query>({ page: 0, size: 4, name: '' });
 
-  const { data: documentData, error, isSuccess, isLoading, refetch } = documentAPI.useFetchDocumentsQuery(query);
-  const [uploadDocuments, { data: uploadData, isLoading: uploadLoading, error: uploadError, isSuccess: uploadSuccess }] = documentAPI.useUploadDocumentsMutation();
+  const { data: documentData, isLoading } = documentAPI.useFetchDocumentsQuery(query);
+  const [uploadDocuments] = documentAPI.useUploadDocumentsMutation();
 
   const selectDocuments = () => inputRef.current?.click();
 
@@ -42,7 +42,7 @@ const Documents = () => {
           <div className="align-items-center row">
             <div className="col-lg-4">
               <div className="mb-3 mb-lg-0">
-                { (documentData?.data.documents.content?.length ?? 0) > 0 && 
+                { (documentData?.data.documents.content?.length ?? 0) > 0 &&
                 <h6 className="fs-16 mb-0">{`Showing ${((documentData?.data?.documents?.number ?? 0) * (documentData?.data?.documents?.size ?? 0)) + 1} - ${((documentData?.data?.documents?.number ?? 0) * (documentData?.data?.documents?.size ?? 0)) + (documentData?.data.documents.content?.length ?? 0)} of ${documentData?.data?.documents?.totalElements ?? 0} results`}</h6>}
               </div>
             </div>

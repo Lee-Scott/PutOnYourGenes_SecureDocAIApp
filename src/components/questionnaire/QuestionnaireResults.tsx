@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetQuestionnaireResponseQuery } from '../../service/QuestionnaireService';
 import { useDeleteQuestionnaireResponseMutation } from '../../service/QuestionnaireService';
@@ -7,6 +7,8 @@ import { useGetUsersQuery, useFetchUserQuery } from '../../service/UserService';
 import { toastSuccess, toastError, toastInfo } from '../../utils/ToastUtils';
 import { generateQuestionnaireResultsPDF } from '../../utils/PDFUtils';
 import type { IQuestionnaireResponse, ICategoryScore } from '../../models/IQuestionnaireResponse';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 
 /**
  * QuestionnaireResults Component
@@ -33,6 +35,19 @@ interface RecommendationCardProps {
 const QuestionnaireResults: React.FC = () => {
   const { responseId } = useParams<{ responseId: string }>();
   const navigate = useNavigate();
+  const { data: user, isLoading: isUserLoading } = useFetchUserQuery();
+  const isAuthenticated = !!user;
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      const timer = setTimeout(() => {
+        setShowPaywall(true);
+      }, 5000); // Show paywall after 5 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated]);
+
   const { 
     data: userResponses, 
     isLoading, 
@@ -222,7 +237,7 @@ This summary was generated from your health questionnaire responses. Please cons
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isUserLoading) {
     return <div className="loading">Loading your results...</div>;
   }
 
@@ -381,6 +396,39 @@ This summary was generated from your health questionnaire responses. Please cons
       </div>
     );
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className={`questionnaire-results-container ${showPaywall ? 'blurred' : ''}`}>
+        {showPaywall && (
+          <div className="auth-prompt">
+            <h2>See Your Full Results</h2>
+            <p>Create an account or log in to view your detailed health recommendations and full results.</p>
+            <div className="auth-buttons">
+              <button className="btn btn-primary" onClick={() => navigate('/login')}>Login</button>
+              <button className="btn btn-secondary" onClick={() => navigate('/register')}>Sign Up</button>
+            </div>
+          </div>
+        )}
+        <div className="results-header">
+          <h1>Your Questionnaire Results</h1>
+          <p>Review your completed health assessments and recommendations</p>
+        </div>
+        <div className="results-content">
+          <div className="results-summary">
+            <h2>Results Summary</h2>
+            {userResponses?.data ? (
+              <ResultsSummary response={userResponses.data} />
+            ) : (
+              <div className="no-summary">
+                <p>No completed questionnaires available for summary.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="questionnaire-results-container">

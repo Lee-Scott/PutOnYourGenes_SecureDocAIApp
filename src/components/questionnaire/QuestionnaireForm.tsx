@@ -118,7 +118,7 @@ const QuestionnaireForm: React.FC = () => {
 
       await submitResponse(responseData).unwrap();
       toastSuccess('Questionnaire submitted successfully!');
-      navigate('/questionnaires/results');
+      navigate('/integrations');
     } catch (error) {
       console.error('Failed to submit questionnaire:', error);
       toastError('Failed to submit questionnaire. Please try again.');
