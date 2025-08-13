@@ -77,7 +77,7 @@ const Settings = () => {
         </div>
         <div className="form-group mt-4">
           <label className="d-block mb-0">Credentials Settings</label>
-          <div className="small text-muted mb-3">Your credentials will expired after 90 days if not updated.</div>
+          <div className="small text-muted mb-3">Your credentials will expire after 90 days if not updated.</div>
         </div>
         <div className="form-group mb-0">
           <ul className="list-group list-group-sm">
