@@ -2,13 +2,19 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetDocumentsQuery, useUploadDocumentMutation } from '../../../service/PaperlessService';
 
+interface PaperlessDocument {
+  id: number;
+  title: string;
+  // Add other properties as needed
+}
+
 const PaperlessWidget: React.FC = () => {
   const { data: documents, error, isLoading, refetch } = useGetDocumentsQuery();
   const [uploadDocument, { isLoading: isUploading }] = useUploadDocumentMutation();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
+    if (event.target.files && event.target.files.length > 0) {
       setSelectedFile(event.target.files[0]);
     }
   };
@@ -21,7 +27,7 @@ const PaperlessWidget: React.FC = () => {
         await uploadDocument(formData).unwrap();
         setSelectedFile(null);
         refetch();
-      } catch (err) {
+      } catch (err: any) {
         console.error('Failed to upload document: ', err);
       }
     }
@@ -73,11 +79,11 @@ const PaperlessWidget: React.FC = () => {
 
         {isLoading && <p>Loading documents...</p>}
         {error && <p className="text-danger">Error fetching documents. Is your token set correctly?</p>}
-        {documents && (
+        {documents && documents.results && (
           <ul className="list-group">
-            {documents.results.map((doc: any) => (
+            {documents.results.map((doc: PaperlessDocument) => (
               <li key={doc.id} className="list-group-item">
-                <Link to={`/paperless/${doc.id}`}>{doc.title}</Link>
+                <Link to={`/editdoc/${doc.id}`}>{doc.title}</Link>
               </li>
             ))}
           </ul>

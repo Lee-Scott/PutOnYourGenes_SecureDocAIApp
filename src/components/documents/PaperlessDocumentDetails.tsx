@@ -4,7 +4,7 @@ import { useGetDocumentsQuery, useUploadDocumentMutation, useGetDocumentFileQuer
 import { PDFDocument } from 'pdf-lib';
 import * as pdfjsLib from 'pdfjs-dist';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 const PaperlessDocumentDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,27 +15,17 @@ const PaperlessDocumentDetails: React.FC = () => {
   const { data: pdfBlob, isLoading: isLoadingPdf, isError } = useGetDocumentFileQuery(documentId, { skip: !documentId });
   const [uploadDocument, { isLoading: isUploading }] = useUploadDocumentMutation();
 
-  const [pdfDoc, setPdfDoc] = useState<PDFDocument | null>(null);
+  const [numPages, setNumPages] = useState(0);
   const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
 
   const document = documents?.results.find((doc: any) => doc.id === documentId);
-
-  useEffect(() => {
-    const loadPdf = async () => {
-      if (pdfBlob) {
-        const arrayBuffer = await pdfBlob.arrayBuffer();
-        const loadedPdfDoc = await PDFDocument.load(arrayBuffer);
-        setPdfDoc(loadedPdfDoc);
-      }
-    };
-    loadPdf();
-  }, [pdfBlob]);
 
   useEffect(() => {
     const renderPdf = async () => {
       if (pdfBlob) {
         const arrayBuffer = await pdfBlob.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        setNumPages(pdf.numPages);
 
         for (let i = 0; i < pdf.numPages; i++) {
           const page = await pdf.getPage(i + 1);
@@ -60,7 +50,9 @@ const PaperlessDocumentDetails: React.FC = () => {
   }, [pdfBlob]);
 
   const handleAddText = async () => {
-    if (pdfDoc) {
+    if (pdfBlob) {
+      const arrayBuffer = await pdfBlob.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
       const pages = pdfDoc.getPages();
       const firstPage = pages[0];
       firstPage.drawText('This is a new text!', {
@@ -68,25 +60,25 @@ const PaperlessDocumentDetails: React.FC = () => {
         y: firstPage.getHeight() / 2,
         size: 50,
       });
-      // Re-render
       const pdfBytes = await pdfDoc.save();
-      const newPdfDoc = await PDFDocument.load(pdfBytes);
-      setPdfDoc(newPdfDoc);
+      const newPdfBlob = new Blob([pdfBytes.slice().buffer], { type: 'application/pdf' });
+      // You might want to re-render the PDF here, or handle the blob differently
     }
   };
 
   const handleSave = async () => {
-    if (pdfDoc && document) {
+    if (pdfBlob && document) {
+      const arrayBuffer = await pdfBlob.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
       const pdfBytes = await pdfDoc.save();
-      const newPdfBlob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
+      const newPdfBlob = new Blob([pdfBytes.slice().buffer], { type: 'application/pdf' });
       const formData = new FormData();
       formData.append('document', newPdfBlob, document.original_file_name);
       formData.append('title', document.title);
-      // By sending the same title, paperless will overwrite the existing document
       
       try {
         await uploadDocument(formData).unwrap();
-        navigate('/patient-dashboard');
+        navigate('/dashboard');
       } catch (err) {
         console.error('Failed to upload document: ', err);
       }
@@ -106,7 +98,7 @@ const PaperlessDocumentDetails: React.FC = () => {
         </button>
       </div>
       <div>
-        {pdfDoc && Array.from({ length: pdfDoc.getPageCount() }).map((_, index) => (
+        {Array.from({ length: numPages }).map((_, index) => (
           <canvas
             key={index}
             ref={(el) => {

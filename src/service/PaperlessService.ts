@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 // The base URL will be handled by the Vite proxy
-const PAPERLESS_API_URL = '/api'; 
+const PAPERLESS_API_URL = '/api';
 
 export const paperlessApi = createApi({
   reducerPath: 'paperlessApi',

@@ -1,0 +1,70 @@
+/* Core Features Section Styles */
+
+.core-features-section {
+  background-color: #f8f9fa;
+  padding: 60px 0;
+}
+
+.core-features-hero {
+  text-align: center;
+  padding: 80px 20px;
+  background-color: #ffffff;
+}
+
+.core-features-hero .hero-headline {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.core-features-hero .hero-subheadline {
+  font-size: 1.25rem;
+  max-width: 600px;
+  margin: 0 auto 30px;
+}
+
+.feature-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60px 20px;
+  gap: 40px;
+}
+
+.feature-block:nth-child(even) {
+  flex-direction: row-reverse;
+}
+
+.feature-text {
+  flex: 1;
+  max-width: 500px;
+}
+
+.feature-text h2 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.feature-text p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.feature-visual {
+  flex: 1;
+  max-width: 500px;
+}
+
+.feature-visual img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Original Homepage Section Styles */
+
+.original-homepage-section {
+  padding: 60px 0;
+}

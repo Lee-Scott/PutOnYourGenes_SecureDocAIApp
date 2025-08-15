@@ -34,9 +34,9 @@ import {
   QuestionnaireBuilder 
 } from './components/questionnaire/index.ts'
 import Homepage from './components/Homepage/Homepage.tsx'
-import PatientDashboard from './components/PatientDashboard/PatientDashboard.tsx'
 import IntegrationHub from './components/IntegrationHub/IntegrationHub.tsx'
 import ReportViewer from './components/ReportViewer/ReportViewer.tsx'
+import UserDashboard from './components/UserDashboard/UserDashboard.tsx'
 
 const store = setupStore();
 const router = createBrowserRouter(createRoutesFromElements(
@@ -49,6 +49,7 @@ const router = createBrowserRouter(createRoutesFromElements(
     <Route path='verify/password' element={<VerifyPassword />} />
     <Route path='integrations' element={<IntegrationHub />} />
     <Route path='PersonalHealth&ServiceInterest' element={<QuestionnaireForm />} />
+    <Route index element={<Homepage />} />
 
     {/* Protected Routes */}
     <Route element={<ProtectedRoute />}>
@@ -58,8 +59,7 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path='questionnaires/:id' element={<QuestionnaireDetails />} />
       <Route path='questionnaires/:id/form' element={<QuestionnaireForm />} />
       <Route path='questionnaires/results/:responseId' element={<QuestionnaireResults />} />
-      <Route index element={<Homepage />} />
-      <Route path='dashboard' element={<PatientDashboard />} />
+      <Route path='dashboard' element={<UserDashboard />} />
         <Route path='documents' element={<Documents />} />
         <Route path='documents/:documentId' element={<DocumentDetails />} />
         <Route path='editdoc/:id' element={<PaperlessDocumentDetails />} />

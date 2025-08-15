@@ -7,7 +7,10 @@ import HeroSection from './HeroSection';
 import BenefitsSection from './BenefitsSection';
 import ProcessSection from './ProcessSection';
 import FooterCTA from './FooterCTA';
+import CoreFeaturesHero from './CoreFeaturesHero';
+import CoreFeaturesBenefits from './CoreFeaturesBenefits';
 import './Homepage.css';
+import './CoreFeatures.css';
 
 const Homepage: React.FC = () => {
   const navigate = useNavigate();
@@ -29,10 +32,16 @@ const Homepage: React.FC = () => {
 
   return (
     <div className="homepage-container">
-      <HeroSection onCTAClick={handleStartAssessment} />
-      <BenefitsSection />
-      <ProcessSection currentStep={userJourney.currentStep} />
-      <FooterCTA onCTAClick={handleStartAssessment} />
+      <section className="core-features-section">
+        <CoreFeaturesHero />
+        <CoreFeaturesBenefits />
+      </section>
+      <section className="original-homepage-section">
+        <HeroSection onCTAClick={handleStartAssessment} />
+        <BenefitsSection />
+        <ProcessSection currentStep={userJourney.currentStep} />
+        <FooterCTA onCTAClick={handleStartAssessment} />
+      </section>
     </div>
   );
 };
