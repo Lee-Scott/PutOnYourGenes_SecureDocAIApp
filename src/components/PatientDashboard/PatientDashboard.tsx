@@ -1,29 +1,31 @@
 import React from 'react';
-import { documentAPI } from '../../service/DocumentService';
-import Document from '../documents/Document';
-import DocumentLoader from '../documents/DocumentLoader';
+import ReportWidget from './widgets/ReportWidget';
+import QuestionnaireWidget from './widgets/QuestionnaireWidget';
+import IntegrationWidget from './widgets/IntegrationWidget';
+import ChatWidget from './widgets/ChatWidget';
+import DocumentWidget from './widgets/DocumentWidget';
+import './PatientDashboard.css';
 
 const PatientDashboard: React.FC = () => {
-  const { data: documentData, isLoading } = documentAPI.useFetchDocumentsQuery({ page: 0, size: 100, name: '' });
-
-  if (isLoading) {
-    return <DocumentLoader />;
-  }
-
   return (
     <div className="patient-dashboard-container container mtb">
-      <h2>Your Health Documents</h2>
-      <p>Here are the lab results and other documents you have uploaded.</p>
-      <div className="candidate-list">
-        {documentData?.data.documents.content?.length === 0 && (
-          <div className="card mt-4 align-items-center row" style={{ border: 'none', boxShadow: 'none' }}>
-            <h4>No documents found.</h4>
-            <p>You can upload your documents from the integration page.</p>
-          </div>
-        )}
-        {documentData?.data.documents.content.map(document => (
-          <Document {...document} key={document.id} />
-        ))}
+      <h2>Patient Dashboard</h2>
+      <div className="dashboard-grid">
+        <div className="dashboard-widget">
+          <ReportWidget />
+        </div>
+        <div className="dashboard-widget">
+          <QuestionnaireWidget />
+        </div>
+        <div className="dashboard-widget">
+          <IntegrationWidget />
+        </div>
+        <div className="dashboard-widget-large">
+          <ChatWidget />
+        </div>
+        <div className="dashboard-widget-large">
+          <DocumentWidget />
+        </div>
       </div>
     </div>
   );

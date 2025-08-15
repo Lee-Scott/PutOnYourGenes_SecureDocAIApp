@@ -60,35 +60,44 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
       case 'SINGLE_CHOICE':
         return (
           <div className="option-group">
-            {question.options?.map((option) => (
-              <div key={option.id} className="option-item">
-                <input
-                  className="option-input"
-                  type={question.questionType === 'MULTIPLE_CHOICE' ? 'checkbox' : 'radio'}
-                  name={question.id}
-                  value={option.optionValue}
-                  checked={
-                    question.questionType === 'MULTIPLE_CHOICE'
-                      ? Array.isArray(localValue) && localValue.includes(option.optionValue)
-                      : localValue === option.optionValue
-                  }
-                  onChange={(e) => {
-                    if (question.questionType === 'MULTIPLE_CHOICE') {
-                      const currentValues = Array.isArray(localValue) ? localValue : [];
-                      const newValues = e.target.checked
-                        ? [...currentValues, option.optionValue]
-                        : currentValues.filter(v => v !== option.optionValue);
-                      handleValueChange(newValues);
-                    } else {
-                      handleValueChange(option.optionValue);
-                    }
-                  }}
-                />
-                <label className="option-label" htmlFor={`${question.id}-${option.id}`}>
-                  {option.optionText}
-                </label>
-              </div>
-            ))}
+            {question.options?.map((option) => {
+              const isChecked = question.questionType === 'MULTIPLE_CHOICE'
+                ? Array.isArray(localValue) && localValue.includes(option.optionValue)
+                : localValue === option.optionValue;
+
+              const handleChange = () => {
+                if (question.questionType === 'MULTIPLE_CHOICE') {
+                  const currentValues = Array.isArray(localValue) ? localValue : [];
+                  const newValues = !isChecked
+                    ? [...currentValues, option.optionValue]
+                    : currentValues.filter(v => v !== option.optionValue);
+                  handleValueChange(newValues);
+                } else {
+                  handleValueChange(option.optionValue);
+                }
+              };
+
+              return (
+                <div
+                  key={option.id || option.optionValue}
+                  className={`option-item ${isChecked ? 'selected' : ''}`}
+                  onClick={handleChange}
+                >
+                  <input
+                    id={`${question.id}-${option.id || option.optionValue}`}
+                    className="option-input"
+                    type={question.questionType === 'MULTIPLE_CHOICE' ? 'checkbox' : 'radio'}
+                    name={question.id}
+                    value={option.optionValue}
+                    checked={isChecked}
+                    onChange={handleChange}
+                  />
+                  <label className="option-label" htmlFor={`${question.id}-${option.id || option.optionValue}`}>
+                    {option.optionText}
+                  </label>
+                </div>
+              );
+            })}
           </div>
         );
 

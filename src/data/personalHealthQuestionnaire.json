@@ -1,0 +1,141 @@
+{
+  "title": "Personal Health & Service Interest Questionnaire",
+  "description": "A quick intake form to collect your basic health info and see if you'd like to explore any partner health services.",
+  "category": "HEALTHCARE",
+  "isActive": true,
+  "estimatedTimeMinutes": 8,
+  "pages": [
+    {
+      "pageNumber": 1,
+      "title": "Basic Health Information",
+      "description": "Please provide your basic information.",
+      "questions": [
+        {
+          "id": "age",
+          "questionNumber": 1,
+          "questionText": "What is your age?",
+          "questionType": "NUMBER",
+          "isRequired": true,
+          "helpText": "Enter your age in years",
+          "validationRules": { "minValue": 0, "maxValue": 120 }
+        },
+        {
+          "id": "gender",
+          "questionNumber": 2,
+          "questionText": "What is your gender?",
+          "questionType": "SINGLE_CHOICE",
+          "isRequired": true,
+          "helpText": "Select your gender",
+          "options": [
+            { "id": "gender-male", "optionText": "Male", "optionValue": "male", "orderIndex": 1 },
+            { "id": "gender-female", "optionText": "Female", "optionValue": "female", "orderIndex": 2 },
+            { "id": "gender-other", "optionText": "Other", "optionValue": "other", "orderIndex": 3 },
+            { "id": "gender-prefer-not-to-say", "optionText": "Prefer not to say", "optionValue": "prefer_not_to_say", "orderIndex": 4 }
+          ]
+        },
+        {
+          "id": "conditions",
+          "questionNumber": 3,
+          "questionText": "Do you have any ongoing medical conditions?",
+          "questionType": "YES_NO",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "pageNumber": 2,
+      "title": "Service Interest",
+      "description": "Learn about our partner services and let us know your interest.",
+      "questions": [
+        {
+          "id": "vitamin-lab",
+          "questionNumber": 4,
+          "questionText": "VitaminLab: Creates custom supplements tailored to your health profile.",
+          "questionType": "SINGLE_CHOICE",
+          "isRequired": true,
+          "options": [
+            { "id": "vitamin-lab-interested", "optionText": "Interested", "optionValue": "interested", "orderIndex": 1 },
+            { "id": "vitamin-lab-done", "optionText": "Already done", "optionValue": "done", "orderIndex": 2 },
+            { "id": "vitamin-lab-not-interested", "optionText": "Not interested", "optionValue": "not_interested", "orderIndex": 3 }
+          ]
+        },
+        {
+          "id": "rupa-health",
+          "questionNumber": 5,
+          "questionText": "Rupa Health: Access a wide range of lab tests and receive results online.",
+          "questionType": "SINGLE_CHOICE",
+          "isRequired": true,
+          "options": [
+            { "id": "rupa-health-interested", "optionText": "Interested", "optionValue": "interested", "orderIndex": 1 },
+            { "id": "rupa-health-done", "optionText": "Already done", "optionValue": "done", "orderIndex": 2 },
+            { "id": "rupa-health-not-interested", "optionText": "Not interested", "optionValue": "not_interested", "orderIndex": 3 }
+          ]
+        },
+        {
+          "id": "pure-insight",
+          "questionNumber": 6,
+          "questionText": "PureInsight: Provides deep health analytics and actionable insights.",
+          "questionType": "SINGLE_CHOICE",
+          "isRequired": true,
+          "options": [
+            { "id": "pure-insight-interested", "optionText": "Interested", "optionValue": "interested", "orderIndex": 1 },
+            { "id": "pure-insight-done", "optionText": "Already done", "optionValue": "done", "orderIndex": 2 },
+            { "id": "pure-insight-not-interested", "optionText": "Not interested", "optionValue": "not_interested", "orderIndex": 3 }
+          ]
+        },
+        {
+          "id": "fullscript",
+          "questionNumber": 7,
+          "questionText": "Fullscript: Professional-grade supplement ordering platform.",
+          "questionType": "SINGLE_CHOICE",
+          "isRequired": true,
+          "options": [
+            { "id": "fullscript-interested", "optionText": "Interested", "optionValue": "interested", "orderIndex": 1 },
+            { "id": "fullscript-done", "optionText": "Already done", "optionValue": "done", "orderIndex": 2 },
+            { "id": "fullscript-not-interested", "optionText": "Not interested", "optionValue": "not_interested", "orderIndex": 3 }
+          ]
+        },
+        {
+          "id": "3x4-genetics",
+          "questionNumber": 8,
+          "questionText": "3X4 Genetics: DNA testing for personalized health and nutrition.",
+          "questionType": "SINGLE_CHOICE",
+          "isRequired": true,
+          "options": [
+            { "id": "3x4-genetics-interested", "optionText": "Interested", "optionValue": "interested", "orderIndex": 1 },
+            { "id": "3x4-genetics-done", "optionText": "Already done", "optionValue": "done", "orderIndex": 2 },
+            { "id": "3x4-genetics-not-interested", "optionText": "Not interested", "optionValue": "not_interested", "orderIndex": 3 }
+          ]
+        }
+      ]
+    },
+    {
+      "pageNumber": 3,
+      "title": "Uploads & Communication",
+      "description": "Optional — share existing reports or connect with a doctor/AI.",
+      "questions": [
+        {
+          "id": "upload",
+          "questionNumber": 9,
+          "questionText": "Would you like to upload any existing health reports now?",
+          "questionType": "YES_NO",
+          "isRequired": false,
+          "helpText": "You can upload PDFs, images, or text documents on the next page."
+        },
+        {
+          "id": "chat",
+          "questionNumber": 10,
+          "questionText": "Would you like to chat with a doctor or AI about your results?",
+          "questionType": "SINGLE_CHOICE",
+          "isRequired": false,
+          "options": [
+            { "id": "chat-doctor", "optionText": "Doctor", "optionValue": "doctor", "orderIndex": 1 },
+            { "id": "chat-ai", "optionText": "AI", "optionValue": "ai", "orderIndex": 2 },
+            { "id": "chat-both", "optionText": "Both", "optionValue": "both", "orderIndex": 3 },
+            { "id": "chat-not-now", "optionText": "Not now", "optionValue": "not_now", "orderIndex": 4 }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,17 +1,22 @@
 import { Key } from '../enum/catch.key';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
-const ProtectedRoute = () => {
+interface ProtectedRouteProps {
+    unauthenticatedOnly?: boolean;
+}
+
+const ProtectedRoute = ({ unauthenticatedOnly = false }: ProtectedRouteProps) => {
     const location = useLocation();
     const isLoggedIn: boolean = JSON.parse(localStorage.getItem(Key.LOGGEDIN)!) as boolean || false;
 
+    if (unauthenticatedOnly) {
+        return !isLoggedIn ? <Outlet /> : <Navigate to="/dashboard" replace />;
+    }
+
     if (isLoggedIn) {
-        return <Outlet />
+        return <Outlet />;
     } else {
-        // Toast notification can be added here to inform the user they need to log in
-        return (
-            <Navigate to="/login" replace state={{ from: location }} />
-        );
+        return <Navigate to="/login" replace state={{ from: location }} />;
     }
 };
 

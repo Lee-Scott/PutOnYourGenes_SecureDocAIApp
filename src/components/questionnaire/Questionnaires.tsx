@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetQuestionnairesQuery, useGetUserResponsesQuery } from '../../service/QuestionnaireService';
+import { IQuestionnaire } from '../../models/IQuestionnaire';
 import './Questionnaire.css';
 
 /**
@@ -69,9 +70,13 @@ const Questionnaires: React.FC = () => {
     navigate(`/questionnaires/results/${responseId}`);
   };
 
+  const handleCreateNew = () => {
+    navigate('/questionnaires/builder');
+  };
+
   const renderAvailableQuestionnaires = () => (
     <div className="questionnaire-grid">
-      {questionnaires.map((questionnaire) => (
+      {questionnaires.map((questionnaire: IQuestionnaire) => (
         <div key={questionnaire.id} className="questionnaire-card">
           <div className="questionnaire-card-header">
             <div className="questionnaire-category">{questionnaire.category}</div>
@@ -100,7 +105,7 @@ const Questionnaires: React.FC = () => {
   const renderCompletedQuestionnaires = () => (
     <div className="questionnaire-grid">
       {userResponses?.data?.map((response) => {
-        const questionnaire = questionnaires.find(q => q.id === response.questionnaireId);
+        const questionnaire = questionnaires.find((q: IQuestionnaire) => q.id === response.questionnaireId);
         return (
           <div key={response.id} className="questionnaire-card">
             <div className="questionnaire-card-header">
@@ -123,11 +128,16 @@ const Questionnaires: React.FC = () => {
   return (
     <div className="questionnaire-container">
       <div className="questionnaire-header">
-        <h1>
-          <i className="bi bi-clipboard-check me-2"></i>
-          Medical Questionnaires
-        </h1>
-        <p>Complete your health assessments to help us provide better care</p>
+        <div>
+          <h1>
+            <i className="bi bi-clipboard-check me-2"></i>
+            Medical Questionnaires
+          </h1>
+          <p>Complete your health assessments to help us provide better care</p>
+        </div>
+        <button className="btn-questionnaire" onClick={handleCreateNew}>
+          <i className="bi bi-plus-circle-fill me-1"></i> Create New
+        </button>
       </div>
 
       <div className="questionnaire-tabs">

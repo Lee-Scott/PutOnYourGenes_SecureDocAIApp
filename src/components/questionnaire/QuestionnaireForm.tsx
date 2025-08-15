@@ -1,10 +1,14 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetQuestionnaireByIdQuery, useSubmitQuestionnaireResponseMutation } from '../../service/QuestionnaireService';
 import QuestionPage from './QuestionPage';
 import ProgressIndicator from './ProgressIndicator';
 import type { IQuestionResponseRequest } from '../../models/IQuestionnaireResponse';
 import { toastSuccess, toastError, toastWarning } from '../../utils/ToastUtils';
+import { useDispatch } from 'react-redux';
+import { setSelectedIntegrations } from '../../store/slices/integrationSlice';
+import personalHealthQuestionnaire from '../../data/personalHealthQuestionnaire.json';
+import { IQuestionnaire } from '../../models/IQuestionnaire';
 
 /**
  * QuestionnaireForm Component
@@ -19,17 +23,31 @@ import { toastSuccess, toastError, toastWarning } from '../../utils/ToastUtils';
 const QuestionnaireForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   
   const [currentPage, setCurrentPage] = useState(0);
   const [responses, setResponses] = useState<Map<string, IQuestionResponseRequest>>(new Map());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
 
+  const personalHealthQuestionnaireId = '488d2107-24e5-5d05-a471-c64b9091685f';
+  const isPersonalHealthQuestionnaire = window.location.pathname.endsWith('/PersonalHealth&ServiceInterest') || id === personalHealthQuestionnaireId;
+
   const { 
-    data: questionnaire, 
+    data: fetchedQuestionnaire, 
     isLoading, 
     error 
-  } = useGetQuestionnaireByIdQuery(id || '');
+  } = useGetQuestionnaireByIdQuery(id || '', { skip: isPersonalHealthQuestionnaire });
+
+  const [questionnaire, setQuestionnaire] = useState<IQuestionnaire | undefined>();
+
+  useEffect(() => {
+    if (isPersonalHealthQuestionnaire) {
+      setQuestionnaire(personalHealthQuestionnaire as IQuestionnaire);
+    } else if (fetchedQuestionnaire) {
+      setQuestionnaire(fetchedQuestionnaire.data);
+    }
+  }, [isPersonalHealthQuestionnaire, fetchedQuestionnaire]);
 
   const [submitResponse] = useSubmitQuestionnaireResponseMutation();
 
@@ -41,8 +59,8 @@ const QuestionnaireForm: React.FC = () => {
   const validateCurrentPage = (): boolean => {
     if (!questionnaire) return false;
     
-    const currentPageData = questionnaire.data.pages[currentPage];
-    const requiredQuestions = currentPageData.questions.filter(q => q.isRequired);
+    const currentPageData = questionnaire.pages[currentPage];
+    const requiredQuestions = currentPageData.questions.filter((q: any) => q.isRequired);
     
     for (const question of requiredQuestions) {
       const response = responses.get(question.id);
@@ -57,9 +75,9 @@ const QuestionnaireForm: React.FC = () => {
   const validateAllPages = (): { isValid: boolean; firstInvalidPage?: number } => {
     if (!questionnaire) return { isValid: false };
 
-    for (let i = 0; i < questionnaire.data.pages.length; i++) {
-      const page = questionnaire.data.pages[i];
-      const requiredQuestions = page.questions.filter(q => q.isRequired);
+    for (let i = 0; i < questionnaire.pages.length; i++) {
+      const page = questionnaire.pages[i];
+      const requiredQuestions = page.questions.filter((q: any) => q.isRequired);
 
       for (const question of requiredQuestions) {
         const response = responses.get(question.id);
@@ -73,7 +91,7 @@ const QuestionnaireForm: React.FC = () => {
   };
 
   const handleNextPage = () => {
-    if (!questionnaire || currentPage >= questionnaire.data.pages.length - 1) return;
+    if (!questionnaire || currentPage >= questionnaire.pages.length - 1) return;
     
     // Validate current page before proceeding
     if (!validateCurrentPage()) {
@@ -91,9 +109,9 @@ const QuestionnaireForm: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!questionnaire || !id) return;
+    if (!questionnaire) return;
+    const questionnaireIdToSubmit = id || personalHealthQuestionnaireId;
 
-    // Final validation before submission
     const { isValid, firstInvalidPage } = validateAllPages();
     if (!isValid) {
       toastWarning('Please answer all required questions before submitting.');
@@ -111,14 +129,32 @@ const QuestionnaireForm: React.FC = () => {
       }));
 
       const responseData = {
-        questionnaireId: id,
+        questionnaireId: questionnaireIdToSubmit,
         responses: formattedResponses,
         isCompleted: true
       };
 
-      await submitResponse(responseData).unwrap();
+      const result = await submitResponse(responseData).unwrap();
       toastSuccess('Questionnaire submitted successfully!');
-      navigate('/integrations');
+
+      if (isPersonalHealthQuestionnaire) {
+        const serviceInterestPage = questionnaire.pages.find((p: any) => p.title === 'Service Interest');
+        if (serviceInterestPage) {
+          const interestedIntegrations = serviceInterestPage.questions
+            .filter((q: any) => responses.get(q.id)?.answerValue === 'interested')
+            .map((q: any) => q.questionText.split(':')[0]);
+          dispatch(setSelectedIntegrations(interestedIntegrations));
+        }
+        
+        const uploadQuestion = questionnaire.pages.flatMap((p: any) => p.questions).find((q: any) => q.questionText.includes('upload'));
+        if (uploadQuestion && responses.get(uploadQuestion.id)?.answerValue === 'Yes') {
+          navigate('/documents');
+        } else {
+          navigate('/integrations');
+        }
+      } else {
+        navigate(`/questionnaires/results/${result.data.id}`);
+      }
     } catch (error) {
       console.error('Failed to submit questionnaire:', error);
       toastError('Failed to submit questionnaire. Please try again.');
@@ -156,14 +192,14 @@ const QuestionnaireForm: React.FC = () => {
     return <div className="error">Questionnaire not found</div>;
   }
 
-  const currentPageData = questionnaire.data.pages[currentPage];
-  const totalPages = questionnaire.data.pages.length;
+  const currentPageData = questionnaire.pages[currentPage];
+  const totalPages = questionnaire.pages.length;
   const isLastPage = currentPage === totalPages - 1;
 
   return (
     <div className="questionnaire-form-container">
       <div className="questionnaire-form-header">
-        <h1>{questionnaire.data.title}</h1>
+        <h1>{questionnaire.title}</h1>
         <ProgressIndicator 
           currentPage={currentPage + 1} 
           totalPages={totalPages}

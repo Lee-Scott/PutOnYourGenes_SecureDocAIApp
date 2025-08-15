@@ -1,260 +1,245 @@
-# PureInsight Integration Prompt
+# PureInsight Frontend Integration Plan
 
-**Your Role:** You are a senior frontend engineer specializing in React and healthcare applications. Your task is to create a complete, developer-ready implementation plan for integrating PureInsight into the existing patient onboarding web application.
+## 1. Overview
 
-**Primary Objective:** Generate a single markdown document that outlines the entire frontend plan for this integration. The plan must be detailed enough for another frontend developer to implement the feature without needing additional architectural guidance.
+This document outlines the frontend-only implementation plan for integrating PureInsight into the patient onboarding application. The plan details the necessary changes to introduce PureInsight as a new integration option, including UI updates, a new component for viewing PDF reports, state management, and routing.
 
-**Project Context**
+The primary goal is to create a functional, developer-ready prototype that allows a patient to:
+- See the PureInsight integration option on the `IntegrationHub` page.
+- Access PureInsight via a QR code or a fallback link.
+- View sample patient and practitioner reports within the application.
 
-*   **Application:** A patient onboarding web application.
-*   **Frontend Stack:** React, Redux Toolkit, TypeScript.
-*   **Existing User Flow:**
-    1.  A patient completes a questionnaire.
-    2.  After submission, they are directed to an `IntegrationHub` page.
-    3.  The `IntegrationHub` currently offers a simple redirect to Fullscript and a manual file upload option.
+## 2. Implementation Plan
 
-**Key Integration Details**
+### 2.1. Redux State Updates (integrationSlice)
 
-*   **PureInsight QR Code:** The integration will feature a QR code that allows patients to easily access the PureInsight platform. The QR code is located at `public/practice-qr-code.png`.
-*   **Sample Reports:** To inform the UI design, you have access to two sample reports:
-    *   `public/pationt-report-example.pdf`: A sample report for patients.
-    *   `public/Practicioners-report-example.pdf`: A sample report for practitioners.
+We will update the existing `integrationSlice` to manage the state of the selected PDF report for the `ReportViewer`.
 
-**Requirements for the Implementation Plan**
+**File:** `src/store/slices/integrationSlice.ts`
 
-Your generated document must cover the following sections in detail:
-
-**1. UI Implementation**
-
-*   **Update `IntegrationHub.tsx`:**
-    *   Add a new section for the PureInsight integration.
-    *   This section should display the QR code from `public/practice-qr-code.png`.
-    *   Include clear, user-friendly instructions on how to use the QR code (e.g., "Scan the QR code with your mobile device to connect to PureInsight").
-    *   Provide a fallback link for users who cannot scan the QR code.
-
-*   **Design a `ReportViewer.tsx` Component:**
-    *   Create a new component that can display the sample PDF reports.
-    *   This component should be able to dynamically load and render a PDF from a given URL.
-    *   Include controls for zooming and navigating through the PDF.
-
-**2. Step-by-Step Implementation Guide**
-
-*   Provide a numbered list of tasks for a developer to follow.
-*   Include detailed code snippets for each step, including:
-    *   The updated `IntegrationHub.tsx` component.
-    *   The new `ReportViewer.tsx` component.
-    *   Any necessary updates to the application's routing in `src/main.tsx`.
-
-**3. User Journey and UI Flow**
-
-*   Create a text-based or Mermaid diagram illustrating the updated user journey:
-    1.  Patient completes the questionnaire.
-    2.  Navigates to the `IntegrationHub`.
-    3.  Scans the PureInsight QR code or clicks the fallback link.
-    4.  (Optional) Views a sample report in the `ReportViewer` component.
-
-**4. Final Document Structure**
-
-Your final output should be a single, well-structured markdown file with the following sections:
-
-*   **Overview:** A brief summary of the integration plan.
-*   **Implementation Plan:** The detailed, step-by-step guide with code snippets.
-*   **User Flow:** The user journey diagram and route changes.
-*   **Task Breakdown:** A table of tasks with estimated effort (in hours) and priority.
-
-
-Combined Fullscript + PureInsight Frontend Integration Plan
-1. Overview
-This plan implements a frontend-only integration of Fullscript and PureInsight in the patient onboarding app. It provides a simple working prototype with:
-
-Fullscript: Button to view dashboard (no OAuth backend yet)
-
-PureInsight: QR code access, fallback link, and PDF viewer
-
-Centralized state management using Redux
-
-2. Implementation Plan
-2.1 Redux Updates
-Fullscript Slice (simplified, frontend-only)
-ts
-Copy
-Edit
-// src/store/slices/fullscriptSlice.ts
+```typescript
+// src/store/slices/integrationSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { RootState } from '../store';
 
-interface FullscriptState {
-  isAuthenticated: boolean;
+interface IntegrationState {
+  selectedPartner: 'fullscript' | 'pure_insight' | 'manual' | null;
+  uploadedFiles: string[];
+  processingStatus: 'idle' | 'processing' | 'complete' | 'error';
+  selectedReport: string | null; // Add this line
 }
 
-const initialState: FullscriptState = {
-  isAuthenticated: false,
+const initialState: IntegrationState = {
+  selectedPartner: null,
+  uploadedFiles: [],
+  processingStatus: 'idle',
+  selectedReport: null, // Add this line
 };
 
-const fullscriptSlice = createSlice({
-  name: 'fullscript',
+const integrationSlice = createSlice({
+  name: 'integration',
   initialState,
   reducers: {
-    setAuthenticated: (state, action: PayloadAction<boolean>) => {
-      state.isAuthenticated = action.payload;
+    setSelectedPartner: (state, action: PayloadAction<'fullscript' | 'pure_insight' | 'manual' | null>) => {
+      state.selectedPartner = action.payload;
     },
-  },
-});
-
-export const { setAuthenticated } = fullscriptSlice.actions;
-export default fullscriptSlice.reducer;
-PureInsight Slice
-ts
-Copy
-Edit
-// src/store/slices/pureInsightSlice.ts
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-interface PureInsightState {
-  selectedReport: string | null;
-}
-
-const initialState: PureInsightState = {
-  selectedReport: null,
-};
-
-const pureInsightSlice = createSlice({
-  name: 'pureInsight',
-  initialState,
-  reducers: {
-    setSelectedReport: (state, action: PayloadAction<string>) => {
+    addUploadedFile: (state, action: PayloadAction<string>) => {
+      state.uploadedFiles.push(action.payload);
+    },
+    setProcessingStatus: (state, action: PayloadAction<'idle' | 'processing' | 'complete' | 'error'>) => {
+      state.processingStatus = action.payload;
+    },
+    setSelectedReport: (state, action: PayloadAction<string | null>) => { // Add this reducer
       state.selectedReport = action.payload;
     },
-    clearSelectedReport: (state) => {
-      state.selectedReport = null;
-    },
+    resetIntegrationState: (state) => {
+      state.selectedPartner = null;
+      state.uploadedFiles = [];
+      state.processingStatus = 'idle';
+      state.selectedReport = null; // Add this line
+    }
   },
 });
 
-export const { setSelectedReport, clearSelectedReport } = pureInsightSlice.actions;
-export default pureInsightSlice.reducer;
-Store Configuration
-ts
-Copy
-Edit
-// src/store/store.ts
-import { configureStore } from '@reduxjs/toolkit';
-import fullscriptReducer from './slices/fullscriptSlice';
-import pureInsightReducer from './slices/pureInsightSlice';
+export const { 
+  setSelectedPartner, 
+  addUploadedFile, 
+  setProcessingStatus, 
+  setSelectedReport, // Export the new action
+  resetIntegrationState 
+} = integrationSlice.actions;
 
-export const store = configureStore({
-  reducer: {
-    fullscript: fullscriptReducer,
-    pureInsight: pureInsightReducer,
-  },
-});
+export const selectIntegration = (state: RootState) => state.integration;
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
-export default store;
-2.2 IntegrationHub Component
-tsx
-Copy
-Edit
+export default integrationSlice.reducer;
+```
+
+### 2.2. Update `IntegrationHub` Component
+
+We will add a new section to the `IntegrationHub` component for the PureInsight integration. This section will display the QR code, a fallback link, and buttons to view the sample reports.
+
+**File:** `src/components/IntegrationHub/IntegrationHub.tsx`
+
+```tsx
 // src/components/IntegrationHub/IntegrationHub.tsx
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../store/store';
-import { setSelectedReport } from '../../store/slices/pureInsightSlice';
-import { setAuthenticated } from '../../store/slices/fullscriptSlice';
+import { useDispatch } from 'react-redux';
+import { setSelectedReport } from '../../store/slices/integrationSlice';
 
 const IntegrationHub: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const isFullscriptAuthenticated = useSelector((state: RootState) => state.fullscript.isAuthenticated);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFullscript = () => {
-    // For prototype: toggle auth state
-    dispatch(setAuthenticated(true));
-    navigate('/documents');
+  const fullscriptUrl = import.meta.env.VITE_FULLSCRIPT_PRACTITIONER_URL;
+
+  const handleNavigate = (url: string) => {
+    window.open(url, '_blank');
   };
 
-  const handlePureInsightReport = (report: string) => {
-    dispatch(setSelectedReport(report));
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleViewReport = (reportUrl: string) => {
+    dispatch(setSelectedReport(reportUrl));
     navigate('/report-viewer');
   };
 
   return (
-    <div className="integration-hub-container">
+    <div className="integration-hub-container" style={{ textAlign: 'center', padding: '2rem' }}>
       <h2>Connect with Our Partners</h2>
-
-      {/* Fullscript Section */}
-      <div className="fullscript-section" style={{ marginBottom: '2rem' }}>
-        <h3>Fullscript</h3>
-        {isFullscriptAuthenticated ? (
-          <button onClick={() => navigate('/documents')}>View Fullscript Dashboard</button>
-        ) : (
-          <button onClick={handleFullscript}>Connect to Fullscript</button>
-        )}
-      </div>
+      <p>Please choose one of the following options to proceed.</p>
 
       {/* PureInsight Section */}
-      <div className="pureinsight-section">
-        <h3>PureInsight Access</h3>
-        <p>Scan the QR code below with your mobile device to connect:</p>
-        <img
-          src="/practice-qr-code.png"
-          alt="PureInsight QR Code"
-          style={{ maxWidth: '300px', width: '100%' }}
-        />
-        <p>Or click this <a href="https://www.pureinsight.com/" target="_blank" rel="noopener noreferrer">fallback link</a> if you cannot scan the QR code.</p>
-
+      <div className="pureinsight-section" style={{ margin: '2rem 0' }}>
+        <h3>PureInsight</h3>
+        <p>Scan the QR code with your mobile device to access PureInsight.</p>
+        <img src="/practice-qr-code.png" alt="PureInsight QR Code" style={{ maxWidth: '200px', margin: '1rem auto' }} />
+        <p>
+          Or, <a href="https://www.pureinsight.com" target="_blank" rel="noopener noreferrer">click here</a> if you cannot scan the code.
+        </p>
         <div style={{ marginTop: '1rem' }}>
-          <button onClick={() => handlePureInsightReport('/patient-report-example.pdf')}>
+          <button className="btn btn-secondary" onClick={() => handleViewReport('/patient-report-example.pdf')}>
             View Sample Patient Report
           </button>
-          <button onClick={() => handlePureInsightReport('/practitioner-report-example.pdf')} style={{ marginLeft: '1rem' }}>
+          <button className="btn btn-secondary" style={{ marginLeft: '1rem' }} onClick={() => handleViewReport('/practitioner-report-example.pdf')}>
             View Sample Practitioner Report
           </button>
         </div>
+      </div>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <div className="integration-options" style={{ margin: '2rem 0' }}>
+        <h3>Fullscript</h3>
+        <p>Click the button below to open Fullscript in a new tab.</p>
+        <button className="btn btn-primary" onClick={() => handleNavigate(fullscriptUrl)}>
+          Continue to Fullscript
+        </button>
+      </div>
+
+      <hr style={{ margin: '2rem 0' }} />
+
+      <div className="manual-upload-section">
+        <h3>Manual Upload</h3>
+        <p>If you have a JSON or CSV file of your questionnaire results, you can upload it here.</p>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+          accept=".json,.csv"
+        />
+        <button className="btn btn-outline" onClick={handleUploadClick}>
+          Select File
+        </button>
+        {selectedFile && (
+          <div style={{ marginTop: '1rem' }}>
+            <p><strong>Selected file:</strong> {selectedFile.name}</p>
+            <button className="btn btn-primary" onClick={() => navigate('/documents')}>
+              Upload and Continue
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default IntegrationHub;
-2.3 ReportViewer Component
-tsx
-Copy
-Edit
+```
+
+### 2.3. Create `ReportViewer` Component
+
+We will create a new component to display the PDF reports. This component will use `react-pdf` to render the PDF.
+
+First, we need to install `react-pdf`:
+```bash
+npm install react-pdf
+```
+
+**File:** `src/components/ReportViewer/ReportViewer.tsx` (New File)
+```tsx
 // src/components/ReportViewer/ReportViewer.tsx
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { Document, Page, pdfjs } from 'react-pdf';
 import { RootState } from '../../store/store';
-import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const ReportViewer: React.FC = () => {
   const navigate = useNavigate();
-  const file = useSelector((state: RootState) => state.pureInsight.selectedReport);
+  const { selectedReport } = useSelector((state: RootState) => state.integration);
+  const [numPages, setNumPages] = useState<number | null>(null);
+  const [pageNumber, setPageNumber] = useState(1);
 
-  const [numPages, setNumPages] = React.useState<number | null>(null);
-  const [pageNumber, setPageNumber] = React.useState(1);
+  function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
+    setNumPages(numPages);
+  }
 
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => setNumPages(numPages);
+  if (!selectedReport) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <h2>No Report Selected</h2>
+        <p>Please go back and select a report to view.</p>
+        <button className="btn btn-primary" onClick={() => navigate(-1)}>Back</button>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <div style={{ padding: '1rem', textAlign: 'center' }}>
       <h2>Report Viewer</h2>
-      <button onClick={() => navigate(-1)}>Back</button>
-      {file ? (
-        <Document file={file} onLoadSuccess={onDocumentLoadSuccess}>
+      <div style={{ margin: '1rem 0' }}>
+        <button className="btn btn-secondary" onClick={() => navigate(-1)}>Back</button>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <Document file={selectedReport} onLoadSuccess={onDocumentLoadSuccess}>
           <Page pageNumber={pageNumber} />
         </Document>
-      ) : (
-        <p>No report selected.</p>
-      )}
-
+      </div>
       {numPages && (
         <div style={{ marginTop: '1rem' }}>
-          <button disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)}>Previous</button>
-          <span style={{ margin: '0 1rem' }}>Page {pageNumber} of {numPages}</span>
-          <button disabled={pageNumber >= numPages} onClick={() => setPageNumber(pageNumber + 1)}>Next</button>
+          <button className="btn" disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)}>
+            Previous
+          </button>
+          <span style={{ margin: '0 1rem' }}>
+            Page {pageNumber} of {numPages}
+          </span>
+          <button className="btn" disabled={pageNumber >= numPages} onClick={() => setPageNumber(pageNumber + 1)}>
+            Next
+          </button>
         </div>
       )}
     </div>
@@ -262,77 +247,67 @@ const ReportViewer: React.FC = () => {
 };
 
 export default ReportViewer;
-2.4 Documents Component (Fullscript Dashboard placeholder)
-tsx
-Copy
-Edit
-// src/components/documents/Documents.tsx
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+```
 
-const Documents: React.FC = () => {
-  const isAuthenticated = useSelector((state: RootState) => state.fullscript.isAuthenticated);
+### 2.4. Update Routing
 
-  return (
-    <div>
-      <h2>Fullscript Dashboard</h2>
-      {isAuthenticated ? (
-        <p>Fullscript dashboard content goes here (prototype).</p>
-      ) : (
-        <p>Please connect to Fullscript to view your documents.</p>
-      )}
-    </div>
-  );
-};
+We will add a new route for the `ReportViewer` component in the main routing file.
 
-export default Documents;
-2.5 Routing Updates (src/main.tsx)
-tsx
-Copy
-Edit
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import store from './store/store';
-import IntegrationHub from './components/IntegrationHub/IntegrationHub';
-import ReportViewer from './components/ReportViewer/ReportViewer';
-import Documents from './components/documents/Documents';
+**File:** `src/main.tsx`
+```tsx
+// Add the following import
+import ReportViewer from './components/ReportViewer/ReportViewer.tsx';
 
-const App = () => (
-  <Provider store={store}>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/integration-hub" element={<IntegrationHub />} />
-        <Route path="/report-viewer" element={<ReportViewer />} />
-        <Route path="/documents" element={<Documents />} />
-      </Routes>
-    </BrowserRouter>
-  </Provider>
-);
+// Add the following route within the public routes
+<Route path='report-viewer' element={<ReportViewer />} />
+```
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(<App />);
-3. User Journey and UI Flow
-mermaid
-Copy
-Edit
-graph TD
-    A[Patient completes questionnaire] --> B[IntegrationHub Page]
-    B --> C[Click Fullscript Connect / Dashboard]
-    C --> D[Documents Page (Fullscript Dashboard placeholder)]
-    B --> E[Scan PureInsight QR Code or click fallback]
-    B --> F[Click "View Sample Report"]
-    F --> G[ReportViewer Component (Redux)]
-4. Task Breakdown
-Task	Estimated Effort (hours)	Priority
-Create Fullscript slice	1	High
-Create PureInsight slice	1	High
-Update IntegrationHub.tsx	3	High
-Create ReportViewer.tsx	2	High
-Update Documents.tsx	1	Medium
-Update routing (main.tsx)	1	High
-Test UI flows	2	Medium
-Total	11	
+The updated `createBrowserRouter` call will look like this:
+```tsx
+const router = createBrowserRouter(createRoutesFromElements(
+  <Route path='/' element={<App />}>
+    {/* Public Routes */}
+    <Route index element={<Homepage />} />
+    <Route path='login' element={<Login />} />
+    <Route path='register' element={<Register />} />
+    <Route path='resetpassword' element={<ResetPassword />} />
+    <Route path='user/verify' element={<VerifyAccount />} />
+    <Route path='verify/password' element={<VerifyPassword />} />
+    <Route path='integrations' element={<IntegrationHub />} />
+    <Route path='report-viewer' element={<ReportViewer />} />
+    <Route path='questionnaires' element={<Questionnaires />} />
+    <Route path='questionnaires/builder' element={<QuestionnaireBuilder />} />
+    <Route path='questionnaires/:id' element={<QuestionnaireDetails />} />
+    <Route path='questionnaires/:id/form' element={<QuestionnaireForm />} />
+    <Route path='questionnaires/results/:responseId' element={<QuestionnaireResults />} />
 
-This combined integration keeps things frontend-only, prototype-friendly, and centralized in Redux. Later, backend calls for Fullscript and PureInsight can be added without touching the UI flow.
+    {/* ... rest of the routes */}
+  </Route>
+));
+```
+
+## 3. User Flow
+
+1.  **Patient completes the questionnaire.**
+2.  **Navigates to the `IntegrationHub` page (`/integrations`).**
+3.  **The patient sees three options:** PureInsight, Fullscript, and Manual Upload.
+4.  **For PureInsight, the patient can:**
+    *   Scan the QR code to access PureInsight on their mobile device.
+    *   Click the fallback link to open the PureInsight website in a new tab.
+    *   Click "View Sample Patient Report" or "View Sample Practitioner Report".
+5.  **If a sample report is clicked:**
+    *   The application navigates to the `/report-viewer` route.
+    *   The `ReportViewer` component displays the selected PDF.
+    *   The patient can navigate through the pages of the PDF and go back to the `IntegrationHub`.
+
+## 4. Task Breakdown
+
+| Task                                      | Estimated Effort (hours) | Priority |
+| ----------------------------------------- | ------------------------ | -------- |
+| Update `integrationSlice` in Redux        | 1                        | High     |
+| Update `IntegrationHub.tsx` component     | 2                        | High     |
+| Install `react-pdf` dependency            | 0.5                      | High     |
+| Create `ReportViewer.tsx` component       | 3                        | High     |
+| Update routing in `src/main.tsx`          | 0.5                      | High     |
+| Test the end-to-end user flow             | 1                        | Medium   |
+| **Total**                                 | **8**                    |          |

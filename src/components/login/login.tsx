@@ -111,14 +111,6 @@ const Login = () => {
     await verifyQrCode(qrCode);
   };
 
-  /**
-   * Redirect: If already logged in, navigate to previous location or homepage
-   */
-  if (isLoggedIn) {
-    return location?.state?.from?.pathname
-      ? <Navigate to={location.state.from.pathname} replace />
-      : <Navigate to="/" replace />;
-  }
 
   /**
    * Redirect: If login success and MFA not required, complete login

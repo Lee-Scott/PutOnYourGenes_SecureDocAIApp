@@ -3,6 +3,7 @@ import type { IResponse } from '../models/IResponse';
 import { isJsonContentType, processError, processResponse } from '../utils/RequestUtils';
 import { Http } from '../enum/http.method';
 import { createBaseQueryWithAuth } from './BaseQueryWithAuth';
+import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { 
   IQuestionnaire, 
   IQuestionnaireRequest, 
@@ -120,48 +121,19 @@ const questionnaireApiBaseUrl = 'http://localhost:8085/api/questionnaires';
  * - Admin functions require elevated permissions
  */
 export const questionnaireAPI = createApi({
-  // Unique identifier for this API slice in the Redux store
   reducerPath: 'questionnaireAPI',
-
-  // Base query configuration with authentication
   baseQuery: createBaseQueryWithAuth(questionnaireApiBaseUrl, isJsonContentType),
-
-  // Cache tag types for invalidation strategies
   tagTypes: ['Questionnaire', 'QuestionnaireResponse', 'QuestionnaireList'],
-
-  // Define the API endpoints
   endpoints: (builder) => ({
-    /**
-     * Fetches all available questionnaires for users
-     * @returns {IResponse<IQuestionnaireList>} Response containing list of questionnaires
-     */
     getQuestionnaires: builder.query<IResponse<IQuestionnaireList>, { page?: number; size?: number; category?: string }>({
-      query: ({ page = 0, size = 10, category }) => ({
-        url: `?page=${page}&size=${size}${category ? `&category=${category}` : ''}`,
-        method: Http.GET
-      }),
-      keepUnusedDataFor: 300, // Cache for 5 minutes
+      query: ({ page = 0, size = 10, category }) => `?page=${page}&size=${size}${category ? `&category=${category}` : ''}`,
       transformResponse: transformQuestionnaireListResponse,
-      transformErrorResponse: processError,
-      providesTags: ['QuestionnaireList']
+      providesTags: ['QuestionnaireList'],
     }),
-
-    /**
-     * Fetches a specific questionnaire by ID
-     * @param {string} questionnaireId - The ID of the questionnaire
-     * @returns {IResponse<IQuestionnaire>} Response containing questionnaire details
-     */
     getQuestionnaireById: builder.query<IResponse<IQuestionnaire>, string>({
-      query: (questionnaireId) => ({
-        url: `/${questionnaireId}`,
-        method: Http.GET
-      }),
-      keepUnusedDataFor: 600, // Cache for 10 minutes
+      query: (questionnaireId) => `/${questionnaireId}`,
       transformResponse: transformQuestionnaireResponse,
-      transformErrorResponse: processError,
-      providesTags: (_result, _error, questionnaireId) => [
-        { type: 'Questionnaire', id: questionnaireId }
-      ]
+      providesTags: (_result, _error, questionnaireId) => [{ type: 'Questionnaire', id: questionnaireId }],
     }),
 
     /**
