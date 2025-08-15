@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import type { Reducer } from "redux";
 import { userAPI } from "../service/UserService";
 import logger from 'redux-logger';
+import { paperlessApi } from "../service/PaperlessService";
 import { documentAPI } from "../service/DocumentService";
 import { chatRoomAPI } from "../service/ChatRoomService";
 import { questionnaireAPI } from "../service/QuestionnaireService";
@@ -14,6 +15,7 @@ import integrationReducer from './slices/integrationSlice';
 const rootReducer = combineReducers({
     [userAPI.reducerPath]: userAPI.reducer, // set reducer to api reducer path
     [documentAPI.reducerPath]: documentAPI.reducer,
+    [paperlessApi.reducerPath]: paperlessApi.reducer,
     [chatRoomAPI.reducerPath]: chatRoomAPI.reducer,
     [questionnaireAPI.reducerPath]: questionnaireAPI.reducer,
     homepage: homepageReducer,
@@ -33,6 +35,7 @@ export const setupStore = () => {
             // Add RTK Query middleware for handling API requests, caching, etc.
             .concat(userAPI.middleware)
             .concat(documentAPI.middleware)
+            .concat(paperlessApi.middleware)
             .concat(chatRoomAPI.middleware)
             .concat(questionnaireAPI.middleware)
             // Add logger middleware for debugging actions and state changes

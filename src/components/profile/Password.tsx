@@ -7,6 +7,7 @@ import Loader from './Loader';
 import { userAPI } from '../../service/UserService';
 import ResetPassword from '../ResetPassword';
 import React from 'react';
+import { useOutletContext } from 'react-router-dom';
 
 const schema = z.object({
     newPassword: z.string().min(4, { message: 'New password is required' }),
@@ -24,7 +25,6 @@ const schema = z.object({
 
 const Password = () => {
     const { register, handleSubmit, reset, formState: form, getFieldState } = useForm<UpdatePassword>({ resolver: zodResolver(schema), mode: 'onTouched' });
-    const { data: user, error, isSuccess, isLoading, refetch } = userAPI.useFetchUserQuery();
     const [updatePassword, { data: updateData, isLoading: updateLoading, isSuccess: updateSuccess }] = userAPI.useUpdatePasswordMutation();
 
   
@@ -37,8 +37,6 @@ const Password = () => {
 
     return (
     <>
-      {isLoading && <Loader />}
-      {isSuccess && <>
         <h4 className="mb-3">Password</h4>
         <hr />
         <form onSubmit={handleSubmit(onUpdatePassword)} className="needs-validation" noValidate>
@@ -71,13 +69,12 @@ const Password = () => {
           </div>
           <hr className="my-4" />
           <div className="col">
-            <button disabled={!form.isValid || form.isSubmitting || isLoading || updateLoading} className="btn btn-primary btn-block" type="submit" >
-              {(form.isSubmitting || isLoading || updateLoading) && <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>}
-              <span role="status">{(form.isSubmitting || isLoading || updateLoading) ? 'Loading...' : 'Update'}</span>
+            <button disabled={!form.isValid || form.isSubmitting || updateLoading} className="btn btn-primary btn-block" type="submit" >
+              {(form.isSubmitting || updateLoading) && <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>}
+              <span role="status">{(form.isSubmitting || updateLoading) ? 'Loading...' : 'Update'}</span>
             </button>
           </div>
         </form>
-      </>}
     </>
   )
 }

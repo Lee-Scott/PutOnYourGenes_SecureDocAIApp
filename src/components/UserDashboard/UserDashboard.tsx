@@ -5,12 +5,12 @@ import IntegrationWidget from './widgets/IntegrationWidget';
 import ChatWidget from './widgets/ChatWidget';
 import DocumentWidget from './widgets/DocumentWidget';
 import PaperlessWidget from './widgets/PaperlessWidget';
-import './PatientDashboard.css';
+import './UserDashboard.css';
 
-const PatientDashboard: React.FC = () => {
+const UserDashboard: React.FC = () => {
   return (
-    <div className="patient-dashboard-container container mtb">
-      <h2>Patient Dashboard</h2>
+    <div className="user-dashboard-container container mtb">
+      <h2>User Dashboard</h2>
       <div className="dashboard-grid">
         <div className="dashboard-widget">
           <ReportWidget />
@@ -35,4 +35,4 @@ const PatientDashboard: React.FC = () => {
   );
 };
 
-export default PatientDashboard;
+export default UserDashboard;

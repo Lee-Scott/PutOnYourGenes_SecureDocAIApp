@@ -1,4 +1,5 @@
 import React from 'react';
+import logo from '../../assets/logo.png';
 
 interface HeroSectionProps {
   onCTAClick: () => void;
@@ -8,7 +9,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onCTAClick }) => {
   return (
     <section className="hero-section">
       <div className="hero-content">
-        <img src="/assets/logo.png" alt="PutOnYourGenes" className="hero-logo" />
+        <img src={logo} alt="PutOnYourGenes" className="hero-logo" />
         <h1 className="hero-headline">
           Personalized Health Starts Here
         </h1>

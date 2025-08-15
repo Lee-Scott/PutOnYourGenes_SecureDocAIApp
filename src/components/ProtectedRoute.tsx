@@ -1,5 +1,6 @@
 import { Key } from '../enum/catch.key';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import NavBar from './NavBar/NavBar';
 
 interface ProtectedRouteProps {
     unauthenticatedOnly?: boolean;
@@ -14,7 +15,12 @@ const ProtectedRoute = ({ unauthenticatedOnly = false }: ProtectedRouteProps) =>
     }
 
     if (isLoggedIn) {
-        return <Outlet />;
+        return (
+            <>
+                <NavBar />
+                <Outlet />
+            </>
+        );
     } else {
         return <Navigate to="/login" replace state={{ from: location }} />;
     }

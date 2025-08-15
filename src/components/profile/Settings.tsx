@@ -2,9 +2,10 @@ import React from 'react'
 import { userAPI } from '../../service/UserService';
 import { AccountSettings } from '../../enum/account.settings';
 import Loader from './Loader';
+import { useOutletContext } from 'react-router-dom';
 
 const Settings = () => {
-  const { data: user, error, isSuccess, isLoading, refetch } = userAPI.useFetchUserQuery();
+  const { user, refetch } = useOutletContext<any>();
   const [toggleAccountExpired] = userAPI.useToggleAccountExpiredMutation();
   const [toggleAccountLocked] = userAPI.useToggleAccountLockedMutation();
   const [toggleAccountEnabled] = userAPI.useToggleAccountEnabledMutation();
@@ -30,8 +31,6 @@ const Settings = () => {
   }
    return (
     <>
-      {isLoading && <Loader />}
-      {isSuccess && <>
         <h4 className="mb-3">Settings</h4>
         <hr />
         <div className="form-group">
@@ -96,7 +95,6 @@ const Settings = () => {
             </li>
           </ul>
         </div>
-      </>}
     </>
   )
 }

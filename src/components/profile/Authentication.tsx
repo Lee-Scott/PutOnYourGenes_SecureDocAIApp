@@ -1,5 +1,6 @@
 import { userAPI } from '../../service/UserService';
 import Loader from './Loader';
+import { useOutletContext } from 'react-router-dom';
 
 function formatLastLogin(dateString?: string) {
   if (!dateString) return 'Never';
@@ -15,7 +16,7 @@ function formatLastLogin(dateString?: string) {
 }
 
 const Authentication = () => {
-  const { data: user, error, isSuccess, isLoading, refetch } = userAPI.useFetchUserQuery();
+  const { user, refetch } = useOutletContext<any>();
   const [enableMfa, { data: qrData, isLoading: enableLoading, isSuccess: qrCodeSuccess }] = userAPI.useEnableMfaMutation();
   const [disableMfa, { isLoading: disableLoading }] = userAPI.useDisableMfaMutation();
 
@@ -26,16 +27,14 @@ const Authentication = () => {
   }
   return (
     <>
-      {isLoading && <Loader /> }
-      {isSuccess && <>
         <h4 className="mb-3">Authentication(MFA) <span className={`badge pill text-light text-bg-${user?.data.user.mfa ? 'success' : 'warning'} fs-6`}>{user?.data.user.mfa ? 'Enabled' : 'Disabled'}</span></h4>
         <hr />
         <div className="row g-3">
           <div className="col-12 mb-2">
             <label className="form-label d-block mb-1">Multi Factor Authentication</label>
             <p className="small text-muted">Two-factor authentication adds an additional layer of security to your account by requiring more than just a password to log in.</p>
-            <button onClick={toggleMfa} disabled={isLoading || disableLoading || enableLoading} className={`btn border btn-${user?.data.user.mfa ? 'light' : 'primary'} mt-2`} type="button">{user?.data.user.mfa ? 'Disable' : 'Enable'} Two-Factor Authentication
-              {(isLoading || disableLoading || enableLoading) && <div className={`spinner-border text-${user?.data.user.mfa ? 'primary' : 'light'}`} role="status" style={{ height: '20px', width: '20px', marginLeft: '10px' }}></div>}
+            <button onClick={toggleMfa} disabled={disableLoading || enableLoading} className={`btn border btn-${user?.data.user.mfa ? 'light' : 'primary'} mt-2`} type="button">{user?.data.user.mfa ? 'Disable' : 'Enable'} Two-Factor Authentication
+              {(disableLoading || enableLoading) && <div className={`spinner-border text-${user?.data.user.mfa ? 'primary' : 'light'}`} role="status" style={{ height: '20px', width: '20px', marginLeft: '10px' }}></div>}
             </button>
             {(user?.data.user.mfa) && <div className="accordion mt-3 mb-3" id="accordionExample">
               <div className="accordion-item">
@@ -67,7 +66,6 @@ const Authentication = () => {
             </ul>
           </div>
         </div>
-      </>}
     </>
   )
 }

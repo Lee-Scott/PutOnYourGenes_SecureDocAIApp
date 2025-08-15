@@ -36,6 +36,12 @@ function NavBar() {
                 </NavLink>
               </li>
               <li className="nav-item">
+                <NavLink to='/dashboard' end className="nav-link" aria-current="page">
+                  <i className="bi bi-speedometer2 me-1"></i>
+                  Dashboard
+                </NavLink>
+              </li>
+              <li className="nav-item">
                 <NavLink to='/chat' className="nav-link">
                   <i className="bi bi-chat-dots me-1"></i>
                   Chat
@@ -106,7 +112,6 @@ function NavBar() {
           </div>
         </div>
       </nav>
-      <Outlet />
     </>
   )
 }

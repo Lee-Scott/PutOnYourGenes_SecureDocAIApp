@@ -22,6 +22,7 @@ import Authorization from './components/profile/Authorization.tsx'
 import Authentication from './components/profile/Authentication.tsx'
 import NotFound from './components/NotFound.tsx'
 import DocumentDetails from './components/documents/DocumentDetails.tsx'
+import PaperlessDocumentDetails from './components/documents/PaperlessDocumentDetails.tsx'
 import Users from './components/users/Users.tsx'
 import UserDetails from './components/users/UserDetails.tsx'
 import { ChatRooms } from './components/chat/index.ts'
@@ -41,7 +42,6 @@ const store = setupStore();
 const router = createBrowserRouter(createRoutesFromElements(
   <Route path='/' element={<App />}>
     {/* Public Routes */}
-    <Route index element={<Homepage />} />
     <Route path='login' element={<Login />} />
     <Route path='register' element={<Register />} />
     <Route path='resetpassword' element={<ResetPassword />} />
@@ -58,10 +58,11 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path='questionnaires/:id' element={<QuestionnaireDetails />} />
       <Route path='questionnaires/:id/form' element={<QuestionnaireForm />} />
       <Route path='questionnaires/results/:responseId' element={<QuestionnaireResults />} />
-      <Route element={<NavBar />}>
-        <Route path='dashboard' element={<PatientDashboard />} />
+      <Route index element={<Homepage />} />
+      <Route path='dashboard' element={<PatientDashboard />} />
         <Route path='documents' element={<Documents />} />
         <Route path='documents/:documentId' element={<DocumentDetails />} />
+        <Route path='editdoc/:id' element={<PaperlessDocumentDetails />} />
         <Route path='chat' element={<ChatRooms />} />
         <Route path='chat/:chatRoomId' element={<ChatRooms />} />
         <Route element={<Restricted />}>
@@ -75,9 +76,8 @@ const router = createBrowserRouter(createRoutesFromElements(
           <Route path='password' element={<Password />} />
           <Route path='settings' element={<Settings />} />
           <Route path='authorization' element={<Authorization />} />
-          <Route path='authentication' element={<Authentication />} />
+        <Route path='authentication' element={<Authentication />} />
         </Route>
-      </Route>
     </Route>
     
     <Route path='*' element={<NotFound />} />

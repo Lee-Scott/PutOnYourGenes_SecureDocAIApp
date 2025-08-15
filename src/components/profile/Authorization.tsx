@@ -2,17 +2,16 @@ import React from 'react'
 import { userAPI } from '../../service/UserService';
 import { Role } from '../../models/IUser';
 import Loader from './Loader';
+import { useOutletContext } from 'react-router-dom';
 
 const Authorization = () => {
-  const { data: user, error, isSuccess, isLoading, refetch } = userAPI.useFetchUserQuery();
+  const { user, refetch } = useOutletContext<any>();
   const [updateRole, { data: roleData, isLoading: updateLoading, isSuccess: updateSuccess }] = userAPI.useUpdateRoleMutation();
   
   const onUpdateRole = async (role: Role) => await updateRole(role);
 
   return (
     <>
-      {isLoading && <Loader />}
-      {isSuccess && <>
         <h4 className="mb-3">Authorization</h4>
         <hr />
         <form className="needs-validation">
@@ -52,7 +51,6 @@ const Authorization = () => {
           <div className="col">
           </div>
         </form>
-      </>}
     </>
   )
 }

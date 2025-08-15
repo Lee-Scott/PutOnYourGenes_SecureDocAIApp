@@ -21,8 +21,14 @@ export interface IDocument {
 export type Document = IDocument;
 
 export type DocumentForm = {
+    documentId: string;
     name: string;
     description: string;
+    uri?: string;
+    formattedSize?: string;
+    updaterName?: string;
+    createdAt?: string;
+    updatedAt?: string;
 };
 
 export type Documents = {

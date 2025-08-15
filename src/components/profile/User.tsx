@@ -114,7 +114,7 @@ const User = () => {
         <div className="col-lg-9 col-md-7 col-sm-12">
           <div className="card">
             <div className="card-body">
-              <Outlet />
+              <Outlet context={{ user: userData, refetch }} />
             </div>
           </div>
         </div>

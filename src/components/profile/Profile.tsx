@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import Loader from './Loader';
 import { userAPI } from '../../service/UserService';
+import { useOutletContext } from 'react-router-dom';
 
 const schema = z.object({
   email: z.string().min(3, 'Email is required').email('Invalid email address'),
@@ -18,8 +19,8 @@ const schema = z.object({
 });
 
 const Profile = () => {
+  const { user, refetch } = useOutletContext<any>();
   const { register, handleSubmit, formState: form, getFieldState, reset } = useForm<IRegisterRequest>({ resolver: zodResolver(schema), mode: 'onTouched' });
-  const { data: user, error, isSuccess, isLoading, refetch } = userAPI.useFetchUserQuery();
   const [update, { data: updateData, isLoading: updateLoading }] = userAPI.useUpdateUserMutation();
 
   const updateUser = async (formData: IRegisterRequest) => {
@@ -47,11 +48,9 @@ const Profile = () => {
 
   return (
     <>
-      {isLoading && <Loader /> }
-      {isSuccess && <>
-        <h4 className="mb-3">Profile</h4>
-        <hr />
-        <form onSubmit={handleSubmit(updateUser)} className="needs-validation" noValidate>
+      <h4 className="mb-3">Profile</h4>
+      <hr />
+      <form onSubmit={handleSubmit(updateUser)} className="needs-validation" noValidate>
           <div className="row g-3">
             <div className="col-sm-6">
               <label htmlFor="firstName" className="form-label">First name</label><div className="input-group has-validation">
@@ -92,13 +91,12 @@ const Profile = () => {
           </div>
           <hr className="my-4"/>
           <div className="col">
-            <button disabled={!form.isValid || form.isSubmitting || isLoading || updateLoading || user?.data.user.role === 'USER'} className="btn btn-primary btn-block" type="submit" >
-                  {(form.isSubmitting || isLoading || updateLoading) && <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>}
-                    <span role="status">{(form.isSubmitting || isLoading || updateLoading) ? 'Loading...' : 'Update'}</span>
+            <button disabled={!form.isValid || form.isSubmitting || updateLoading || user?.data.user.role === 'USER'} className="btn btn-primary btn-block" type="submit" >
+                  {(form.isSubmitting || updateLoading) && <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>}
+                    <span role="status">{(form.isSubmitting || updateLoading) ? 'Loading...' : 'Update'}</span>
                   </button>
           </div>
         </form>
-      </>}
     </>
   )
 }
