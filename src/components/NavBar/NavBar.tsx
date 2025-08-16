@@ -20,7 +20,7 @@ function NavBar() {
     <>
       <nav className="navbar navbar-expand-md fixed-top bg-light" data-bs-theme="light" style={{ marginBottom: '250px' }}>
         <div className="container">
-          <NavLink to='/' end className="navbar-brand">
+          <NavLink to='/dashboard' end className="navbar-brand">
             <img src={logo} alt="Logo" width="40" height="40" style={{ padding: '0', margin: '0', borderRadius: '0.370rem' }} />
           </NavLink>
           <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02"

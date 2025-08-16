@@ -1,53 +1,57 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGetDocumentsQuery, useUploadDocumentMutation, useGetDocumentFileQuery } from '../../service/PaperlessService';
+import { useGetDocumentQuery, useUploadDocumentMutation, useGetDocumentFileQuery } from '../../service/PaperlessService';
 import { PDFDocument } from 'pdf-lib';
 import * as pdfjsLib from 'pdfjs-dist';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = `/assets/pdf.worker.min.mjs`;
 
 const PaperlessDocumentDetails: React.FC = () => {
+  console.log('Rendering PaperlessDocumentDetails');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const documentId = parseInt(id || '0', 10);
 
-  const { data: documents, isLoading: isLoadingDocuments } = useGetDocumentsQuery();
+  const { data: document, isLoading: isLoadingDocument } = useGetDocumentQuery(documentId, { skip: !documentId });
   const { data: pdfBlob, isLoading: isLoadingPdf, isError } = useGetDocumentFileQuery(documentId, { skip: !documentId });
   const [uploadDocument, { isLoading: isUploading }] = useUploadDocumentMutation();
 
   const [numPages, setNumPages] = useState(0);
   const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
 
-  const document = documents?.results.find((doc: any) => doc.id === documentId);
-
   useEffect(() => {
+    console.log('pdfBlob:', pdfBlob);
     const renderPdf = async () => {
       if (pdfBlob) {
-        const arrayBuffer = await pdfBlob.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        setNumPages(pdf.numPages);
+        try {
+          const arrayBuffer = await pdfBlob.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          setNumPages(pdf.numPages);
 
-        for (let i = 0; i < pdf.numPages; i++) {
-          const page = await pdf.getPage(i + 1);
-          const viewport = page.getViewport({ scale: 1.5 });
-          const canvas = canvasRefs.current[i];
-          if (canvas) {
-            const context = canvas.getContext('2d');
-            if (context) {
-              canvas.height = viewport.height;
-              canvas.width = viewport.width;
-              const renderContext = {
-                canvasContext: context,
-                viewport: viewport,
-              };
-              await page.render(renderContext).promise;
+          for (let i = 0; i < pdf.numPages; i++) {
+            const page = await pdf.getPage(i + 1);
+            const viewport = page.getViewport({ scale: 1.5 });
+            const canvas = canvasRefs.current[i];
+            if (canvas) {
+              const context = canvas.getContext('2d');
+              if (context) {
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                const renderContext = {
+                  canvasContext: context,
+                  viewport: viewport,
+                };
+                await page.render(renderContext).promise;
+              }
             }
           }
+        } catch (error) {
+          console.error('Error rendering PDF:', error);
         }
       }
     };
     renderPdf();
-  }, [pdfBlob]);
+  }, [pdfBlob, isLoadingPdf, isError]);
 
   const handleAddText = async () => {
     if (pdfBlob) {
@@ -85,9 +89,10 @@ const PaperlessDocumentDetails: React.FC = () => {
     }
   };
 
-  if (isLoadingDocuments || isLoadingPdf) return <p>Loading document...</p>;
+  if (isLoadingDocument || isLoadingPdf) return <p>Loading document...</p>;
   if (isError || !document) return <p>Document not found.</p>;
 
+  console.log('Rendering PaperlessDocumentDetails');
   return (
     <div className="container mtb">
       <h2>Edit Document: {document.title}</h2>

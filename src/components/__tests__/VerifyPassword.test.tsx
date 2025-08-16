@@ -1,16 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { vi, describe, test, expect, beforeEach, Mock } from 'vitest';
-import VerifyPassword from './VerifyPassword';
-import { userAPI } from '../service/UserService';
+import VerifyPassword from '../VerifyPassword';
+import { userAPI } from '../../service/UserService';
 
 // Mock the userAPI
-vi.mock('../service/UserService', () => ({
-  userAPI: {
-    useVerifyPasswordMutation: vi.fn(),
-    useDoResetPasswordMutation: vi.fn(),
-  },
-}));
+// No longer mocking the entire module
 
 describe('VerifyPassword', () => {
   const verifyPasswordFn = vi.fn();
@@ -18,17 +13,19 @@ describe('VerifyPassword', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (userAPI.useVerifyPasswordMutation as Mock).mockReturnValue([verifyPasswordFn, { 
-        isLoading: false, 
-        isSuccess: false, 
+    vi.spyOn(userAPI, 'useVerifyPasswordMutation').mockReturnValue([verifyPasswordFn, {
+        isLoading: false,
+        isSuccess: false,
         error: null,
         data: null,
+        reset: vi.fn(),
     }]);
-    (userAPI.useDoResetPasswordMutation as Mock).mockReturnValue([doResetPasswordFn, { 
-        isLoading: false, 
-        isSuccess: false, 
+    vi.spyOn(userAPI, 'useDoResetPasswordMutation').mockReturnValue([doResetPasswordFn, {
+        isLoading: false,
+        isSuccess: false,
         error: null,
         data: null,
+        reset: vi.fn(),
     }]);
   });
 

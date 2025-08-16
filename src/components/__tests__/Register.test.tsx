@@ -1,25 +1,22 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import Register from './Register';
-import { userAPI } from '../service/UserService';
+import Register from '../Register';
+import { userAPI } from '../../service/UserService';
 import { vi, describe, test, expect, beforeEach, Mock } from 'vitest';
 
 // Mock the userAPI
-vi.mock('../service/UserService', () => ({
-  userAPI: {
-    useRegisterUserMutation: vi.fn(),
-  },
-}));
+// No longer mocking the entire module
 
 describe('Register', () => {
   const registerUserFn = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (userAPI.useRegisterUserMutation as Mock).mockReturnValue([registerUserFn, { 
-        isLoading: false, 
-        isSuccess: false, 
+    vi.spyOn(userAPI, 'useRegisterUserMutation').mockReturnValue([registerUserFn, {
+        isLoading: false,
+        isSuccess: false,
         data: undefined,
+        reset: vi.fn(),
     }]);
   });
 

@@ -55,12 +55,12 @@ describe('DocumentService', () => {
     const { data } = await store.dispatch(
       documentAPI.endpoints.updateDocument.initiate(doc as any)
     );
-    expect(data?.data.document.name).toBe('updated-document.pdf');
+    expect(data?.data.name).toBe('updated-document.pdf');
   });
 
   it('downloadDocument should download a document', async () => {
     const { data } = await store.dispatch(
-      documentAPI.endpoints.downloadDocument.initiate('test.pdf')
+      documentAPI.endpoints.downloadDocument.initiate('1')
     );
     expect(data?.type).toBe('application/pdf');
     expect(data?.size).toBe(13);

@@ -1,14 +1,12 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { vi, describe, test, expect, beforeEach, Mock } from 'vitest';
-import Questionnaires from './Questionnaires';
-import { useGetQuestionnairesQuery, useGetUserResponsesQuery } from '../../service/QuestionnaireService';
+import { vi, describe, test, expect, beforeEach, beforeAll, Mock } from 'vitest';
+import * as QuestionnaireService from '../../../service/QuestionnaireService';
+import Questionnaires from '../Questionnaires';
+import { useGetQuestionnairesQuery, useGetUserResponsesQuery } from '../../../service/QuestionnaireService';
 
 // Mock the service
-vi.mock('../../service/QuestionnaireService', () => ({
-  useGetQuestionnairesQuery: vi.fn(),
-  useGetUserResponsesQuery: vi.fn(),
-}));
+// No longer mocking the entire module
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -20,18 +18,23 @@ vi.mock('react-router-dom', async () => {
 });
 
 describe('Questionnaires', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    (useGetQuestionnairesQuery as Mock).mockReturnValue({
+  beforeAll(() => {
+    vi.spyOn(QuestionnaireService, 'useGetQuestionnairesQuery').mockReturnValue({
       data: { data: { questionnaires: [] } },
       isLoading: false,
       error: null,
+      refetch: vi.fn(),
     });
-    (useGetUserResponsesQuery as Mock).mockReturnValue({
+    vi.spyOn(QuestionnaireService, 'useGetUserResponsesQuery').mockReturnValue({
       data: { data: [] },
       isLoading: false,
       error: null,
+      refetch: vi.fn(),
     });
+  });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
   test('renders loading state', () => {

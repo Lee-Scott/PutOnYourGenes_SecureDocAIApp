@@ -1,16 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { vi, describe, test, expect, beforeEach, Mock } from 'vitest';
-import Documents from './Documents';
-import { documentAPI } from '../../service/DocumentService';
+import Documents from '../Documents';
+import { documentAPI } from '../../../service/DocumentService';
 
 // Mock the service
-vi.mock('../../service/DocumentService', () => ({
-  documentAPI: {
-    useFetchDocumentsQuery: vi.fn(),
-    useUploadDocumentsMutation: vi.fn(),
-  },
-}));
+// No longer mocking the entire module
 
 const mockDocuments = {
   data: {
@@ -33,13 +28,13 @@ describe('Documents', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (documentAPI.useFetchDocumentsQuery as Mock).mockReturnValue({
+    vi.spyOn(documentAPI, 'useFetchDocumentsQuery').mockReturnValue({
       data: mockDocuments,
       isLoading: false,
       error: null,
       refetch: fetchDocumentsFn,
     });
-    (documentAPI.useUploadDocumentsMutation as Mock).mockReturnValue([uploadDocumentsFn, { isLoading: false }]);
+    vi.spyOn(documentAPI, 'useUploadDocumentsMutation').mockReturnValue([uploadDocumentsFn, { isLoading: false, reset: vi.fn() }]);
   });
 
   test('renders loading state', () => {

@@ -39,8 +39,8 @@ const DocumentDetails = () => {
     await updateDocument(form);
   };
 
-  const onDownloadDocument = async (documentName: string) => {
-    const resource = await downloadDocument(documentName).unwrap();
+  const onDownloadDocument = async (documentId: string, documentName: string) => {
+    const resource = await downloadDocument(documentId).unwrap();
     const url = URL.createObjectURL(new Blob([resource]));
     const link = document.createElement('a');
     link.href = url;
@@ -107,7 +107,7 @@ const DocumentDetails = () => {
                       <h4 className="card-title mb-2 mt-sm-3">{documentData.data.document.name}</h4>
                       <div className="row mt-3">
                         <div className="col-md-12">
-                          <button type="button" onClick={() => onDownloadDocument(documentData.data.document.name)} className="btn btn-primary downloadb"><i className="bi bi-download"></i> Download</button>
+                          <button type="button" onClick={() => onDownloadDocument(documentData.data.document.documentId, documentData.data.document.name)} className="btn btn-primary downloadb"><i className="bi bi-download"></i> Download</button>
                           {documentData.data.document.referenceId && (
                             <Link to={`/editdoc/${documentData.data.document.referenceId}`} className="btn btn-info"><i className="bi bi-pencil"></i> Open in Editor</Link>
                           )}

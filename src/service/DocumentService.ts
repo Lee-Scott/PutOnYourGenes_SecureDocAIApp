@@ -55,8 +55,8 @@ export const documentAPI = createApi({
     }),
 
     downloadDocument: builder.mutation<Blob, string>({
-      query: (documentName: string): { url: string; method: Http; responseHandler: (response: Response) => Promise<Blob> } => ({
-        url: `/download/${documentName}`,
+      query: (documentId: string): { url: string; method: Http; responseHandler: (response: Response) => Promise<Blob> } => ({
+        url: `/${documentId}/download`,
         method: Http.GET,
         responseHandler: (response: Response): Promise<Blob> => response.blob()
       }),

@@ -1,20 +1,22 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { vi, describe, test, expect, beforeEach, Mock } from 'vitest';
-import QuestionnaireBuilder from './QuestionnaireBuilder';
-import { useCreateQuestionnaireMutation } from '../../service/QuestionnaireService';
+import { vi, describe, test, expect, beforeEach, beforeAll, Mock } from 'vitest';
+import * as QuestionnaireService from '../../../service/QuestionnaireService';
+import QuestionnaireBuilder from '../QuestionnaireBuilder';
+import { useCreateQuestionnaireMutation } from '../../../service/QuestionnaireService';
 
 // Mock the service
-vi.mock('../../service/QuestionnaireService', () => ({
-  useCreateQuestionnaireMutation: vi.fn(),
-}));
+// No longer mocking the entire module
 
 describe('QuestionnaireBuilder', () => {
   const createQuestionnaireFn = vi.fn();
 
+  beforeAll(() => {
+    vi.spyOn(QuestionnaireService, 'useCreateQuestionnaireMutation').mockReturnValue([createQuestionnaireFn, { isLoading: false, reset: vi.fn() }]);
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
-    (useCreateQuestionnaireMutation as Mock).mockReturnValue([createQuestionnaireFn, { isLoading: false }]);
   });
 
   test('renders the builder form with default values', () => {

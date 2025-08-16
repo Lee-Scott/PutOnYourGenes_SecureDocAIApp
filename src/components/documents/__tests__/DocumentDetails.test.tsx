@@ -1,13 +1,12 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { vi, describe, test, expect, beforeEach, Mock } from 'vitest';
-import DocumentDetails from './DocumentDetails';
-import { documentAPI } from '../../service/DocumentService';
-import { userAPI } from '../../service/UserService';
+import DocumentDetails from '../DocumentDetails';
+import { documentAPI } from '../../../service/DocumentService';
+import { userAPI } from '../../../service/UserService';
 
 // Mock services
-vi.mock('../../service/DocumentService');
-vi.mock('../../service/UserService');
+// No longer mocking the entire module
 
 const mockDocument = {
   data: {
@@ -43,11 +42,11 @@ describe('DocumentDetails', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (documentAPI.useFetchDocumentQuery as Mock).mockReturnValue({ data: mockDocument, isLoading: false, isSuccess: true });
-    (userAPI.useFetchUserQuery as Mock).mockReturnValue({ data: mockUser });
-    (documentAPI.useUpdateDocumentMutation as Mock).mockReturnValue([updateDocumentFn, {}]);
-    (documentAPI.useDownloadDocumentMutation as Mock).mockReturnValue([downloadDocumentFn, {}]);
-    (documentAPI.useDeleteDocumentMutation as Mock).mockReturnValue([deleteDocumentFn, {}]);
+    vi.spyOn(documentAPI, 'useFetchDocumentQuery').mockReturnValue({ data: mockDocument, isLoading: false, isSuccess: true, refetch: vi.fn() });
+    vi.spyOn(userAPI, 'useFetchUserQuery').mockReturnValue({ data: mockUser, refetch: vi.fn() });
+    vi.spyOn(documentAPI, 'useUpdateDocumentMutation').mockReturnValue([updateDocumentFn, { reset: vi.fn() }]);
+    vi.spyOn(documentAPI, 'useDownloadDocumentMutation').mockReturnValue([downloadDocumentFn, { reset: vi.fn() }]);
+    vi.spyOn(documentAPI, 'useDeleteDocumentMutation').mockReturnValue([deleteDocumentFn, { reset: vi.fn() }]);
     
     updateDocumentFn.mockReturnValue({ unwrap: () => Promise.resolve() });
     downloadDocumentFn.mockReturnValue({ unwrap: () => Promise.resolve(new Blob()) });
@@ -79,7 +78,7 @@ describe('DocumentDetails', () => {
     render(<MemoryRouter initialEntries={['/documents/doc1']}><Routes><Route path="/documents/:documentId" element={<DocumentDetails />} /></Routes></MemoryRouter>);
     fireEvent.click(screen.getByRole('button', { name: /Download/i }));
     await waitFor(() => {
-      expect(downloadDocumentFn).toHaveBeenCalledWith('Test Document');
+      expect(downloadDocumentFn).toHaveBeenCalledWith('doc1');
     });
   });
 

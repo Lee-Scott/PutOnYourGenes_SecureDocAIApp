@@ -19,6 +19,9 @@ export const paperlessApi = createApi({
     getDocuments: builder.query<any, void>({
       query: () => 'documents/',
     }),
+    getDocument: builder.query<any, number>({
+      query: (id) => `documents/${id}/`,
+    }),
     uploadDocument: builder.mutation<any, FormData>({
       query: (formData) => ({
         url: 'documents/post_document/',
@@ -43,4 +46,4 @@ export const paperlessApi = createApi({
   }),
 });
 
-export const { useGetDocumentsQuery, useUploadDocumentMutation, useUpdateDocumentMutation, useGetDocumentFileQuery } = paperlessApi;
+export const { useGetDocumentsQuery, useGetDocumentQuery, useUploadDocumentMutation, useUpdateDocumentMutation, useGetDocumentFileQuery } = paperlessApi;

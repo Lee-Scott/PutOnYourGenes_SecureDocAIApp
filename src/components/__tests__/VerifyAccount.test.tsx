@@ -1,26 +1,23 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import VerifyAccount from './VerifyAccount';
-import { userAPI } from '../service/UserService';
+import VerifyAccount from '../VerifyAccount';
+import { userAPI } from '../../service/UserService';
 import { vi, describe, test, expect, beforeEach, Mock } from 'vitest';
 
 // Mock the userAPI
-vi.mock('../service/UserService', () => ({
-  userAPI: {
-    useVerifyAccountMutation: vi.fn(),
-  },
-}));
+// No longer mocking the entire module
 
 describe('VerifyAccount', () => {
   const verifyAccountFn = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (userAPI.useVerifyAccountMutation as Mock).mockReturnValue([verifyAccountFn, { 
-        isLoading: false, 
-        isSuccess: false, 
+    vi.spyOn(userAPI, 'useVerifyAccountMutation').mockReturnValue([verifyAccountFn, {
+        isLoading: false,
+        isSuccess: false,
         error: null,
         data: null,
+        reset: vi.fn(),
     }]);
   });
 
