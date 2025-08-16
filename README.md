@@ -1,75 +1,70 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-# PutOnYourGenes_SecureDocAIApp
-=======
->>>>>>> 1aa504e (Initial commit)
-# React + TypeScript + Vite
+# SecureDocAI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SecureDocAI is a secure healthcare document AI application designed to streamline patient onboarding, document management, and personalized health assessments. This platform allows patients to complete health questionnaires, upload medical documents, and interact with an AI-powered chat for insights.
 
-Currently, two official plugins are available:
+## Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Document Management**: Upload, view, and manage medical documents securely.
+- **AI Chat**: An interactive chat interface for discussing document contents with AI.
+- **Health Questionnaires**: A flexible system for creating and completing patient questionnaires.
+- **User Management**: Robust authentication, user profiles, and role-based access control.
+- **Report Generation**: Dynamically generate and view patient reports.
+- **Partner Integrations**: Seamlessly connect with healthcare partners like Fullscript and PureInsight.
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Frontend**: React 19, TypeScript, Redux Toolkit
+- **Build Tool**: Vite
+- **Routing**: React Router v7
+- **Form Handling**: React Hook Form with Zod for validation
+- **Testing**: Vitest for unit tests and Playwright for end-to-end testing
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## Getting Started
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Prerequisites
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Node.js (v18 or higher)
+- npm (v9 or higher)
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+### Installation
 
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/your-repo/securedocaiapp.git
+   cd securedocaiapp
+   ```
 
-## TODO
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-- [ ] Add authentication with Firebase
-- [ ] Create responsive mobile layout
-- [ ] Set up unit tests for components
-- [ ] Add dark mode toggle
-<<<<<<< HEAD
-=======
-# PutOnYourGenes_SecureDocAIApp
->>>>>>> 466c216 (Initial commit)
-=======
->>>>>>> 20df52f (Initial commit)
->>>>>>> 1aa504e (Initial commit)
+3. **Set up environment variables**:
+   Create a `.env` file in the root directory and add the necessary environment variables.
+
+### Development
+
+- **Run the development server**:
+  ```bash
+  npm run dev
+  ```
+  The application will be available at `http://localhost:5173`.
+
+- **Run tests**:
+  ```bash
+  npm run test
+  ```
+
+- **Run end-to-end tests**:
+  ```bash
+  npx playwright test
+  ```
+
+- **Lint the codebase**:
+  ```bash
+  npm run lint
+  ```
+
+## License
+
+This project is licensed under the MIT License.
