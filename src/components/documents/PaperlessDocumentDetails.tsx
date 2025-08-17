@@ -1,119 +1,56 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useGetDocumentQuery, useUploadDocumentMutation, useGetDocumentFileQuery } from '../../service/PaperlessService';
-import { PDFDocument } from 'pdf-lib';
-import * as pdfjsLib from 'pdfjs-dist';
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = `/assets/pdf.worker.min.mjs`;
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import { useGetDocumentQuery, useGetDocumentFileQuery, useUpdateDocumentMutation } from '../../service/PaperlessService';
+import NutrientDocumentEditor from './NutrientDocumentEditor';
+import DocumentLoader from './DocumentLoader';
 
 const PaperlessDocumentDetails: React.FC = () => {
-  console.log('Rendering PaperlessDocumentDetails');
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const documentId = parseInt(id || '0', 10);
 
-  const { data: document, isLoading: isLoadingDocument } = useGetDocumentQuery(documentId, { skip: !documentId });
-  const { data: pdfBlob, isLoading: isLoadingPdf, isError } = useGetDocumentFileQuery(documentId, { skip: !documentId });
-  const [uploadDocument, { isLoading: isUploading }] = useUploadDocumentMutation();
+  if (!id) {
+    return <div className="alert alert-danger">No document ID provided.</div>;
+  }
+  const documentId = parseInt(id, 10);
 
-  const [numPages, setNumPages] = useState(0);
-  const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
+  const { data: document, error: docError, isLoading: docIsLoading } = useGetDocumentQuery(documentId);
+  const { data: documentBlob, error: fileError, isLoading: fileIsLoading } = useGetDocumentFileQuery(documentId);
+  const [updateDocument] = useUpdateDocumentMutation();
 
-  useEffect(() => {
-    console.log('pdfBlob:', pdfBlob);
-    const renderPdf = async () => {
-      if (pdfBlob) {
-        try {
-          const arrayBuffer = await pdfBlob.arrayBuffer();
-          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-          setNumPages(pdf.numPages);
-
-          for (let i = 0; i < pdf.numPages; i++) {
-            const page = await pdf.getPage(i + 1);
-            const viewport = page.getViewport({ scale: 1.5 });
-            const canvas = canvasRefs.current[i];
-            if (canvas) {
-              const context = canvas.getContext('2d');
-              if (context) {
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-                const renderContext = {
-                  canvasContext: context,
-                  viewport: viewport,
-                };
-                await page.render(renderContext).promise;
-              }
-            }
-          }
-        } catch (error) {
-          console.error('Error rendering PDF:', error);
-        }
-      }
-    };
-    renderPdf();
-  }, [pdfBlob, isLoadingPdf, isError]);
-
-  const handleAddText = async () => {
-    if (pdfBlob) {
-      const arrayBuffer = await pdfBlob.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(arrayBuffer);
-      const pages = pdfDoc.getPages();
-      const firstPage = pages[0];
-      firstPage.drawText('This is a new text!', {
-        x: 5,
-        y: firstPage.getHeight() / 2,
-        size: 50,
-      });
-      const pdfBytes = await pdfDoc.save();
-      const newPdfBlob = new Blob([pdfBytes.slice().buffer], { type: 'application/pdf' });
-      // You might want to re-render the PDF here, or handle the blob differently
+  const handleSave = async (editedBlob: Blob) => {
+    const formData = new FormData();
+    formData.append('document', editedBlob, document.original_file_name);
+    formData.append('title', document.title);
+    
+    try {
+      await updateDocument({ id: documentId, ...formData }).unwrap();
+      alert('Document saved successfully!');
+    } catch (error) {
+      console.error('Failed to save document:', error);
+      alert('Failed to save document.');
     }
   };
 
-  const handleSave = async () => {
-    if (pdfBlob && document) {
-      const arrayBuffer = await pdfBlob.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(arrayBuffer);
-      const pdfBytes = await pdfDoc.save();
-      const newPdfBlob = new Blob([pdfBytes.slice().buffer], { type: 'application/pdf' });
-      const formData = new FormData();
-      formData.append('document', newPdfBlob, document.original_file_name);
-      formData.append('title', document.title);
-      
-      try {
-        await uploadDocument(formData).unwrap();
-        navigate('/dashboard');
-      } catch (err) {
-        console.error('Failed to upload document: ', err);
-      }
-    }
-  };
+  if (docIsLoading || fileIsLoading) {
+    return <DocumentLoader />;
+  }
 
-  if (isLoadingDocument || isLoadingPdf) return <p>Loading document...</p>;
-  if (isError || !document) return <p>Document not found.</p>;
+  if (docError || fileError) {
+    return <div className="alert alert-danger">Error loading document.</div>;
+  }
 
-  console.log('Rendering PaperlessDocumentDetails');
+  if (!document || !documentBlob) {
+    return <div className="alert alert-warning">Document not found.</div>;
+  }
+
   return (
-    <div className="container mtb">
-      <h2>Edit Document: {document.title}</h2>
-      <div className="mb-3">
-        <button className="btn btn-secondary" onClick={handleAddText}>Add Text to First Page</button>
-        <button className="btn btn-primary ms-2" onClick={handleSave} disabled={isUploading}>
-          {isUploading ? 'Saving...' : 'Save Document'}
-        </button>
-      </div>
-      <div>
-        {Array.from({ length: numPages }).map((_, index) => (
-          <canvas
-            key={index}
-            ref={(el) => {
-              if (el) canvasRefs.current[index] = el;
-            }}
-            className="mb-2"
-            style={{ border: '1px solid black' }}
-          />
-        ))}
-      </div>
+    <div className="container mt-4">
+      <h2>{document.title}</h2>
+      <p>Original file: {document.original_file_name}</p>
+      <NutrientDocumentEditor
+        document={document}
+        documentBlob={documentBlob}
+        onSave={handleSave}
+      />
     </div>
   );
 };

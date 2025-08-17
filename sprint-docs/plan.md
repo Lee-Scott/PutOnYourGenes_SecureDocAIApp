@@ -1,122 +1,149 @@
-# Patient Onboarding Funnel - Master Sprint Plan
+# Technical Plan: Replacing pdf-lib with Nutrient SDK
 
-## Sprint Metadata
-- **Sprint Duration:** 3 days (24 development hours)
-- **Team Size Assumption:** 1-2 developers
-- **Risk Level:** Medium (integration dependencies, API limitations)
-- **Sprint Start:** January 13, 2025
-- **Sprint End:** January 15, 2025
+## 1. Introduction
 
-## User Story
-**As a patient**, I want to complete a health assessment questionnaire and upload my lab results, so that I can receive personalized health recommendations and supplement orders through integrated services.
+This document outlines the technical plan for replacing the `pdf-lib` library with the Nutrient SDK for document editing within the application. The goal is to improve performance, enhance functionality, and standardize our document processing workflow. This plan focuses on the integration within the `PaperlessDocumentDetails.tsx` component.
 
-## Technical Objectives
+## 2. Current Implementation Analysis
 
-1. **OBJ-001:** Create patient-facing homepage with clear CTA to questionnaire (4 hours)
-2. **OBJ-002:** Connect existing questionnaire flow to homepage funnel (2 hours)
-3. **OBJ-003:** Implement manual lab result upload workflow (6 hours)
-4. **OBJ-004:** Implement Fullscript redirect integration (3 hours)
-5. **OBJ-005:** Implement Pure Insight redirect integration (2 hours)
-6. **OBJ-006:** Create patient dashboard for results aggregation (4 hours)
-7. **OBJ-007:** Implement error handling and fallback mechanisms (3 hours)
+The `pdf-lib` library is currently used in [`src/components/documents/PaperlessDocumentDetails.tsx`](src/components/documents/PaperlessDocumentDetails.tsx) for the following functionalities:
 
-## Architecture Decisions
+- **Loading PDFs:** PDFs are loaded from a blob into a `PDFDocument` object.
+- **Adding Text:** The `drawText` method is used to add text to the first page of the document.
+- **Saving Documents:** The modified `PDFDocument` is saved as a byte array, converted to a blob, and then uploaded to the server.
 
-### Decision 1: Homepage as Primary Entry Point
-**Rationale:** Currently app defaults to `/documents`. Need dedicated patient landing.
-**Implementation:** New route at `/` with homepage component, update routing logic.
+The component also uses `pdfjs-dist` to render the PDF pages onto `<canvas>` elements for display.
 
-### Decision 2: Hardcoded Questionnaire Link (MVP)
-**Rationale:** Faster implementation, questionnaire already exists.
-**Implementation:** Direct link to `http://localhost:5173/questionnaires/e873eb2a-2e29-d46f-1f85-8dc3ad0b2fb2/form`
+## 3. Proposed Architecture with Nutrient SDK
 
-### Decision 3: Manual Upload First, API Later
-**Rationale:** Immediate functionality while API integrations are developed.
-**Implementation:** Phase 1: File upload → Phase 2: API automation
+The proposed architecture will introduce a new component, `NutrientDocumentEditor`, which will encapsulate all interactions with the Nutrient SDK. This component will be responsible for rendering the document and handling all editing functions.
 
-### Decision 4: Redux for State Management
-**Rationale:** Existing pattern in codebase, RTK Query already configured.
-**Implementation:** New slices for homepage and integration state.
+### Key Components:
 
-## Task Breakdown
+- **`NutrientDocumentEditor`:** A new React component that will use the Nutrient SDK to render and edit the document. It will expose methods for adding text, saving the document, and other editing functionalities.
+- **`PaperlessDocumentDetails.tsx`:** This component will be modified to use the `NutrientDocumentEditor` instead of the current canvas-based rendering and `pdf-lib` functions.
 
-### Day 1: Foundation (8 hours)
-| Task ID | Description | Estimate | Dependencies |
-|---------|-------------|----------|--------------|
-| T-001 | Create Homepage component structure | 2h | None |
-| T-002 | Implement homepage routing | 1h | T-001 |
-| T-003 | Design and style homepage UI | 2h | T-001 |
-| T-004 | Add Redux state for homepage | 1h | T-002 |
-| T-005 | Connect questionnaire CTA | 1h | T-002 |
-| T-006 | Create PatientDashboard component | 1h | None |
+### Data Flow:
 
-### Day 2: Integration Flow (8 hours)
-| Task ID | Description | Estimate | Dependencies |
-|---------|-------------|----------|--------------|
-| T-007 | Create IntegrationHub component | 2h | T-006 |
-| T-008 | Implement manual upload UI | 2h | T-007 |
-| T-009 | Connect to existing DocumentService | 1h | T-008 |
-| T-010 | Create result processing logic | 2h | T-009 |
-| T-011 | Implement Fullscript redirect button | 1h | T-007 |
-| T-012 | Implement Pure Insight redirect button | 1h | T-007 |
+1.  `PaperlessDocumentDetails.tsx` fetches the PDF blob.
+2.  The blob is passed as a prop to the `NutrientDocumentEditor`.
+3.  The `NutrientDocumentEditor` loads the document using the Nutrient SDK.
+4.  User interactions (e.g., clicking "Add Text") trigger methods within the `NutrientDocumentEditor`.
+5.  When "Save" is clicked, the `NutrientDocumentEditor` exports the modified document as a blob, which is then passed back to `PaperlessDocumentDetails.tsx` to be uploaded.
 
-### Day 3: API & Polish (8 hours)
-| Task ID | Description | Estimate | Dependencies |
-|---------|-------------|----------|--------------|
-| T-013 | Implement error boundaries | 1h | All |
-| T-014 | Add loading states and transitions | 1h | All |
-| T-015 | Testing and bug fixes | 2h | All |
+## 4. Step-by-Step Integration Plan
 
-## Definition of Done
+### Step 1: Install Nutrient SDK
 
-### Code Quality
-- [ ] TypeScript types defined for all new components
-- [ ] Components follow existing patterns (RTK Query, Redux)
-- [ ] Error handling implemented for all async operations
-- [ ] Loading states present for all data fetching
+Add the Nutrient SDK as a project dependency.
 
-### Functionality
-- [ ] Homepage loads at root path (`/`)
-- [ ] Questionnaire link functional and tracked
-- [ ] File upload accepts PDF/image formats
-- [ ] Results display in patient dashboard
-- [ ] Manual workflow complete end-to-end
+```bash
+npm install @nutrient/sdk
+```
 
-### Documentation
-- [ ] Component props documented with JSDoc
-- [ ] API integration points documented
-- [ ] README updated with new routes
-- [ ] Environment variables documented
+### Step 2: Create `NutrientDocumentEditor` Component
 
-### Testing
-- [ ] Unit tests for new Redux slices
-- [ ] Component render tests created
-- [ ] Manual E2E test completed
-- [ ] Error scenarios tested
+Create a new file: `src/components/documents/NutrientDocumentEditor.tsx`. This component will handle the document rendering and editing.
 
-## Risk Mitigation
+```tsx
+// src/components/documents/NutrientDocumentEditor.tsx
+import React, 'react';
+import { NutrientSDK } from '@nutrient/sdk';
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| API rate limits | High | Medium | Implement caching, manual fallback |
-| CORS issues | Medium | High | Proxy configuration, backend relay |
-| File size limits | Low | Medium | Client-side validation, chunking |
-| OAuth complexity | High | High | Start with manual, phase in OAuth |
+interface NutrientDocumentEditorProps {
+  documentBlob: Blob;
+  onSave: (editedBlob: Blob) => void;
+}
 
-## Success Metrics
-- Homepage → Questionnaire conversion rate baseline established
-- Upload success rate > 95%
-- Page load time < 2 seconds
-- Zero critical bugs in production
+const NutrientDocumentEditor: React.FC<NutrientDocumentEditorProps> = ({ documentBlob, onSave }) => {
+  // SDK initialization and document loading logic here
 
-## Technical Debt Acknowledged
-- Hardcoded questionnaire ID (TODO: dynamic selection)
-- Manual upload workflow (TODO: auto-fetch from partners)
-- No real-time updates (TODO: websocket integration)
-- Limited error recovery (TODO: retry mechanisms)
+  const handleAddText = () => {
+    // Logic to add text using Nutrient SDK
+  };
 
-## Next Sprint Preview
-- Implement Fullscript OAuth2 flow
-- Begin outreach to Pure Insight for API access
-- Create admin interface for questionnaire selection
-- Implement automated result fetching
+  const handleSave = () => {
+    // Logic to save and export the document, then call onSave
+  };
+
+  return (
+    <div>
+      {/* Nutrient SDK's viewer and editor UI */}
+      <button onClick={handleAddText}>Add Text</button>
+      <button onClick={handleSave}>Save</button>
+    </div>
+  );
+};
+
+export default NutrientDocumentEditor;
+```
+
+### Step 3: Modify `PaperlessDocumentDetails.tsx`
+
+Update [`src/components/documents/PaperlessDocumentDetails.tsx`](src/components/documents/PaperlessDocumentDetails.tsx) to use the new `NutrientDocumentEditor`.
+
+- Remove the `pdf-lib` and `pdfjs-dist` imports.
+- Remove the canvas rendering logic and the `useEffect` hook for rendering.
+- Replace the existing `handleAddText` and `handleSave` functions with logic to interact with the `NutrientDocumentEditor` component.
+
+```tsx
+// src/components/documents/PaperlessDocumentDetails.tsx (simplified)
+import React from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useGetDocumentQuery, useUploadDocumentMutation, useGetDocumentFileQuery } from '../../service/PaperlessService';
+import NutrientDocumentEditor from './NutrientDocumentEditor';
+
+const PaperlessDocumentDetails: React.FC = () => {
+  // ... existing hooks and logic ...
+  const { data: pdfBlob, isLoading: isLoadingPdf } = useGetDocumentFileQuery(documentId, { skip: !documentId });
+  const [uploadDocument] = useUploadDocumentMutation();
+
+  const handleSave = async (editedBlob: Blob) => {
+    if (document) {
+      const formData = new FormData();
+      formData.append('document', editedBlob, document.original_file_name);
+      formData.append('title', document.title);
+      
+      try {
+        await uploadDocument(formData).unwrap();
+        navigate('/dashboard');
+      } catch (err) {
+        console.error('Failed to upload document: ', err);
+      }
+    }
+  };
+
+  if (isLoadingDocument || isLoadingPdf) return <p>Loading document...</p>;
+  if (!document || !pdfBlob) return <p>Document not found.</p>;
+
+  return (
+    <div className="container mtb">
+      <h2>Edit Document: {document.title}</h2>
+      <NutrientDocumentEditor documentBlob={pdfBlob} onSave={handleSave} />
+    </div>
+  );
+};
+
+export default PaperlessDocumentDetails;
+```
+
+### Step 4: Remove `pdf-lib`
+
+Once the integration is complete and tested, remove `pdf-lib` from the project's dependencies.
+
+```bash
+npm uninstall pdf-lib
+```
+
+## 5. Potential Challenges and Mitigations
+
+- **API Differences:** The Nutrient SDK will have a different API from `pdf-lib`.
+  - **Mitigation:** Thoroughly review the Nutrient SDK documentation and create wrapper functions if necessary to simplify its use within the application.
+- **Complex PDF Operations:** If more complex operations than adding text are needed in the future, the Nutrient SDK's capabilities must be assessed.
+  - **Mitigation:** For this initial integration, the scope is limited to text addition. A separate investigation will be conducted if more advanced features are required.
+- **Testing:** The new implementation will require thorough testing to ensure that the document editing and saving processes work correctly.
+  - **Mitigation:** Create a comprehensive test plan that covers different document types, sizes, and editing scenarios.
+
+## 6. Conclusion
+
+Migrating from `pdf-lib` to the Nutrient SDK will provide a more robust and feature-rich document editing experience. By encapsulating the SDK's functionality in a dedicated component, we can create a clean and maintainable architecture that can be easily extended in the future.

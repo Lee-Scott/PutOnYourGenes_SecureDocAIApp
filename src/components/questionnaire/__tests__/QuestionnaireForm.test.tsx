@@ -32,7 +32,8 @@ const mockQuestionnaire = {
 describe('QuestionnaireForm', () => {
   const submitResponseFn = vi.fn();
 
-  beforeAll(() => {
+  beforeEach(() => {
+    vi.clearAllMocks();
     vi.spyOn(QuestionnaireService, 'useGetQuestionnaireByIdQuery').mockReturnValue({
       data: mockQuestionnaire,
       isLoading: false,
@@ -40,10 +41,6 @@ describe('QuestionnaireForm', () => {
       refetch: vi.fn(),
     });
     vi.spyOn(QuestionnaireService, 'useSubmitQuestionnaireResponseMutation').mockReturnValue([submitResponseFn, { isLoading: false, reset: vi.fn() }]);
-  });
-
-  beforeEach(() => {
-    vi.clearAllMocks();
     submitResponseFn.mockReturnValue({ unwrap: () => Promise.resolve() });
   });
 

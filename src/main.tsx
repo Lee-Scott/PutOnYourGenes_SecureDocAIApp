@@ -1,5 +1,5 @@
-import { StrictMode } from 'react'
 import './index.css'
+import { StrictMode } from 'react'
 import App from './App.tsx'
 import { setupStore } from './store/store.ts'
 import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from 'react-router-dom'
@@ -38,6 +38,8 @@ import IntegrationHub from './components/IntegrationHub/IntegrationHub.tsx'
 import ReportViewer from './components/ReportViewer/ReportViewer.tsx'
 import UserDashboard from './components/UserDashboard/UserDashboard.tsx'
 import PublicLayout from './components/PublicLayout.tsx';
+import NutrientDocumentEditor from './components/documents/NutrientDocumentEditor.tsx'
+import NutrientTestViewer from './components/documents/NutrientTestViewer';
 
 const store = setupStore();
 const router = createBrowserRouter(createRoutesFromElements(
@@ -56,6 +58,7 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route index element={<Homepage />} />
       <Route path='integrations' element={<IntegrationHub />} />
       <Route path='PersonalHealth&ServiceInterest' element={<QuestionnaireForm />} />
+      <Route path='nutrient-test' element={<NutrientTestViewer />} />
     </Route>
 
     {/* Protected routes for authenticated users */}

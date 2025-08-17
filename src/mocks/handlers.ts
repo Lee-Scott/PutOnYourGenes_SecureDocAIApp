@@ -118,14 +118,14 @@ export const handlers = [
     const doc = await request.json() as { id: string, name: string };
     return HttpResponse.json({
       status: 'success',
-      data: { document: { ...doc, url: `http://example.com/${doc.name}` } },
+      data: { ...doc, url: `http://example.com/${doc.name}` },
       message: 'Document updated successfully',
       timeStamp: new Date().toISOString(),
       code: 200,
       path: '/documents',
     });
   }),
-  http.get('http://localhost:8085/documents/download/:name', () => {
+  http.get('http://localhost:8085/documents/:id/download', () => {
     return new HttpResponse(new Blob(['test document']), {
       headers: {
         'Content-Type': 'application/pdf',
@@ -183,3 +183,4 @@ export const handlers = [
     });
   }),
 ];
+
