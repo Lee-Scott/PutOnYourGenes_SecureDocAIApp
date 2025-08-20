@@ -1,11 +1,12 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useGetDocumentQuery, useGetDocumentFileQuery, useUpdateDocumentMutation } from '../../service/PaperlessService';
 import DocumentViewer from './DocumentViewer';
 import DocumentLoader from './DocumentLoader';
 
 const PaperlessDocumentDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   if (!id) {
     return <div className="alert alert-danger">No document ID provided.</div>;
@@ -46,6 +47,14 @@ const PaperlessDocumentDetails: React.FC = () => {
     <div className="container mt-4">
       <h2>{document.title}</h2>
       <p>Original file: {document.original_file_name}</p>
+      {document && (
+        <button
+          className="btn btn-primary mb-3"
+          onClick={() => navigate(`/viewdoc/${document.id}`)}
+        >
+          Open in Viewer
+        </button>
+      )}
       <DocumentViewer
         document={document}
         documentBlob={documentBlob}

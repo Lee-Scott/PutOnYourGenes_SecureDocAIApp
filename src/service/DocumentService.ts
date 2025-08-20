@@ -117,3 +117,16 @@ export const documentAPI = createApi({
     
   })
 });
+
+export const {
+  useFetchDocumentsQuery,
+  useUploadDocumentsMutation,
+  useFetchDocumentQuery,
+  useUpdateDocumentMutation,
+  useDownloadDocumentMutation,
+  useDeleteDocumentMutation,
+  useCheckoutDocumentMutation,
+  useGetDocumentStatusQuery,
+  useCheckinDocumentMutation,
+  useGetVersionsQuery,
+} = documentAPI;
