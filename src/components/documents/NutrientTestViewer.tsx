@@ -5,22 +5,34 @@ function NutrientTestViewer() {
 
   useEffect(() => {
     const container = containerRef.current;
+    let instance: any;
 
-    const { NutrientViewer } = window;
-    if (container && NutrientViewer) {
-      NutrientViewer.load({
-        container,
-        // You can also specify a file in public directory, for example /document.pdf
-        document: "/pationt-report-example.pdf",
-      });
-    }
+    (async () => {
+      if (window.NutrientViewer && container) {
+        try {
+          instance = await window.NutrientViewer.load({
+            container,
+            document: "/pationt-report-example.pdf",
+          });
+        } catch (error: any) {
+          // In development, React's StrictMode mounts components twice, which can cause this error.
+          // We can safely ignore it because the viewer will be initialized on the second mount.
+          if (error.message.includes("already used to mount")) {
+            console.warn("NutrientTestViewer: Remounting due to React StrictMode.");
+          } else {
+            console.error("Error loading document in test viewer:", error);
+          }
+        }
+      }
+    })();
 
     return () => {
-      NutrientViewer?.unload(container);
+      if (window.NutrientViewer) {
+        window.NutrientViewer.unload(container);
+      }
     };
   }, []);
 
-  // we also need to set the container height and width
   return <div ref={containerRef} style={{ height: "100vh", width: "100vw", position: "relative" }} />;
 }
 

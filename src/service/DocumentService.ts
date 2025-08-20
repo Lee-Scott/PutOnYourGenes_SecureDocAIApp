@@ -3,9 +3,10 @@ import type { IResponse } from '../models/IResponse';
 import { isJsonContentType, processError, processResponse, documentsApiBaseUrl } from '../utils/RequestUtils';
 import type { IRegisterRequest } from '../models/ICredentials';
 import { Http } from '../enum/http.method';
-import { Document, DocumentForm, Documents, Query } from '../models/IDocument';
+import { Document, DocumentDetails, DocumentForm, Documents, Query } from '../models/IDocument';
 import { Page } from '../models/IPage';
 import { createBaseQueryWithAuth } from './BaseQueryWithAuth';
+import { ILock } from '../models/ILock';
 
 export const documentAPI = createApi({
   reducerPath: 'documentAPI',
@@ -22,9 +23,9 @@ export const documentAPI = createApi({
       transformErrorResponse: processError,
       providesTags: () => ['Documents']
     }),
-    uploadDocuments: builder.mutation<IResponse<Documents>, FormData>({
-      query: (formData) => ({
-        url: '/upload',
+    uploadDocuments: builder.mutation<IResponse<Documents>, { formData: FormData, userId: string }>({
+      query: ({ formData, userId }) => ({
+        url: `/upload?userId=${userId}`,
         method: Http.POST,
         body: formData,
       }),
@@ -33,7 +34,7 @@ export const documentAPI = createApi({
       invalidatesTags: (result, error) => error ? [] : ['Documents']
     }),
 
-    fetchDocument: builder.query<IResponse<Document>, IRegisterRequest>({
+    fetchDocument: builder.query<IResponse<DocumentDetails>, string>({
       query: (documentId) => ({
         url: `/${documentId}`,
         method: Http.GET
@@ -45,7 +46,7 @@ export const documentAPI = createApi({
 
     updateDocument: builder.mutation<IResponse<Document>, DocumentForm>({
       query: (documentForm: DocumentForm): { url: string; method: Http; body: DocumentForm } => ({
-        url: ``,
+        url: `/${documentForm.documentId}`,
         method: Http.PATCH,
         body: documentForm
       }),
@@ -54,7 +55,7 @@ export const documentAPI = createApi({
       invalidatesTags: (result: IResponse<Document> | undefined, error: any) => error ? [] : ['Documents']
     }),
 
-    downloadDocument: builder.mutation<Blob, string>({
+    downloadDocument: builder.query<Blob, string>({
       query: (documentId: string): { url: string; method: Http; responseHandler: (response: Response) => Promise<Blob> } => ({
         url: `/${documentId}/download`,
         method: Http.GET,
@@ -75,5 +76,75 @@ export const documentAPI = createApi({
       invalidatesTags: (result, error) => error ? [] : ['Documents']
     }),
     
+    checkoutDocument: builder.mutation<IResponse<ILock>, string>({
+      query: (documentId) => ({
+        url: `/${documentId}/checkout`,
+        method: Http.POST,
+      }),
+      transformResponse: processResponse<ILock>,
+      transformErrorResponse: processError,
+    }),
+
+    getDocumentStatus: builder.query<IResponse<any>, string>({
+      query: (documentId) => ({
+        url: `/${documentId}/status`,
+        method: Http.GET,
+      }),
+      transformErrorResponse: processError,
+    }),
+
+    checkinDocument: builder.mutation<IResponse<void>, { documentId: string; file: File; baseVersion: number; lockId?: string }>({
+      query: ({ documentId, file, baseVersion, lockId }) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        return {
+          url: `/${documentId}/checkin?baseVersion=${baseVersion}&lockId=${lockId}`,
+          method: Http.PUT,
+          body: formData,
+        };
+      },
+      transformResponse: processResponse<void>,
+      transformErrorResponse: processError,
+    }),
+
+    getVersions: builder.query<IResponse<any[]>, string>({
+      query: (documentId) => ({
+        url: `/${documentId}/versions`,
+        method: Http.GET,
+      }),
+      transformErrorResponse: processError,
+    }),
+    
+    processDocument: builder.mutation<IResponse<any>, FormData>({
+      query: (formData) => ({
+        url: `http://localhost:8085/api/v1/ai/documents/process`,
+        method: Http.POST,
+        body: formData,
+      }),
+      transformErrorResponse: processError,
+    }),
+    processDocumentsBatch: builder.mutation<IResponse<any>, FormData>({
+      query: (formData) => ({
+        url: `http://localhost:8085/api/v1/ai/documents/process/batch`,
+        method: Http.POST,
+        body: formData,
+      }),
+      transformErrorResponse: processError,
+    }),
   })
 });
+
+export const {
+  useFetchDocumentsQuery,
+  useUploadDocumentsMutation,
+  useFetchDocumentQuery,
+  useUpdateDocumentMutation,
+  useDownloadDocumentQuery,
+  useDeleteDocumentMutation,
+  useCheckoutDocumentMutation,
+  useGetDocumentStatusQuery,
+  useCheckinDocumentMutation,
+  useGetVersionsQuery,
+  useProcessDocumentMutation,
+  useProcessDocumentsBatchMutation,
+} = documentAPI;

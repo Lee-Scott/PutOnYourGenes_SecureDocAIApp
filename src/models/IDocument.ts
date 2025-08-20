@@ -20,6 +20,9 @@ export interface IDocument {
 
 export type Document = IDocument;
 
+export type DocumentDetails = {
+    document: IDocument;
+};
 export type DocumentForm = {
     documentId: string;
     name: string;

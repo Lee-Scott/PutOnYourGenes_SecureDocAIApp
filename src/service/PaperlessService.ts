@@ -19,7 +19,7 @@ export const paperlessApi = createApi({
     getDocuments: builder.query<any, void>({
       query: () => 'documents/',
     }),
-    getDocument: builder.query<any, number>({
+    getDocument: builder.query<any, string>({
       query: (id) => `documents/${id}/`,
     }),
     uploadDocument: builder.mutation<any, FormData>({
@@ -29,14 +29,14 @@ export const paperlessApi = createApi({
         body: formData,
       }),
     }),
-    updateDocument: builder.mutation<any, { id: number; title: string; content: string }>({
-      query: ({ id, ...patch }) => ({
+    updateDocument: builder.mutation<any, { id: string; document: FormData }>({
+      query: ({ id, document }) => ({
         url: `documents/${id}/`,
         method: 'PATCH',
-        body: patch,
+        body: document,
       }),
     }),
-    getDocumentFile: builder.query<Blob, number>({
+    getDocumentFile: builder.query<Blob, string>({
       query: (id) => ({
         url: `documents/${id}/download/`,
         responseHandler: (response) => response.blob(),
