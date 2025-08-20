@@ -1,5 +1,4 @@
 import './index.css'
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { StrictMode } from 'react'
 import App from './App.tsx'
 import { setupStore } from './store/store.ts'
@@ -40,9 +39,7 @@ import ReportViewer from './components/ReportViewer/ReportViewer.tsx'
 import UserDashboard from './components/UserDashboard/UserDashboard.tsx'
 import PublicLayout from './components/PublicLayout.tsx';
 import NutrientTestViewer from './components/documents/NutrientTestViewer';
-import DocumentViewerWrapper from './components/documents/DocumentViewerWrapper.tsx';
 import PdfLibViewer from './components/documents/PdfLibViewer';
-
 const store = setupStore();
 const router = createBrowserRouter(createRoutesFromElements(
   <Route path='/' element={<App />}>
@@ -73,7 +70,6 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path='dashboard' element={<UserDashboard />} />
       <Route path='documents' element={<Documents />} />
       <Route path='documents/:documentId' element={<DocumentDetails />} />
-      <Route path='documents/:documentId/view' element={<DocumentViewerWrapper />} />
       <Route path='editdoc/:id' element={<PaperlessDocumentDetails />} />
       <Route path='chat' element={<ChatRooms />} />
       <Route path='chat/:chatRoomId' element={<ChatRooms />} />
@@ -93,7 +89,7 @@ const router = createBrowserRouter(createRoutesFromElements(
     </Route>
 
     <Route path='nutrient-test' element={<NutrientTestViewer />} />
-    <Route path='pdf-lib' element={<PdfLibViewer pdfData={'/pdf-lib'} />} />
+    <Route path='pdf-lib' element={<PdfLibViewer />} />
     {/* Catch-all for not found pages */}
     <Route path='*' element={<NotFound />} />
   </Route>

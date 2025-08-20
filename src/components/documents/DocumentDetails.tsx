@@ -1,6 +1,6 @@
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { toastSuccess, toastError } from '../../utils/ToastUtils'; // Add this import
-import { useState } from 'react';
+
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { DocumentForm } from '../../models/IDocument';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,12 +29,9 @@ const DocumentDetails = () => {
   const { register, handleSubmit, formState: form, getFieldState } = useForm<DocumentForm>({ resolver: zodResolver(schema), mode: 'onTouched'});
   const { data: userData, isLoading: isUserLoading } = userAPI.useFetchUserQuery();
   const { data: documentData, isLoading, error,  isSuccess } = documentAPI.useFetchDocumentQuery(documentId ?? '');
-const [updateDocument] = documentAPI.useUpdateDocumentMutation();
-  const [downloadDocument] = documentAPI.useLazyDownloadDocumentQuery();
+  const [updateDocument] = documentAPI.useUpdateDocumentMutation();
+  const [downloadDocument] = documentAPI.useDownloadDocumentMutation();
   const [deleteDocument, { isLoading: deleteLoading }] = documentAPI.useDeleteDocumentMutation();
-  const [processDocument, { isLoading: isProcessing }] = documentAPI.useProcessDocumentMutation();
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const isFieldValid = (fieldName: keyof DocumentForm): boolean => getFieldState(fieldName, form).isTouched && !getFieldState(fieldName, form).invalid;
 
@@ -56,7 +53,7 @@ const [updateDocument] = documentAPI.useUpdateDocumentMutation();
 
   const onDeleteDocument = async () => {
   if (window.confirm('Are you sure you want to delete this document? This action cannot be undone.')) {
-    if (!documentData?.data.document?.documentId) return;
+    if (!documentData?.data?.document.documentId) return;
     try {
       await deleteDocument(documentData.data.document.documentId).unwrap();
       // Navigate immediately and show success message
@@ -68,23 +65,6 @@ const [updateDocument] = documentAPI.useUpdateDocumentMutation();
     }
   }
 };
-
-  const handleProcessDocument = async () => {
-    if (!documentData?.data.document) return;
-    try {
-      const blob = await downloadDocument(documentData.data.document.documentId).unwrap();
-      const file = new File([blob], documentData.data.document.name, { type: blob.type });
-      const formData = new FormData();
-      formData.append('file', file);
-      const result = await processDocument(formData).unwrap();
-      setAnalysisResult(result.data);
-      setIsModalOpen(true);
-      toastSuccess('Document analysis complete');
-    } catch (error) {
-      console.error('Failed to process document:', error);
-      toastError('Failed to process document');
-    }
-  };
 
   console.log('documentData:', documentData);
 
@@ -111,11 +91,10 @@ const [updateDocument] = documentAPI.useUpdateDocumentMutation();
 
   if (isSuccess && documentData && documentData.data && documentData.data.document && userData && userData.data) {
     return (
-      <>
-        <div className="container mtb">
-          <div className="row">
-            <div className="col-xl-8">
-              <div className="card">
+      <div className="container mtb">
+        <div className="row">
+          <div className="col-xl-8">
+            <div className="card">
               <div className="card-body">
                 <div className="row align-items-center">
                   <div className="col-md-3">
@@ -129,11 +108,6 @@ const [updateDocument] = documentAPI.useUpdateDocumentMutation();
                       <div className="row mt-3">
                         <div className="col-md-12">
                           <button type="button" onClick={() => onDownloadDocument(documentData.data.document.documentId, documentData.data.document.name)} className="btn btn-primary downloadb"><i className="bi bi-download"></i> Download</button>
-                          <Link to={`/documents/${documentData.data.document.documentId}/view`} className="btn btn-secondary"><i className="bi bi-eye"></i> View Document</Link>
-                          <button type="button" onClick={handleProcessDocument} disabled={isProcessing} className="btn btn-info">
-                            {isProcessing && <span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>}
-                            <i className="bi bi-robot"></i> {isProcessing ? 'Analyzing...' : 'Analyze with AI'}
-                          </button>
                           {documentData.data.document.referenceId && (
                             <Link to={`/editdoc/${documentData.data.document.referenceId}`} className="btn btn-info"><i className="bi bi-pencil"></i> Open in Editor</Link>
                           )}
@@ -269,45 +243,7 @@ const [updateDocument] = documentAPI.useUpdateDocumentMutation();
             </div>
           </div>
         </div>
-        </div>
-        {isModalOpen && (
-          <div className="modal fade show" style={{ display: 'block' }} tabIndex={-1}>
-            <div className="modal-dialog modal-lg">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">AI Analysis Results</h5>
-                  <button type="button" className="btn-close" onClick={() => setIsModalOpen(false)}></button>
-                </div>
-                <div className="modal-body">
-                  {analysisResult ? (
-                    <div>
-                      <h6>Summary</h6>
-                      <p>{analysisResult.summary}</p>
-                      <h6>Entities</h6>
-                      <ul>
-                        {analysisResult.entities.map((entity: any, index: number) => (
-                          <li key={index}><strong>{entity.name}</strong>: {entity.type}</li>
-                        ))}
-                      </ul>
-                      <h6>Timeline</h6>
-                      <ul>
-                        {analysisResult.timeline.map((item: any, index: number) => (
-                          <li key={index}><strong>{item.date}</strong>: {item.event}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : (
-                    <p>No analysis data available.</p>
-                  )}
-                </div>
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>Close</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </>
+      </div>
     )
   } else if (isLoading) {
     return (

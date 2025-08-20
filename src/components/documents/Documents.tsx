@@ -1,31 +1,19 @@
 import React from 'react';
 import { documentAPI } from '../../service/DocumentService';
-import { useFetchUserQuery } from '../../service/UserService';
 import { Query } from '../../models/IDocument';
 import DocumentLoader from './DocumentLoader';
 import Document from './Document';
-import { Modal, Button, Alert } from 'react-bootstrap';
 
 //TODO: make per page size dynamic
 
 const Documents = () => {
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const analyzeInputRef = React.useRef<HTMLInputElement>(null);
   const [query, setQuery] = React.useState<Query>({ page: 0, size: 4, name: '' });
-  const [showModal, setShowModal] = React.useState(false);
-  const [analysisResults, setAnalysisResults] = React.useState<any>(null);
-  const [analysisError, setAnalysisError] = React.useState<string | null>(null);
 
   const { data: documentData, isLoading } = documentAPI.useFetchDocumentsQuery(query);
   const [uploadDocuments] = documentAPI.useUploadDocumentsMutation();
-<<<<<<< Updated upstream
-  const { data: userData } = useFetchUserQuery();
-=======
-  const [processDocumentsBatch, { isLoading: isAnalyzing }] = documentAPI.useProcessDocumentsBatchMutation();
->>>>>>> Stashed changes
 
   const selectDocuments = () => inputRef.current?.click();
-  const selectDocumentsForAnalysis = () => analyzeInputRef.current?.click();
 
   const goToPage = async (direction: string) => {
     if (direction === 'back') {
@@ -36,38 +24,15 @@ const Documents = () => {
   }
 
   const onUploadDocuments = async (documents: FileList) => {
-<<<<<<< Updated upstream
-    if (documents && userData?.data?.user?.userId) {
-=======
-    if (documents) {
->>>>>>> Stashed changes
+    if(documents){
       const formData = new FormData();
       Array.from(documents).forEach((document) => {
         formData.append('files', document, document.name);
       });
-      await uploadDocuments({ formData, userId: userData.data.user.userId });
+      await uploadDocuments(formData);
     }
   }
-
-  const onUploadAndAnalyze = async (documents: FileList) => {
-    if (documents) {
-      const formData = new FormData();
-      Array.from(documents).forEach((document) => {
-        formData.append('files', document, document.name);
-      });
-      try {
-        const result = await processDocumentsBatch(formData).unwrap();
-        setAnalysisResults(result);
-        setShowModal(true);
-        setAnalysisError(null);
-      } catch (error) {
-        setAnalysisError('An error occurred during analysis.');
-        console.error(error);
-      }
-    }
-  };
-
-  if (isLoading) {
+  if(isLoading){
     return <DocumentLoader />
   }
   return (
@@ -77,8 +42,8 @@ const Documents = () => {
           <div className="align-items-center row">
             <div className="col-lg-4">
               <div className="mb-3 mb-lg-0">
-                {(documentData?.data.documents.content?.length ?? 0) > 0 &&
-                  <h6 className="fs-16 mb-0">{`Showing ${((documentData?.data?.documents?.number ?? 0) * (documentData?.data?.documents?.size ?? 0)) + 1} - ${((documentData?.data?.documents?.number ?? 0) * (documentData?.data?.documents?.size ?? 0)) + (documentData?.data.documents.content?.length ?? 0)} of ${documentData?.data?.documents?.totalElements ?? 0} results`}</h6>}
+                { (documentData?.data.documents.content?.length ?? 0) > 0 &&
+                <h6 className="fs-16 mb-0">{`Showing ${((documentData?.data?.documents?.number ?? 0) * (documentData?.data?.documents?.size ?? 0)) + 1} - ${((documentData?.data?.documents?.number ?? 0) * (documentData?.data?.documents?.size ?? 0)) + (documentData?.data.documents.content?.length ?? 0)} of ${documentData?.data?.documents?.totalElements ?? 0} results`}</h6>}
               </div>
             </div>
             <div className="col-lg-8">
@@ -89,7 +54,7 @@ const Documents = () => {
                       <input type="search" onChange={(event) => setQuery((prev) => { return { ...prev, page: 0, name: event.target.value } })} name='name' className='form-control' id="email" placeholder="Search documents" required />
                     </div>
                   </div>
-                  <div className="col-lg-2">
+                  <div className="col-lg-3">
                     <div className="selection-widget">
                       <select onChange={(event) => setQuery((prev) => { return { ...prev, size: +event.target.value } })} className="form-select" data-trigger="true" name="size" aria-label="Select page size">
                         <option value="4">Per page (4)</option>
@@ -99,28 +64,11 @@ const Documents = () => {
                       </select>
                     </div>
                   </div>
-                  <div className="col-lg-2">
+                  <div className="col-lg-3">
                     <div className="selection-widget mt-2 mt-lg-0">
                       <button type="button" onClick={selectDocuments} className="btn btn-primary w-100" style={{ display: 'inline-block' }}>
                         <i className="bi bi-upload upload-icon"></i>
                         Upload
-                      </button>
-                    </div>
-                  </div>
-                  <div className="col-lg-4">
-                    <div className="selection-widget mt-2 mt-lg-0">
-                      <button type="button" onClick={selectDocumentsForAnalysis} className="btn btn-primary w-100" style={{ display: 'inline-block' }} disabled={isAnalyzing}>
-                        {isAnalyzing ? (
-                          <>
-                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            <span className="visually-hidden">Loading...</span>
-                          </>
-                        ) : (
-                          <>
-                            <i className="bi bi-upload upload-icon"></i>
-                            Upload and Analyze
-                          </>
-                        )}
                       </button>
                     </div>
                   </div>
@@ -129,7 +77,7 @@ const Documents = () => {
             </div>
           </div>
           <div className="candidate-list">
-            {documentData?.data.documents.content?.length === 0 && <h4 className='card mt-4 align-items-center row' style={{ border: 'none', boxShadow: 'none' }}>No documents found</h4>}
+            {documentData?.data.documents.content?.length === 0 && <h4 className='card mt-4 align-items-center row' style={{border: 'none', boxShadow: 'none'}}>No documents found</h4>}
             {documentData?.data.documents.content.map(document => <Document {...document} key={document.id} />)}
           </div>
         </div>
@@ -160,25 +108,7 @@ const Documents = () => {
         </div>}
       <div style={{ display: 'none' }}>
         <input type='file' ref={inputRef} onChange={(event) => { if (event.target.files) onUploadDocuments(event.target.files); }} name='file' accept='*' multiple />
-        <input type='file' ref={analyzeInputRef} onChange={(event) => { if (event.target.files) onUploadAndAnalyze(event.target.files); }} name='file' accept='*' multiple />
       </div>
-
-      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Batch Analysis Results</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {analysisError && <Alert variant="danger">{analysisError}</Alert>}
-          {analysisResults && (
-            <pre>{JSON.stringify(analysisResults, null, 2)}</pre>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </div>
   )
 }

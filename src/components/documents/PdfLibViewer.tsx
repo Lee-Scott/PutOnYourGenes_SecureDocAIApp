@@ -1,43 +1,67 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PDFDocument } from 'pdf-lib';
 
-interface PdfLibViewerProps {
-  pdfData: string;
-}
+const PdfLibViewer: React.FC = () => {
+  const [pdfSrc, setPdfSrc] = useState<string>('');
+  const [modifiedPdfBytes, setModifiedPdfBytes] = useState<Uint8Array | null>(null);
 
-const PdfLibViewer: React.FC<PdfLibViewerProps> = ({ pdfData }) => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const modifyPdf = async () => {
+    try {
+      const pdfUrl = '/pationt-report-example.pdf';
+      const existingPdfBytes = await fetch(pdfUrl).then(res => res.arrayBuffer());
+
+      const pdfDoc = await PDFDocument.load(existingPdfBytes);
+      const pages = pdfDoc.getPages();
+      const firstPage = pages;
+
+      firstPage.drawText('This text was added with JavaScript!', {
+        x: 5,
+        y: firstPage.getHeight() / 2 + 250,
+        size: 50,
+      });
+
+      const pdfBytes = await pdfDoc.save();
+      setModifiedPdfBytes(pdfBytes);
+    } catch (error) {
+      console.error('Error modifying PDF:', error);
+    }
+  };
 
   useEffect(() => {
-    const renderPdf = async () => {
+    const loadPdf = async () => {
       try {
-        const existingPdfBytes = await fetch(pdfData).then(res => res.arrayBuffer());
-        const pdfDoc = await PDFDocument.load(existingPdfBytes);
-        const page = pdfDoc.getPage(0);
-        const { width, height } = page.getSize();
-        const canvas = canvasRef.current;
-        if (canvas) {
-          canvas.width = width;
-          canvas.height = height;
-          const context = canvas.getContext('2d');
-          if (context) {
-            // TODO: Render page content to canvas
-          }
+        if (modifiedPdfBytes) {
+          const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
+          const dataUri = URL.createObjectURL(blob);
+          setPdfSrc(dataUri);
+        } else {
+          const pdfUrl = '/pationt-report-example.pdf';
+          const existingPdfBytes = await fetch(pdfUrl).then(res => res.arrayBuffer());
+          const pdfDoc = await PDFDocument.load(existingPdfBytes);
+          const pdfBytes = await pdfDoc.save();
+          const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+          const dataUri = URL.createObjectURL(blob);
+          setPdfSrc(dataUri);
         }
       } catch (error) {
-        console.error('Failed to render PDF:', error);
+        console.error('Error loading PDF:', error);
       }
     };
 
-    if (pdfData) {
-      renderPdf();
-    }
-  }, [pdfData]);
+    loadPdf();
+  }, [modifiedPdfBytes]);
 
   return (
-    <div>
-      <h1>PDF Viewer</h1>
-      <canvas ref={canvasRef} />
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <button onClick={modifyPdf}>Modify PDF</button>
+      {pdfSrc && (
+        <iframe
+          src={pdfSrc}
+          width="100%"
+          height="100%"
+          title="PDF Viewer"
+        ></iframe>
+      )}
     </div>
   );
 };

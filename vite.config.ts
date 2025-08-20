@@ -1,36 +1,27 @@
 /// <reference types="vitest" />
-import { defineConfig, Plugin } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import fs from 'fs';
-import path from 'path';
-import { ViteDevServer } from 'vite';
-import { IncomingMessage, ServerResponse } from 'http';
-
-const configureServerPlugin: Plugin = {
-  name: 'configure-server',
-  configureServer(server: ViteDevServer) {
-    server.middlewares.use('/pdf-lib', (req: IncomingMessage, res: ServerResponse, next: () => void) => {
-      const filePath = path.resolve(__dirname, 'public', 'AI Moonshot Stock Analysis.pdf');
-      fs.readFile(filePath, (err: any, data: Buffer) => {
-        if (err) {
-          console.error('Error reading PDF file:', err);
-          res.writeHead(404, { 'Content-Type': 'text/plain' });
-          res.end('PDF file not found');
-        } else {
-          res.writeHead(200, { 'Content-Type': 'application/pdf' });
-          res.end(data);
-        }
-      });
-    });
-  }
-};
-
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
-    configureServerPlugin,
   ],
-  server: {},
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            if (process.env.VITE_PAPERLESS_TOKEN) {
+              proxyReq.setHeader('Authorization', `Token ${process.env.VITE_PAPERLESS_TOKEN}`);
+            }
+          });
+        },
+      },
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',
