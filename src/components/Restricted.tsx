@@ -4,10 +4,12 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { IResponse } from '../models/IResponse';
 
 const Restricted = () => {
-    const { data: userData, error, isLoading } = userAPI.useFetchUserQuery(undefined, { refetchOnFocus: true, refetchOnReconnect: true });
+    const { data: userData, error, isLoading } = userAPI.useFetchUserQuery(undefined, { 
+        refetchOnFocus: true, 
+        refetchOnReconnect: true 
+    });
 
-    console.log('userData in Restricted.tsx:', userData);
-
+    // Handle loading state
     if (isLoading || !userData) {
         return (
             <div className="container py-5" style={{ marginTop: '100px' }}>
@@ -20,7 +22,7 @@ const Restricted = () => {
         );
     }
 
-    // Show error and navigation options if there is an error
+    // Handle error state
     if (error) {
         const isLoggedIn = !!userData;
         return (
@@ -44,9 +46,11 @@ const Restricted = () => {
         );
     }
 
-    if (userData.data && userData.data.user && (userData.data.user.role === 'ADMIN' || userData.data.user.role === 'SUPER_ADMIN')) {
+    // Check if user has the required role
+    if (userData && (userData.role === 'ADMIN' || userData.role === 'SUPER_ADMIN')) {
         return <Outlet />;
     } else {
+        // User doesn't have permission
         return (
             <div className="container py-5" style={{ marginTop: '100px' }}>
                 <div className="row">

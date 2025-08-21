@@ -94,8 +94,8 @@ const Users = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {data?.data?.users?.map((user: User) => (
-                      <tr 
+                    {data?.users?.map((user: User) => (
+                      <tr
                         key={user.id}
                         onClick={() => handleUserClick(user.userId)}
                         style={{ cursor: 'pointer' }}
@@ -117,7 +117,7 @@ const Users = () => {
                   </tbody>
                 </table>
               </div>
-              {(!data?.data?.users || data.data.users.length === 0) && (
+              {(!data?.users || data.users.length === 0) && (
                 <div className="text-center mt-3">
                   <p className="text-muted">No users found.</p>
                 </div>

@@ -48,7 +48,7 @@ function NavBar() {
                   Chat
                 </NavLink>
               </li>
-              {user?.user && user.user.role !== 'USER' && (
+              {user && user.data.role !== 'USER' && (
                 <li className="nav-item">
                   <NavLink to="/users" end className="nav-link">
                     <i className="bi bi-people me-1"></i>
@@ -63,7 +63,7 @@ function NavBar() {
                 </NavLink>
               </li>
             </ul>
-            {user?.user && (
+            {user && (
               <div className="flex-shrink-0 dropdown">
                 <a
                   className="d-block link-body-emphasis text-decoration-none dropdown-toggle profile-dropdown"
@@ -97,55 +97,55 @@ function NavBar() {
                             ? 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExODF4MTlob2VueGN5YTk4dTFhZTVleGplZGRhNndlYjVpeTkwaHNpdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7bu3XilJ5BOiSGic/giphy.gif'
                             : user.user.imageUrl
                         }
-                      alt={user.user.firstName}
-                      width="35"
-                      height="35"
-                      className="rounded-circle"
-                      loading="lazy"
-                    />
-                    <div className="">
-                      <p style={{ display: 'block', margin: 0, padding: 0, color: '#000 !important' }}>
-                        {user.user.firstName} {user.user.lastName}
-                      </p>
-                      <p style={{ display: 'block', margin: 0, padding: 0, fontSize: '12px', fontWeight: 600 }}>
-                        {user.user.email}
-                      </p>
-                    </div>
-                  </NavLink>
-                </li>
-                <hr className="dropdown-divider" />
-                <li>
-                  <NavLink to="/user/password" end className="rounded-2 dropdown-item d-flex gap-2 align-items-center rounded-2">
-                  <i className="bi bi-key"></i>
-                    Password
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink to="/user/settings" end className="rounded-2 dropdown-item d-flex gap-2 align-items-center">
-                    <i className="bi bi-gear-wide-connected"></i>
-                    Settings
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink to="/user/authorization" end className="rounded-2 dropdown-item d-flex gap-2 align-items-center">
-                    <i className="bi bi-shield-exclamation"></i>
-                    Authorization
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink to="/user/authentication" end className="rounded-2 dropdown-item d-flex gap-2 align-items-center">
-                    <i className="bi bi-lock-fill"></i>
-                    Authentication (MFA)
-                  </NavLink>
-                </li>
-                <hr className="dropdown-divider" />
-                <li>
-                  <a onClick={onLogout} className="rounded-2 dropdown-item dropdown-item-danger d-flex gap-2 align-items-center" style={{cursor: 'pointer'}}>
-                  <i className="bi bi-box-arrow-right"></i>
-                    Logout
-                  </a>
-                </li>
-              </ul>
+                        alt={user.user.firstName}
+                        width="35"
+                        height="35"
+                        className="rounded-circle"
+                        loading="lazy"
+                      />
+                      <div className="">
+                        <p style={{ display: 'block', margin: 0, padding: 0, color: '#000 !important' }}>
+                          {user.user.firstName} {user.user.lastName}
+                        </p>
+                        <p style={{ display: 'block', margin: 0, padding: 0, fontSize: '12px', fontWeight: 600 }}>
+                          {user.user.email}
+                        </p>
+                      </div>
+                    </NavLink>
+                  </li>
+                  <hr className="dropdown-divider" />
+                  <li>
+                    <NavLink to="/user/password" end className="rounded-2 dropdown-item d-flex gap-2 align-items-center rounded-2">
+                    <i className="bi bi-key"></i>
+                      Password
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/user/settings" end className="rounded-2 dropdown-item d-flex gap-2 align-items-center">
+                      <i className="bi bi-gear-wide-connected"></i>
+                      Settings
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/user/authorization" end className="rounded-2 dropdown-item d-flex gap-2 align-items-center">
+                      <i className="bi bi-shield-exclamation"></i>
+                      Authorization
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/user/authentication" end className="rounded-2 dropdown-item d-flex gap-2 align-items-center">
+                      <i className="bi bi-lock-fill"></i>
+                      Authentication (MFA)
+                    </NavLink>
+                  </li>
+                  <hr className="dropdown-divider" />
+                  <li>
+                    <a onClick={onLogout} className="rounded-2 dropdown-item dropdown-item-danger d-flex gap-2 align-items-center" style={{cursor: 'pointer'}}>
+                    <i className="bi bi-box-arrow-right"></i>
+                      Logout
+                    </a>
+                  </li>
+                </ul>
               </div>
             )}
           </div>

@@ -15,9 +15,9 @@ export const processResponse = <T>(response: IResponse<T>, meta: any, arg: unkno
     if (!request.url.includes('profile') && !request.url.includes('delete')) {
         toastSuccess(response.message || 'Operation successful');
     }
-    console.log('response in processResponse:', response);
-    // Flatten the API response to return only the data payload
-    return (response?.data as T);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    return (response?.data?.user || response?.data) as T;
 };
 
 export const processError = (error: { status: number; data: IResponse<void>}, meta: unknown, arg: unknown): { status: number; data: IResponse<void>} =>{
