@@ -120,7 +120,7 @@ const Login = () => {
     localStorage.setItem(Key.LOGGEDIN, 'true');
     return location?.state?.from?.pathname
       ? <Navigate to={location.state.from.pathname} replace />
-      : <Navigate to="/dashboard" replace />;
+      : <Navigate to="/documents" replace />;
   }
 
   /**
@@ -130,7 +130,7 @@ const Login = () => {
     localStorage.setItem(Key.LOGGEDIN, 'true');
     return location?.state?.from?.pathname
       ? <Navigate to={location.state.from.pathname} replace />
-      : <Navigate to="/dashboard" replace />;
+      : <Navigate to="/documents" replace />;
   }
 
     /**
