@@ -16,13 +16,13 @@ const DocumentWidget: React.FC = () => {
       <div className="card-body">
         <h5 className="card-title">Recent Documents</h5>
         <div className="candidate-list">
-          {documentData?.data.documents.content?.length === 0 && (
+          {documentData?.documents.content?.length === 0 && (
             <div className="card mt-4 align-items-center row" style={{ border: 'none', boxShadow: 'none' }}>
               <h4>No documents found.</h4>
               <p>You can upload your documents from the integration page.</p>
             </div>
           )}
-          {documentData?.data.documents.content.map(document => (
+          {documentData?.documents.content.map(document => (
             <Document {...document} key={document.id} />
           ))}
         </div>

@@ -115,11 +115,14 @@ const Login = () => {
   /**
    * Redirect: If login success and MFA not required, complete login
    */
-  if (isSuccess && !data?.data.user.mfa) {
-    localStorage.setItem(Key.LOGGEDIN, 'true');
-    return location?.state?.from?.pathname
-      ? <Navigate to={location.state.from.pathname} replace />
-      : <Navigate to="/dashboard" replace />;
+  if (isSuccess) {
+    console.log('Login success - data:', data); // Debug log
+    if (!data?.data?.user?.mfa) { // Added extra optional chaining
+      localStorage.setItem(Key.LOGGEDIN, 'true');
+      return location?.state?.from?.pathname
+        ? <Navigate to={location.state.from.pathname} replace />
+        : <Navigate to="/dashboard" replace />;
+    }
   }
 
   /**

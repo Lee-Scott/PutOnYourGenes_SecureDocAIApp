@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useGetDocumentQuery, useGetDocumentFileQuery, useUpdateDocumentMutation } from '../../service/PaperlessService';
 import DocumentViewer from './DocumentViewer';
 import DocumentLoader from './DocumentLoader';
@@ -13,8 +13,8 @@ const PaperlessDocumentDetails: React.FC = () => {
   }
   const documentId = id;
 
-  const { data: document, error: docError, isLoading: docIsLoading } = useGetDocumentQuery(documentId);
-  const { data: documentBlob, error: fileError, isLoading: fileIsLoading } = useGetDocumentFileQuery(documentId);
+  const { data: document, error: docError, isLoading: docIsLoading } = useGetDocumentQuery(documentId, { skip: !documentId });
+  const { data: documentBlob, error: fileError, isLoading: fileIsLoading } = useGetDocumentFileQuery(documentId, { skip: !documentId });
   const [updateDocument] = useUpdateDocumentMutation();
 
   const handleSave = async (editedBlob: Blob) => {
@@ -47,13 +47,18 @@ const PaperlessDocumentDetails: React.FC = () => {
     <div className="container mt-4">
       <h2>{document.title}</h2>
       <p>Original file: {document.original_file_name}</p>
-      {document && (
-        <button
-          className="btn btn-primary mb-3"
-          onClick={() => navigate(`/viewdoc/${document.id}`)}
+      {document && document.viewableId && (
+        <Link
+          to={`/viewdoc/${document.viewableId}`}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center transition-colors mb-3"
+          style={{ width: 'fit-content' }}
         >
-          Open in Viewer
-        </button>
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+            <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+          </svg>
+          <span>View Document</span>
+        </Link>
       )}
       <DocumentViewer
         document={document}

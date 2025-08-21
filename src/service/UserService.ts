@@ -1,10 +1,10 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IResponse } from '../models/IResponse';
-import { userApiBaseUrl, isJsonContentType, processError, processResponse } from '../utils/RequestUtils';
+import { userApiBaseUrl, isJsonContentType, processError, processResponse } from '../utils/requestutils';
 import type { QrCodeRequest, Role, User } from '../models/IUser';
 import type { EmailAddress, IRegisterRequest, IUserRequest, UpdateNewPassword, UpdatePassword } from '../models/ICredentials';
 import { Http } from '../enum/http.method';
-import { createBaseQueryWithAuth } from './BaseQueryWithAuth';
+import { createBaseQueryWithAuth } from './baseQueryWithAuth';
 
 /**
  * Redux Toolkit Query API for user-related operations.
@@ -41,8 +41,8 @@ export const userAPI = createApi({
       keepUnusedDataFor: 120,
 
       // Response handling
-      transformResponse: processResponse<User>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<User>,
 
       // Cache tag association for automatic invalidation
       providesTags: () => ['User']
@@ -54,8 +54,8 @@ export const userAPI = createApi({
         method: Http.GET
       }),
       keepUnusedDataFor: 120,
-      transformResponse: processResponse<User>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<User>,
       providesTags: () => ['User']
     }),
 
@@ -75,8 +75,8 @@ export const userAPI = createApi({
       }),
 
       // Response handling
-      transformResponse: processResponse<User>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<User>,
 
       // No providesTags needed for login - authentication shouldn't be cached
       // Login is a stateful operation that should always be performed fresh
@@ -89,8 +89,8 @@ export const userAPI = createApi({
 
         body: registerRequest
       }),
-      transformResponse: processResponse<void>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<void>,
 
     }),
 
@@ -99,16 +99,16 @@ export const userAPI = createApi({
         url: `/verify?key=${key}`,
         method: Http.GET,
       }),
-      transformResponse: processResponse<void>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<void>,
     }),
     verifyPassword: builder.mutation<IResponse<User>, string>({
       query: (key) => ({
         url: `/verify/password?key=${key}`,
         method: Http.GET,
       }),
-      transformResponse: processResponse<User>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<User>,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
 
@@ -119,8 +119,8 @@ export const userAPI = createApi({
 
         body: qrCodeRequest
       }),
-      transformResponse: processResponse<User>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<User>,
       invalidatesTags: (_result, error) => error ? [] : ['User'] // tag is a reference to the cache in the store
 
     }),
@@ -131,8 +131,8 @@ export const userAPI = createApi({
         method: Http.POST,
         body: email
       }),
-      transformResponse: processResponse<void>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<void>,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     doResetPassword: builder.mutation<IResponse<void>, UpdateNewPassword>({
@@ -141,8 +141,8 @@ export const userAPI = createApi({
         method: Http.GET,
         body: passwordrequest
       }),
-      transformResponse: processResponse<void>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<void>,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     updatePhoto: builder.mutation<IResponse<string>, FormData>({
@@ -151,8 +151,8 @@ export const userAPI = createApi({
         method: Http.PATCH,
         body: form
       }),
-      transformResponse: processResponse<string>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<string>,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     updateUser: builder.mutation<IResponse<User>, IUserRequest>({
@@ -161,8 +161,8 @@ export const userAPI = createApi({
         method: Http.PATCH,
         body: user
       }),
-      transformResponse: processResponse<User>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<User>,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
 
@@ -172,8 +172,8 @@ export const userAPI = createApi({
         method: Http.PATCH,
         body: role
       }),
-      transformResponse: processResponse<void>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<void>,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
 
@@ -188,8 +188,8 @@ export const userAPI = createApi({
         method: Http.PATCH,
         body: userData
       }),
-      transformResponse: processResponse<User>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<User>,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     updateRoleByAdmin: builder.mutation<IResponse<void>, { userId: string; role: string }>({
@@ -198,8 +198,8 @@ export const userAPI = createApi({
         method: Http.PATCH,
         body: { role }
       }),
-      transformResponse: processResponse<void>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<void>,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     updatePassword: builder.mutation<IResponse<void>, UpdatePassword>({
@@ -212,8 +212,8 @@ export const userAPI = createApi({
           confirmNewPassword: request.confirmNewPassword
         }
       }),
-      transformResponse: processResponse<void>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<void>,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     toggleAccountExpired: builder.mutation<IResponse<void>, void>({
@@ -221,8 +221,8 @@ export const userAPI = createApi({
         url: `/toggleAccountExpired`,
         method: Http.PATCH
       }),
-      transformResponse: processResponse<void>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<void>,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     toggleAccountLocked: builder.mutation<IResponse<void>, void>({
@@ -230,8 +230,8 @@ export const userAPI = createApi({
         url: `/toggleAccountLocked`,
         method: Http.PATCH
       }),
-      transformResponse: processResponse<void>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<void>,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     toggleAccountEnabled: builder.mutation<IResponse<void>, void>({
@@ -239,8 +239,8 @@ export const userAPI = createApi({
         url: `/toggleAccountEnabled`,
         method: Http.PATCH
       }),
-      transformResponse: processResponse<void>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<void>,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     toggleCredentialsExpired: builder.mutation<IResponse<void>, void>({
@@ -248,8 +248,8 @@ export const userAPI = createApi({
         url: `/toggleCredentialsExpired`,
         method: Http.PATCH
       }),
-      transformResponse: processResponse<void>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<void>,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     enableMfa: builder.mutation<IResponse<User>, void>({
@@ -257,8 +257,8 @@ export const userAPI = createApi({
         url: `/mfa/setup`,
         method: Http.PATCH
       }),
-      transformResponse: processResponse<User>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<User>,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     disableMfa: builder.mutation<IResponse<User>, void>({
@@ -266,8 +266,8 @@ export const userAPI = createApi({
         url: `/mfa/cancel`,
         method: Http.PATCH
       }),
-      transformResponse: processResponse<User>,
       transformErrorResponse: processError,
+      transformResponse: processResponse<User>,
       invalidatesTags: (_result, error) => error ? [] : ['User']
     }),
     getUsers: builder.query<IResponse<{ users: User[] }>, void>({
@@ -275,40 +275,40 @@ export const userAPI = createApi({
         url: '/list',
         method: Http.PATCH
       }),
+      transformErrorResponse: processError,
       transformResponse: processResponse<{ users: User[] }>,
-      transformErrorResponse: processError,
       providesTags: () => ['User']
     }),
-    logout: builder.mutation<IResponse<void>, void>({
-      query: () => ({
-        url: '/logout',
-        method: Http.POST
-      }),
-      transformResponse: processResponse<void>,
-      transformErrorResponse: processError,
-      invalidatesTags: (_result, error) => error ? [] : ['User']
-    }),
-    deleteUser: builder.mutation<IResponse<void>, string>({
-      query: (userId) => ({
-        url: `/delete/${userId}`,
-        method: Http.DELETE
-      }),
-      transformResponse: processResponse<void>,
-      transformErrorResponse: processError,
-      invalidatesTags: (_result, error) => error ? [] : ['User']
-    }),
+        logout: builder.mutation<IResponse<void>, void>({
+            query: () => ({
+                url: '/logout',
+                method: Http.POST
+            }),
+            transformErrorResponse: processError,
+            transformResponse: processResponse<void>,
+            invalidatesTags: (_result, error) => error ? [] : ['User']
+        }),
+        deleteUser: builder.mutation<IResponse<void>, string>({
+            query: (userId) => ({
+                url: `/delete/${userId}`,
+                method: Http.DELETE
+            }),
+            transformErrorResponse: processError,
+            transformResponse: processResponse<void>,
+            invalidatesTags: (_result, error) => error ? [] : ['User']
+        }),
 
-    getHealthcareProviders: builder.query<IResponse<User[]>, void>({
-      query: () => ({
-        url: '/healthcare-providers',
-        method: Http.GET
-      }),
-      transformResponse: processResponse<User[]>,
-      transformErrorResponse: processError,
-      providesTags: () => ['User']
-    }),
+        getHealthcareProviders: builder.query<IResponse<User[]>, void>({
+            query: () => ({
+                url: '/healthcare-providers',
+                method: Http.GET
+            }),
+            transformErrorResponse: processError,
+            transformResponse: processResponse<User[]>,
+            providesTags: () => ['User']
+        }),
 
-  }),
+    }),
 });
 
 // Export the auto-generated React hook for use in components 

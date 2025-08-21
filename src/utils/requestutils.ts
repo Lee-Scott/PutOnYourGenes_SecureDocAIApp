@@ -1,4 +1,3 @@
-
 import { Key } from "../enum/catch.key";
 import { type IResponse } from "../models/IResponse";
 import { toastError, toastSuccess } from "./ToastUtils";
@@ -10,23 +9,25 @@ export const isJsonContentType = (headers: Headers) =>
     ['application/vnd.api+json', 'application/json', 'application/vnd.hal+json', 'application/pdf', 'multipart/form-data']
     .includes(headers.get('content-type')?.trimEnd() ?? '');
 
-export const processResponse = <T>(response: IResponse<T>, meta: any, arg: unknown): IResponse<T> => {
+export const processResponse = <T>(response: IResponse<T>, meta: any, arg: unknown): T => {
     const { request } = meta;
-    if(request.url.includes('logout')) { localStorage.removeItem(Key.LOGGEDIN); }
-    if(!request.url.includes('profile') && !request.url.includes('delete')) { 
+    if (request.url.includes('logout')) { localStorage.removeItem(Key.LOGGEDIN); }
+    if (!request.url.includes('profile') && !request.url.includes('delete')) {
         toastSuccess(response.message || 'Operation successful');
     }
-    console.log('processResponse', response);
-    return response;
+    console.log('response in processResponse:', response);
+    // Flatten the API response to return only the data payload
+    return (response?.data as T);
 };
 
 export const processError = (error: { status: number; data: IResponse<void>}, meta: unknown, arg: unknown): { status: number; data: IResponse<void>} =>{
-        if(error.data.code === 401 && error.data.status === 'UNAUTHORIZED' && error.data.message === 'You are not Logged in ') { 
-            localStorage.setItem(Key.LOGGEDIN, 'false');  
+        if(error.data.code === 401 && error.data.status === 'UNAUTHORIZED' && error.data.message === 'You are not Logged in ') {
+            localStorage.setItem(Key.LOGGEDIN, 'false');
            }
         toastError(error.data.message);
         console.log({ error: error.data  });
         return error;
     };
 
-        
+// Use when you need the full response wrapper (metadata + data)
+export const processResponseRaw = <T>(response: IResponse<T>): IResponse<T> => response;

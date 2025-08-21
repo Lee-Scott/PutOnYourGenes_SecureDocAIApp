@@ -10,11 +10,12 @@ function NavBar() {
     const [logout, { isLoading: logoutLoading }] = userAPI.useLogoutMutation();
 
     const navigate = useNavigate();
-    const onLogout = async () => { 
+    const onLogout = async () => {
       localStorage.removeItem(Key.LOGGEDIN);
       await logout();
       navigate('/login');
     };
+
 
   return (
     <>
@@ -47,31 +48,68 @@ function NavBar() {
                   Chat
                 </NavLink>
               </li>
-              {user?.data.user.role !== 'USER' && <li className="nav-item">
-                <NavLink to='/users' end className="nav-link">
-                  <i className="bi bi-people me-1"></i>
-                  Users
-                </NavLink>
-              </li>}
+              {user?.user && user.user.role !== 'USER' && (
+                <li className="nav-item">
+                  <NavLink to="/users" end className="nav-link">
+                    <i className="bi bi-people me-1"></i>
+                    Users
+                  </NavLink>
+                </li>
+              )}
               <li className="nav-item">
-                <NavLink to='/questionnaires' end className="nav-link">
+                <NavLink to="/questionnaires" end className="nav-link">
                   <i className="bi bi-clipboard-check me-1"></i>
                   Questionnaires
                 </NavLink>
               </li>
             </ul>
-            <div className="flex-shrink-0 dropdown">
-              <a className="d-block link-body-emphasis text-decoration-none dropdown-toggle profile-dropdown" style={{cursor: 'pointer'}}
-                data-bs-toggle="dropdown" aria-expanded="false">
-                <img src={isLoading ? 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExODF4MTlob2VueGN5YTk4dTFhZTVleGplZGRhNndlYjVpeTkwaHNpdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7bu3XilJ5BOiSGic/giphy.gif' : user?.data.user.imageUrl} alt="mdo" width="32" height="32" className="rounded-circle" />
-              </a>
-              <ul className="dropdown-menu dropdown-menu-end" style={{paddingInline: '10px'}}>
-                <li>
-                  <NavLink to="/user/profile" end className="rounded-2 dropdown-item d-flex gap-2 align-items-center">
-                    <img src={isLoading ? 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExODF4MTlob2VueGN5YTk4dTFhZTVleGplZGRhNndlYjVpeTkwaHNpdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7bu3XilJ5BOiSGic/giphy.gif' : user?.data.user.imageUrl} alt={user?.data.user.firstName} width="35" height="35" className="rounded-circle" />
+            {user?.user && (
+              <div className="flex-shrink-0 dropdown">
+                <a
+                  className="d-block link-body-emphasis text-decoration-none dropdown-toggle profile-dropdown"
+                  style={{ cursor: 'pointer' }}
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <img
+                    src={
+                      isLoading
+                        ? 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExODF4MTlob2VueGN5YTk4dTFhZTVleGplZGRhNndlYjVpeTkwaHNpdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7bu3XilJ5BOiSGic/giphy.gif'
+                        : user.user.imageUrl
+                    }
+                    alt="mdo"
+                    width="32"
+                    height="32"
+                    className="rounded-circle"
+                    loading="lazy"
+                  />
+                </a>
+                <ul className="dropdown-menu dropdown-menu-end" style={{ paddingInline: '10px' }}>
+                  <li>
+                    <NavLink
+                      to="/user/profile"
+                      end
+                      className="rounded-2 dropdown-item d-flex gap-2 align-items-center"
+                    >
+                      <img
+                        src={
+                          isLoading
+                            ? 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExODF4MTlob2VueGN5YTk4dTFhZTVleGplZGRhNndlYjVpeTkwaHNpdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7bu3XilJ5BOiSGic/giphy.gif'
+                            : user.user.imageUrl
+                        }
+                      alt={user.user.firstName}
+                      width="35"
+                      height="35"
+                      className="rounded-circle"
+                      loading="lazy"
+                    />
                     <div className="">
-                      <p style={{ display: 'block', margin: 0, padding: 0, color: '#000 !important' }}>{user?.data.user.firstName} {user?.data.user.lastName}</p>
-                      <p style={{ display: 'block', margin: 0, padding: 0, fontSize: '12px', fontWeight: 600 }}>{user?.data.user.email}</p>
+                      <p style={{ display: 'block', margin: 0, padding: 0, color: '#000 !important' }}>
+                        {user.user.firstName} {user.user.lastName}
+                      </p>
+                      <p style={{ display: 'block', margin: 0, padding: 0, fontSize: '12px', fontWeight: 600 }}>
+                        {user.user.email}
+                      </p>
                     </div>
                   </NavLink>
                 </li>
@@ -108,7 +146,8 @@ function NavBar() {
                   </a>
                 </li>
               </ul>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </nav>

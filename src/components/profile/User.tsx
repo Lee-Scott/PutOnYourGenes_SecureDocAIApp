@@ -53,15 +53,15 @@ const User = () => {
           </div>
         }
 
-        {isSuccess && <>
+        {isSuccess && userData?.data?.user &&
           <div className="col-lg-3 col-md-5 col-sm-12">
             <div className="card text-center mb-3">
               <div className="card-body">
-                <img src={userData?.data.user.imageUrl} className="img-fluid mx-auto user-photo" alt={userData.data.user.firstName} />
+                <img src={userData?.data.user.imageUrl} className="img-fluid mx-auto user-photo" alt={userData?.data.user.firstName} />
                 <a onClick={selectImage} className="btn btn-light border btn-sm card-text mb-2 opacity-80" style={{ fontSize: '12px' }}>
                   {!photoLoading && <i className="bi bi-camera-fill" style={{ marginRight: '5px' }}></i>}
                   {photoLoading && <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>}
-                    <span role="status">{photoLoading ? 'Changing...' : 'Change Photo'}</span>
+                  <span role="status">{photoLoading ? 'Changing...' : 'Change Photo'}</span>
                 </a>
                 <p className="h6">{userData?.data.user.firstName} {userData?.data.user.lastName}</p>
                 <p className="card-text">
@@ -110,11 +110,11 @@ const User = () => {
               </div>
             </div>
           </div>
-        </>}
+        }
         <div className="col-lg-9 col-md-7 col-sm-12">
           <div className="card">
             <div className="card-body">
-              <Outlet context={{ user: userData, refetch }} />
+              <Outlet context={{ user: userData?.data?.user, refetch }} />
             </div>
           </div>
         </div>

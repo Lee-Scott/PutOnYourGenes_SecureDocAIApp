@@ -42,8 +42,8 @@ const Documents = () => {
           <div className="align-items-center row">
             <div className="col-lg-4">
               <div className="mb-3 mb-lg-0">
-                { (documentData?.data.documents.content?.length ?? 0) > 0 &&
-                <h6 className="fs-16 mb-0">{`Showing ${((documentData?.data?.documents?.number ?? 0) * (documentData?.data?.documents?.size ?? 0)) + 1} - ${((documentData?.data?.documents?.number ?? 0) * (documentData?.data?.documents?.size ?? 0)) + (documentData?.data.documents.content?.length ?? 0)} of ${documentData?.data?.documents?.totalElements ?? 0} results`}</h6>}
+                { (documentData?.documents.content?.length ?? 0) > 0 &&
+                <h6 className="fs-16 mb-0">{`Showing ${((documentData?.documents?.number ?? 0) * (documentData?.documents?.size ?? 0)) + 1} - ${((documentData?.documents?.number ?? 0) * (documentData?.documents?.size ?? 0)) + (documentData?.documents.content?.length ?? 0)} of ${documentData?.documents?.totalElements ?? 0} results`}</h6>}
               </div>
             </div>
             <div className="col-lg-8">
@@ -77,12 +77,12 @@ const Documents = () => {
             </div>
           </div>
           <div className="candidate-list">
-            {documentData?.data.documents.content?.length === 0 && <h4 className='card mt-4 align-items-center row' style={{border: 'none', boxShadow: 'none'}}>No documents found</h4>}
-            {documentData?.data.documents.content.map(document => <Document {...document} key={document.id} />)}
+            {documentData?.documents.content?.length === 0 && <h4 className='card mt-4 align-items-center row' style={{border: 'none', boxShadow: 'none'}}>No documents found</h4>}
+            {documentData?.documents.content.map(document => <Document {...document} key={document.id} />)}
           </div>
         </div>
       </div>
-      {(documentData?.data.documents.content?.length ?? 0) > 0 && (documentData?.data?.documents.totalPages ?? 0) > 1 &&
+      {(documentData?.documents.content?.length ?? 0) > 0 && (documentData?.documents.totalPages ?? 0) > 1 &&
         <div className="row">
           <div className="mt-4 pt-2 col-lg-12">
             <nav aria-label="Page navigation example">
@@ -92,13 +92,13 @@ const Documents = () => {
                     <i className="bi bi-chevron-double-left"></i>
                   </a>
                 </li>
-                {[...Array(documentData?.data?.documents.totalPages).keys()].map((page, index) =>
+                {[...Array(documentData?.documents.totalPages).keys()].map((page, index) =>
                   <li key={page} className='page-item'>
                     <a onClick={() => setQuery((prev) => { return { ...prev, page } })} className={`page-link ' ${page === query.page ? 'active' : undefined}`}>{page + 1}</a>
                   </li>
                 )}
                 <li className="page-item">
-                  <a onClick={() => goToPage('forward')} className={`page-link ' ${documentData?.data?.documents.totalPages === query.page + 1 ? 'disabled' : undefined}`}>
+                  <a onClick={() => goToPage('forward')} className={`page-link ' ${documentData?.documents.totalPages === query.page + 1 ? 'disabled' : undefined}`}>
                     <i className="bi bi-chevron-double-right"></i>
                   </a>
                 </li>

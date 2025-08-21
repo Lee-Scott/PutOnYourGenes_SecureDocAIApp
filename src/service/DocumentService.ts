@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IResponse } from '../models/IResponse';
-import { isJsonContentType, processError, processResponse, documentsApiBaseUrl } from '../utils/RequestUtils';
+import { isJsonContentType, processError, processResponse, documentsApiBaseUrl } from '../utils/requestutils';
 import type { IRegisterRequest } from '../models/ICredentials';
 import { Http } from '../enum/http.method';
 import { Document, DocumentForm, Documents, Query } from '../models/IDocument';
@@ -13,17 +13,17 @@ export const documentAPI = createApi({
   baseQuery: createBaseQueryWithAuth(documentsApiBaseUrl, isJsonContentType),
   tagTypes: ['Documents'],
   endpoints: (builder) => ({
-    fetchDocuments: builder.query<IResponse<Page>, Query>({
+    fetchDocuments: builder.query<Page, Query>({
       query: (query) => ({
         url: `search?page=${query.page}&size=${query.size}${query.name ? `&name=${query.name}` : ''}`,
         method: Http.GET
       }),
       keepUnusedDataFor: 120,
-      //transformResponse: processResponse<Page>,
+      transformResponse: processResponse<Page>,
       transformErrorResponse: processError,
       providesTags: () => ['Documents']
     }),
-    uploadDocuments: builder.mutation<IResponse<Documents>, FormData>({
+    uploadDocuments: builder.mutation<Documents, FormData>({
       query: (formData) => ({
         url: '/upload',
         method: Http.POST,
@@ -34,17 +34,17 @@ export const documentAPI = createApi({
       invalidatesTags: (result, error) => error ? [] : ['Documents']
     }),
 
-    fetchDocument: builder.query<IResponse<Document>, string>({
+    fetchDocument: builder.query<Document, string>({
       query: (documentId) => ({
-        url: `/${documentId}`,
+        url: `/${encodeURIComponent(documentId)}`,
         method: Http.GET
       }),
-      //transformResponse: processResponse<Page>,
+      transformResponse: processResponse<Document>,
       transformErrorResponse: processError,
       providesTags: () => ['Documents']
     }),
 
-    updateDocument: builder.mutation<IResponse<Document>, DocumentForm>({
+    updateDocument: builder.mutation<Document, DocumentForm>({
       query: (documentForm: DocumentForm): { url: string; method: Http; body: DocumentForm } => ({
         url: `/${documentForm.documentId}`,
         method: Http.PATCH,
@@ -52,12 +52,12 @@ export const documentAPI = createApi({
       }),
       transformResponse: processResponse<Document>,
       transformErrorResponse: processError,
-      invalidatesTags: (result: IResponse<Document> | undefined, error: any) => error ? [] : ['Documents']
+      invalidatesTags: (result: Document | undefined, error: any) => error ? [] : ['Documents']
     }),
 
     downloadDocument: builder.mutation<Blob, string>({
       query: (documentId: string): { url: string; method: Http; responseHandler: (response: Response) => Promise<Blob> } => ({
-        url: `/${documentId}/download`,
+        url: `/${encodeURIComponent(documentId)}/download`,
         method: Http.GET,
         responseHandler: (response: Response): Promise<Blob> => response.blob()
       }),
@@ -66,9 +66,9 @@ export const documentAPI = createApi({
       //invalidatesTags: (result, error) => error ? [] : ['User']
     }),
   
-    deleteDocument: builder.mutation<IResponse<void>, string>({
+    deleteDocument: builder.mutation<void, string>({
       query: (documentId) => ({
-        url: `/delete/${documentId}`,
+        url: `/delete/${encodeURIComponent(documentId)}`,
         method: Http.DELETE,
       }),
       transformResponse: processResponse<void>,
@@ -76,9 +76,9 @@ export const documentAPI = createApi({
       invalidatesTags: (result, error) => error ? [] : ['Documents']
     }),
     
-    checkoutDocument: builder.mutation<IResponse<ILock>, string>({
+    checkoutDocument: builder.mutation<ILock, string>({
       query: (documentId) => ({
-        url: `/${documentId}/checkout`,
+        url: `/${encodeURIComponent(documentId)}/checkout`,
         method: Http.POST,
       }),
       transformResponse: processResponse<ILock>,
@@ -87,18 +87,18 @@ export const documentAPI = createApi({
 
     getDocumentStatus: builder.query<IResponse<any>, string>({
       query: (documentId) => ({
-        url: `/${documentId}/status`,
+        url: `/${encodeURIComponent(documentId)}/status`,
         method: Http.GET,
       }),
       transformErrorResponse: processError,
     }),
 
-    checkinDocument: builder.mutation<IResponse<void>, { documentId: string; file: File; baseVersion: number; lockId?: string }>({
+    checkinDocument: builder.mutation<void, { documentId: string; file: File; baseVersion: number; lockId?: string }>({
       query: ({ documentId, file, baseVersion, lockId }) => {
         const formData = new FormData();
         formData.append("file", file);
         return {
-          url: `/${documentId}/checkin?baseVersion=${baseVersion}&lockId=${lockId}`,
+          url: `/${encodeURIComponent(documentId)}/checkin?baseVersion=${baseVersion}&lockId=${lockId}`,
           method: Http.PUT,
           body: formData,
         };
@@ -109,7 +109,7 @@ export const documentAPI = createApi({
 
     getVersions: builder.query<IResponse<any[]>, string>({
       query: (documentId) => ({
-        url: `/${documentId}/versions`,
+        url: `/${encodeURIComponent(documentId)}/versions`,
         method: Http.GET,
       }),
       transformErrorResponse: processError,

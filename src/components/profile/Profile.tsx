@@ -44,8 +44,12 @@ const Profile = () => {
     }
   }, [user, reset]);
 
+  if (!user?.data?.user) {
+    return <Loader />;
+  }
+ 
   const isFieldValid = (fieldName: keyof IRegisterRequest): boolean => getFieldState(fieldName, form).isTouched && !getFieldState(fieldName, form).invalid;
-
+ 
   return (
     <>
       <h4 className="mb-3">Profile</h4>
@@ -55,7 +59,7 @@ const Profile = () => {
             <div className="col-sm-6">
               <label htmlFor="firstName" className="form-label">First name</label><div className="input-group has-validation">
                 <span className="input-group-text"><i className="bi bi-person-vcard"></i></span>
-                <input type="text" {...register('firstName')} className={`form-control ' ${form.errors.firstName? 'is-invalid' : ''} ${isFieldValid('firstName') ? 'is-valid' : '' }`} placeholder="First name" disabled={user?.data.user.role === 'USER'} required />
+                <input type="text" {...register('firstName')} className={`form-control ' ${form.errors.firstName? 'is-invalid' : ''} ${isFieldValid('firstName') ? 'is-valid' : '' }`} placeholder="First name" disabled={user?.data?.user?.role === 'USER'} required />
                 <div className="invalid-feedback">{form.errors.firstName?.message}</div>
                 </div>
             </div>
@@ -63,7 +67,7 @@ const Profile = () => {
               <label htmlFor="lastName" className="form-label">Last name</label>
               <div className="input-group has-validation">
                 <span className="input-group-text"><i className="bi bi-person-vcard"></i></span>
-                <input type="text" {...register('lastName')} className={`form-control ' ${form.errors.lastName? 'is-invalid' : ''} ${isFieldValid('lastName') ? 'is-valid' : '' }`} placeholder="Last name" disabled={user?.data.user.role === 'USER'} required />
+                <input type="text" {...register('lastName')} className={`form-control ' ${form.errors.lastName? 'is-invalid' : ''} ${isFieldValid('lastName') ? 'is-valid' : '' }`} placeholder="Last name" disabled={user?.data?.user?.role === 'USER'} required />
                 <div className="invalid-feedback">{form.errors.lastName?.message}</div>
               </div>
             </div>
@@ -71,7 +75,7 @@ const Profile = () => {
               <label htmlFor="email" className="form-label">Email address</label>
               <div className="input-group has-validation">
                 <span className="input-group-text"><i className="bi bi-envelope"></i></span>
-                <input type="text" {...register('email')} className={`form-control ' ${form.errors.email? 'is-invalid' : ''} ${isFieldValid('email') ? 'is-valid' : '' }`} placeholder="Email" disabled={user?.data.user.role === 'USER'} required />
+                <input type="text" {...register('email')} className={`form-control ' ${form.errors.email? 'is-invalid' : ''} ${isFieldValid('email') ? 'is-valid' : '' }`} placeholder="Email" disabled={user?.data?.user?.role === 'USER'} required />
                 <div className="invalid-feedback">{form.errors.email?.message}</div>
               </div>
             </div>
@@ -79,19 +83,19 @@ const Profile = () => {
               <label htmlFor="phone" className="form-label">Phone number</label>
               <div className="input-group has-validation">
                 <span className="input-group-text"><i className="bi bi-telephone"></i></span>
-                <input type="text" {...register('phone')} className={`form-control ' ${form.errors.phone? 'is-invalid' : ''} ${isFieldValid('phone') ? 'is-valid' : '' }`} placeholder="123-456-7890" disabled={user?.data.user.role === 'USER'} required />
+                <input type="text" {...register('phone')} className={`form-control ' ${form.errors.phone? 'is-invalid' : ''} ${isFieldValid('phone') ? 'is-valid' : '' }`} placeholder="123-456-7890" disabled={user?.data?.user?.role === 'USER'} required />
                 <div className="invalid-feedback">{form.errors.phone?.message}</div>
               </div>
             </div>
             <div className="col-12">
               <label htmlFor="bio" className="form-label">Bio</label>
-              <textarea className={`form-control ' ${form.errors.bio? 'is-invalid' : ''} ${isFieldValid('bio') ? 'is-valid' : '' }`} {...register('bio')} placeholder="Something about yourself here" disabled={user?.data.user.role === 'USER'} rows={3} required></textarea>
+              <textarea className={`form-control ' ${form.errors.bio? 'is-invalid' : ''} ${isFieldValid('bio') ? 'is-valid' : '' }`} {...register('bio')} placeholder="Something about yourself here" disabled={user?.data?.user?.role === 'USER'} rows={3} required></textarea>
               <div className="invalid-feedback">{form.errors.bio?.message}</div>
             </div>
           </div>
           <hr className="my-4"/>
           <div className="col">
-            <button disabled={!form.isValid || form.isSubmitting || updateLoading || user?.data.user.role === 'USER'} className="btn btn-primary btn-block" type="submit" >
+            <button disabled={!form.isValid || form.isSubmitting || updateLoading || user?.data?.user?.role === 'USER'} className="btn btn-primary btn-block" type="submit" >
                   {(form.isSubmitting || updateLoading) && <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>}
                     <span role="status">{(form.isSubmitting || updateLoading) ? 'Loading...' : 'Update'}</span>
                   </button>
