@@ -7,7 +7,7 @@ import { Http } from '../enum/http.method';
 import { createBaseQueryWithAuth } from './baseQueryWithAuth';
 
 // Message interface based on your backend response
-interface IMessage {
+export interface IMessage {
   id: number;
   messageId: string;
   chatRoomId: string;

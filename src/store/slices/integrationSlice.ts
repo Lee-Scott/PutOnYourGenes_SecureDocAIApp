@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
 
-interface IntegrationState {
+export interface IntegrationState {
   selectedPartner: 'fullscript' | 'pure_insight' | 'manual' | null;
   uploadedFiles: string[];
   processingStatus: 'idle' | 'processing' | 'complete' | 'error';

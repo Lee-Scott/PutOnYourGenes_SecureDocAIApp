@@ -8,7 +8,7 @@ export const paperlessApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: PAPERLESS_API_URL,
     prepareHeaders: (headers) => {
-      const token = import.meta.env.VITE_PAPERLESS_TOKEN;
+      const token = process.env.VITE_PAPERLESS_TOKEN;
       if (token) {
         headers.set('authorization', `Token ${token}`);
       }

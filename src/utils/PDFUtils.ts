@@ -242,7 +242,7 @@ export const generateQuestionnaireResultsPDF = async (
     pdf.text(disclaimerLines, margin, footerY);
 
     // Page numbers
-    const pageCount = (pdf as any).internal.pages.length - 1;
+    const pageCount = pdf.internal.pages.length - 1;
     for (let i = 1; i <= pageCount; i++) {
       pdf.setPage(i);
       pdf.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
@@ -388,9 +388,4 @@ export const generatePDFFromElement = async (
     console.error('Error generating PDF from element:', error);
     throw new Error('Failed to generate PDF from element');
   }
-};
-
-export default {
-  generateQuestionnaireResultsPDF,
-  generatePDFFromElement
 };

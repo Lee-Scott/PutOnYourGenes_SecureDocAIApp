@@ -122,7 +122,7 @@ const questionnaireApiBaseUrl = 'http://localhost:8085/api/questionnaires';
  */
 export const questionnaireAPI = createApi({
   reducerPath: 'questionnaireAPI',
-  baseQuery: createBaseQueryWithAuth(questionnaireApiBaseUrl, isJsonContentType),
+  baseQuery: createBaseQueryWithAuth(questionnaireApiBaseUrl, (headers) => isJsonContentType(headers)),
   tagTypes: ['Questionnaire', 'QuestionnaireResponse', 'QuestionnaireList'],
   endpoints: (builder) => ({
     getQuestionnaires: builder.query<IResponse<IQuestionnaireList>, { page?: number; size?: number; category?: string }>({
@@ -277,7 +277,7 @@ export const questionnaireAPI = createApi({
 
     deleteQuestionnaireResponse: builder.mutation<IResponse<void>, string>({
       query: (responseId) => ({
-        url: `/${responseId}`,
+        url: `/responses/${responseId}`,
         method: Http.DELETE
       }),
       transformResponse: processResponse<void>,

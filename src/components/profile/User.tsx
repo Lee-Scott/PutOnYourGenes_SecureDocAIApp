@@ -15,9 +15,9 @@ const User = () => {
   };
 
   const uploadPhoto = async (file: File) => {
-    if(file) {
+    if (file && userData?.data.user.userId) {
       const form = new FormData();
-      form.append('userId', userData?.data.user.userId);
+      form.append('userId', userData.data.user.userId);
       form.append('file', file, file.name);
       await updatePhoto(form);
     }
