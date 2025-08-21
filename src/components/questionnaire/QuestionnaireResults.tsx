@@ -57,8 +57,6 @@ const QuestionnaireResults: React.FC = () => {
   const [deleteQuestionnaireResponse] = useDeleteQuestionnaireResponseMutation();
   const { data: currentUserResponse } = useFetchUserQuery();
   const [createChatRoom] = useCreateChatRoomMutation();
-  const [_selectedResponse, setSelectedResponse] = useState<IQuestionnaireResponse | null>(null);
-  const [_showEmailModal, setShowEmailModal] = useState(false);
   const [showProviderModal, setShowProviderModal] = useState(false);
 
   // Helper function to generate results summary
@@ -165,9 +163,8 @@ This summary was generated from your health questionnaire responses. Please cons
   };
 
   // Messaging functionality
-  const handleShareWithProvider = async (response: IQuestionnaireResponse) => {
+  const handleShareWithProvider = async () => {
     try {
-      setSelectedResponse(response);
       setShowProviderModal(true);
     } catch (error) {
       console.error('Failed to open provider selection:', error);
@@ -229,7 +226,7 @@ This summary was generated from your health questionnaire responses. Please cons
         await deleteQuestionnaireResponse(userResponses.data.questionnaireId).unwrap();
         toastSuccess('Questionnaire deleted successfully.');
         navigate('/questionnaires');
-      } catch (_error) {
+      } catch {
         toastError('Failed to delete questionnaire.');
       }
     }
@@ -320,7 +317,7 @@ This summary was generated from your health questionnaire responses. Please cons
 
   // Healthcare Provider Selection Modal
   const ProviderSelectionModal: React.FC = () => {
-    const { data: usersResponse, isLoading: loadingProviders, error: _providersError } = useGetUsersQuery();
+    const { data: usersResponse, isLoading: loadingProviders } = useGetUsersQuery();
 
     const providers = usersResponse?.data?.users?.filter((user) => user.user.role === 'DOCTOR') || [];
 
@@ -465,7 +462,7 @@ This summary was generated from your health questionnaire responses. Please cons
                   <button className="btn btn-outline btn-small" onClick={() => handleEmailResults(userResponses.data!)}>
                     📧 Email
                   </button>
-                  <button className="btn btn-outline btn-small" onClick={() => handleShareWithProvider(userResponses.data!)}>
+                  <button className="btn btn-outline btn-small" onClick={() => handleShareWithProvider()}>
                     💬 Message Provider
                   </button>
                   <button className="btn btn-outline btn-small" onClick={() => handleExportPDF(userResponses.data!)}>
@@ -522,7 +519,7 @@ This summary was generated from your health questionnaire responses. Please cons
           <div className="secondary-actions">
             <button 
               className="btn btn-outline"
-              onClick={() => userResponses?.data && handleShareWithProvider(userResponses.data)}
+              onClick={() => userResponses?.data && handleShareWithProvider()}
               disabled={!userResponses?.data}
             >
               💬 Message Healthcare Provider

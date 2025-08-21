@@ -1,7 +1,6 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
+import { createApi, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import type { IResponse } from '../models/IResponse';
 import { isJsonContentType, processError, processResponse, documentsApiBaseUrl } from '../utils/requestutils';
-import type { IRegisterRequest } from '../models/ICredentials';
 import { Http } from '../enum/http.method';
 import { Document, DocumentForm, Documents, Query } from '../models/IDocument';
 import { Page } from '../models/IPage';
@@ -52,7 +51,7 @@ export const documentAPI = createApi({
       }),
       transformResponse: processResponse<Document>,
       transformErrorResponse: processError,
-      invalidatesTags: (result: IResponse<Document> | undefined, error: any) => error ? [] : ['Documents']
+      invalidatesTags: (result: IResponse<Document> | undefined, error: FetchBaseQueryError | undefined) => error ? [] : ['Documents']
     }),
 
     downloadDocument: builder.mutation<Blob, string>({
@@ -85,7 +84,7 @@ export const documentAPI = createApi({
       transformErrorResponse: processError,
     }),
 
-    getDocumentStatus: builder.query<IResponse<any>, string>({
+    getDocumentStatus: builder.query<IResponse<Document>, string>({
       query: (documentId) => ({
         url: `/${documentId}/status`,
         method: Http.GET,
@@ -107,7 +106,7 @@ export const documentAPI = createApi({
       transformErrorResponse: processError,
     }),
 
-    getVersions: builder.query<IResponse<any[]>, string>({
+    getVersions: builder.query<IResponse<Document[]>, string>({
       query: (documentId) => ({
         url: `/${documentId}/versions`,
         method: Http.GET,

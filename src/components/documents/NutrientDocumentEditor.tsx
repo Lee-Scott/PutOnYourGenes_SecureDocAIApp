@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { documentAPI } from '../../service/DocumentService';
 import { toast } from 'react-toastify';
+import { IDocument } from '../../models/IDocument';
 
 interface NutrientDocumentEditorProps {
   document: {
@@ -23,14 +24,13 @@ const NutrientDocumentEditor: React.FC<NutrientDocumentEditorProps> = ({ documen
   const [error, setError] = useState<string | null>(null);
   const [lockId, setLockId] = useState<string | null>(null);
   const [baseVersion, setBaseVersion] = useState<number>(0);
-  type Version = { version: number; timestamp: string };
-  const [selectedVersion, setSelectedVersion] = useState<Version | null>(null);
+  const [selectedVersion, setSelectedVersion] = useState<IDocument | null>(null);
   const [showConflictModal, setShowConflictModal] = useState(false);
  
-   const [checkoutDocument, { isLoading: _isCheckingOut }] = documentAPI.useCheckoutDocumentMutation();
-   const [checkinDocument, { isLoading: _isCheckingIn }] = documentAPI.useCheckinDocumentMutation();
-  const { data: status, error: _statusError, isLoading: isStatusLoading } = documentAPI.useGetDocumentStatusQuery(document.id, { pollingInterval: 30000 });
-  const { data: versions, error: _versionsError, isLoading: isVersionsLoading } = documentAPI.useGetVersionsQuery(document.id);
+   const [checkoutDocument] = documentAPI.useCheckoutDocumentMutation();
+   const [checkinDocument] = documentAPI.useCheckinDocumentMutation();
+  const { data: status, isLoading: isStatusLoading } = documentAPI.useGetDocumentStatusQuery(document.id, { pollingInterval: 30000 });
+  const { data: versions, isLoading: isVersionsLoading } = documentAPI.useGetVersionsQuery(document.id);
  
    useEffect(() => {
      const checkout = async () => {
@@ -40,7 +40,7 @@ const NutrientDocumentEditor: React.FC<NutrientDocumentEditorProps> = ({ documen
            setLockId(response.data.lockId);
            setBaseVersion(response.data.version);
          }
-       } catch (_err) {
+       } catch {
          toast.error('Failed to checkout document for editing.');
          setError('Could not obtain an exclusive lock for editing.');
        }
@@ -209,7 +209,7 @@ const NutrientDocumentEditor: React.FC<NutrientDocumentEditorProps> = ({ documen
         <h5>Version History</h5>
         {isVersionsLoading && <p>Loading versions...</p>}
         <ul className="list-group">
-          {versions?.data?.map((version: Version) => (
+          {versions?.data?.map((version: IDocument) => (
             <button
               key={version.version}
               className={`list-group-item ${selectedVersion?.version === version.version ? 'active' : ''}`}

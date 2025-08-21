@@ -90,7 +90,7 @@ const QuestionnaireBuilder: React.FC = () => {
     try {
       await createQuestionnaire(payload).unwrap();
       setMessage('Questionnaire created successfully!');
-    } catch (err) {
+    } catch {
       setMessage('Failed to create questionnaire.');
     }
   };

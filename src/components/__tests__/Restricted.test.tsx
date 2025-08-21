@@ -12,6 +12,7 @@ describe('Restricted', () => {
       data: undefined,
       error: undefined,
       isLoading: true,
+      refetch: vi.fn(),
     });
     render(<Restricted />);
     expect(screen.getByText('Loading...')).toBeInTheDocument();
@@ -19,10 +20,11 @@ describe('Restricted', () => {
 
   it('renders error state', () => {
     vi.mocked(userAPI.useFetchUserQuery).mockReturnValue({
-      data: { data: { user: null } } as any,
-      error: { data: { message: 'An error occurred' } } as any,
+      data: undefined,
+      error: { status: 401, data: { message: 'An error occurred' } },
       isLoading: false,
-    });
+      refetch: vi.fn(),
+    } as never);
     render(
       <MemoryRouter>
         <Restricted />
@@ -36,6 +38,7 @@ describe('Restricted', () => {
       data: { data: { user: { role: 'USER' } } },
       error: undefined,
       isLoading: false,
+      refetch: vi.fn(),
     });
     render(
       <MemoryRouter>

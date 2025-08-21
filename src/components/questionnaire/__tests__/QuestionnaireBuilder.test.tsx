@@ -1,9 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { vi, describe, test, expect, beforeEach, beforeAll, Mock } from 'vitest';
+import { vi, describe, test, expect, beforeEach, beforeAll } from 'vitest';
 import * as QuestionnaireService from '../../../service/QuestionnaireService';
 import QuestionnaireBuilder from '../QuestionnaireBuilder';
-import { useCreateQuestionnaireMutation } from '../../../service/QuestionnaireService';
 
 // Mock the service
 // No longer mocking the entire module

@@ -70,7 +70,7 @@ describe('Documents', () => {
 
   test('handles document upload', async () => {
     render(<MemoryRouter><Documents /></MemoryRouter>);
-    const _file = new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' });
+    new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' });
     const uploadButton = screen.getByRole('button', { name: /Upload/i });
     
     // The input is hidden, so we can't directly interact with it.

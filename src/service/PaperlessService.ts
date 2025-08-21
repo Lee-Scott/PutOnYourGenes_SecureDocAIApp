@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { IPaperlessDocument, IPaperlessDocuments } from '../models/IPaperless';
 
 // The base URL will be handled by the Vite proxy
 const PAPERLESS_API_URL = '/api';
@@ -16,20 +17,20 @@ export const paperlessApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getDocuments: builder.query<any, void>({
+    getDocuments: builder.query<IPaperlessDocuments, void>({
       query: () => 'documents/',
     }),
-    getDocument: builder.query<any, string>({
+    getDocument: builder.query<IPaperlessDocument, string>({
       query: (id) => `documents/${id}/`,
     }),
-    uploadDocument: builder.mutation<any, FormData>({
+    uploadDocument: builder.mutation<IPaperlessDocument, FormData>({
       query: (formData) => ({
         url: 'documents/post_document/',
         method: 'POST',
         body: formData,
       }),
     }),
-    updateDocument: builder.mutation<any, { id: string; document: FormData }>({
+    updateDocument: builder.mutation<IPaperlessDocument, { id: string; document: FormData }>({
       query: ({ id, document }) => ({
         url: `documents/${id}/`,
         method: 'PATCH',

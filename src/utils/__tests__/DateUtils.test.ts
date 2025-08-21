@@ -7,7 +7,6 @@ describe('DateUtils', () => {
       const dateString = '2023-10-27T10:00:00.000Z';
       // Note: The exact output can vary based on the test runner's timezone.
       // This test assumes a specific timezone for consistency.
-      const expected = 'Friday, Oct 27, 2023, 03:00:00 AM';
       const result = formatDate(dateString);
       expect(result).toContain('Oct 27, 2023');
     });
