@@ -11,7 +11,7 @@ async function globalSetup(config: FullConfig) {
   await page.locator('input[type="password"]').fill('4934');
   await page.locator('button[type="submit"], button:has-text("Login"), button:has-text("Sign In")').first().click();
   
-  await page.waitForURL(baseURL + '/documents', { waitUntil: 'networkidle' });
+  await page.waitForURL(baseURL + '/documents');
   await expect(page).toHaveURL(baseURL + '/documents');
 
   await page.context().storageState({ path: storageState as string });
