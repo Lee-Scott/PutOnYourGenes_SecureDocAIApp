@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import UriPdfViewer from './UriPdfViewer';
-import { documentsApiBaseUrl } from '../../utils/RequestUtils';
+import { documentsApiBaseUrl } from '../../utils/requestutils';
 
 const DocumentViewerPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

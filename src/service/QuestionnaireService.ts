@@ -1,8 +1,8 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IResponse } from '../models/IResponse';
-import { isJsonContentType, processError, processResponse } from '../utils/RequestUtils';
+import { isJsonContentType, processError, processResponse } from '../utils/requestutils';
 import { Http } from '../enum/http.method';
-import { createBaseQueryWithAuth } from './BaseQueryWithAuth';
+import { createBaseQueryWithAuth } from './baseQueryWithAuth';
 import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { 
   IQuestionnaire, 

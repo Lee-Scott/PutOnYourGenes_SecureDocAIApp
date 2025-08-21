@@ -1,11 +1,11 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IResponse } from '../models/IResponse';
-import { isJsonContentType, processError, processResponse, documentsApiBaseUrl } from '../utils/RequestUtils';
+import { isJsonContentType, processError, processResponse, documentsApiBaseUrl } from '../utils/requestutils';
 import type { IRegisterRequest } from '../models/ICredentials';
 import { Http } from '../enum/http.method';
 import { Document, DocumentForm, Documents, Query } from '../models/IDocument';
 import { Page } from '../models/IPage';
-import { createBaseQueryWithAuth } from './BaseQueryWithAuth';
+import { createBaseQueryWithAuth } from './baseQueryWithAuth';
 import { ILock } from '../models/ILock';
 
 export const documentAPI = createApi({

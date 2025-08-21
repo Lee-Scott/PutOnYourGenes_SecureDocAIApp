@@ -1,10 +1,10 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IResponse } from '../models/IResponse';
-import { userApiBaseUrl, isJsonContentType, processError, processResponse } from '../utils/RequestUtils';
+import { userApiBaseUrl, isJsonContentType, processError, processResponse } from '../utils/requestutils';
 import type { QrCodeRequest, Role, User } from '../models/IUser';
 import type { EmailAddress, IRegisterRequest, IUserRequest, UpdateNewPassword, UpdatePassword } from '../models/ICredentials';
 import { Http } from '../enum/http.method';
-import { createBaseQueryWithAuth } from './BaseQueryWithAuth';
+import { createBaseQueryWithAuth } from './baseQueryWithAuth';
 
 /**
  * Redux Toolkit Query API for user-related operations.
