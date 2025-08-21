@@ -17,9 +17,11 @@ type User = {
 
 type UsersApiResponse = {
   data?: {
-    users?: User[];
+    data?: {
+      users?: User[];
+    };
   };
-  error?: any;
+  error?: unknown;
   isLoading: boolean;
 };
 

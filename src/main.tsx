@@ -40,8 +40,6 @@ import PublicLayout from './components/PublicLayout.tsx';
 import DocumentViewerPage from './components/documents/DocumentViewerPage.tsx';
 import NutrientTestViewer from './components/documents/NutrientTestViewer';
 import PdfLibViewer from './components/documents/PdfLibViewer';
-import { ApiProvider } from '@reduxjs/toolkit/query/react';
-import { documentAPI } from './service/DocumentService.ts';
 
 const store = setupStore();
 

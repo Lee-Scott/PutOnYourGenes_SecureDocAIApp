@@ -42,7 +42,6 @@ const Login = () => {
   /**
    * Retrieve login status from localStorage
    */
-  const isLoggedIn: boolean = JSON.parse(localStorage.getItem(Key.LOGGEDIN)!) as boolean || false;
 
   /**
    * RTK Query mutation hook for logging in the user
@@ -52,7 +51,7 @@ const Login = () => {
   /**
    * RTK Query mutation hook for verifying QR code if MFA is enabled
    */
-  const [verifyQrCode, { data: qrCodeData, error: qrCodeError, isLoading: qrCodeLoading, isSuccess: qrCodeSuccess }] =
+  const [verifyQrCode, { error: qrCodeError, isLoading: qrCodeLoading, isSuccess: qrCodeSuccess }] =
     userAPI.useVerifyQrCodeMutation();
 
   /**
@@ -167,7 +166,7 @@ const Login = () => {
 
                 {/* QR Code Input Form */}
                 <form onSubmit={submitQrCode(onVerifyQrCode)} className="needs-validation" noValidate>
-                  <label className="form-label">Please enter QR code</label>
+                  <label className="form-label" htmlFor="qrCode1">Please enter QR code</label>
 
                   <div className="row mt-4 pt-2">
                     {/* Hidden input for userId */}
@@ -194,7 +193,6 @@ const Login = () => {
                           data-testid={`qrCode${i}`}
                           maxLength={1}
                           required
-                          autoFocus={i === 1}
                         />
                       </div>
                     ))}

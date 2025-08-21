@@ -1,11 +1,12 @@
 import React from 'react'
 import { userAPI } from '../../service/UserService';
 import { AccountSettings } from '../../enum/account.settings';
-import Loader from './Loader';
 import { useOutletContext } from 'react-router-dom';
+import { IUser } from '../../models/IUser';
 
 const Settings = () => {
-  const { user, refetch } = useOutletContext<any>();
+  type UserContext = { user: { data: { user: IUser } } };
+  const { user } = useOutletContext<UserContext>();
   const [toggleAccountExpired] = userAPI.useToggleAccountExpiredMutation();
   const [toggleAccountLocked] = userAPI.useToggleAccountLockedMutation();
   const [toggleAccountEnabled] = userAPI.useToggleAccountEnabledMutation();
@@ -34,7 +35,7 @@ const Settings = () => {
         <h4 className="mb-3">Settings</h4>
         <hr />
         <div className="form-group">
-          <label className="d-block mb-0">Account Settings</label>
+          <h6 className="d-block mb-0">Account Settings</h6>
           <div className="small text-muted mb-3">Settings regarding your account</div>
         </div>
         <div className="form-group mb-0">
@@ -75,7 +76,7 @@ const Settings = () => {
           </ul>
         </div>
         <div className="form-group mt-4">
-          <label className="d-block mb-0">Credentials Settings</label>
+          <h6 className="d-block mb-0">Credentials Settings</h6>
           <div className="small text-muted mb-3">Your credentials will expire after 90 days if not updated.</div>
         </div>
         <div className="form-group mb-0">

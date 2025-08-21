@@ -19,10 +19,10 @@ const ChatRoomItem = ({ chatRoom, currentUserId, onClick }: ChatRoomItemProps) =
   };
 
   return (
-    <div
+    <button
       className="list-group-item list-group-item-action d-flex align-items-center p-3"
       onClick={handleClick}
-      style={{ cursor: 'pointer' }}
+      style={{ cursor: 'pointer', border: 'none', background: 'none', textAlign: 'left' }}
     >
       {/* Participant Avatar */}
       <div className="flex-shrink-0 me-3">
@@ -64,7 +64,7 @@ const ChatRoomItem = ({ chatRoom, currentUserId, onClick }: ChatRoomItemProps) =
       <div className="flex-shrink-0">
         <i className="bi bi-chevron-right text-muted"></i>
       </div>
-    </div>
+    </button>
   );
 };
 

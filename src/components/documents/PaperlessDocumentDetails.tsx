@@ -8,14 +8,15 @@ const PaperlessDocumentDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
+  const documentId = id;
+
+  const { data: document, error: docError, isLoading: docIsLoading } = useGetDocumentQuery(documentId!, { skip: !documentId });
+  const { data: documentBlob, error: fileError, isLoading: fileIsLoading } = useGetDocumentFileQuery(documentId!, { skip: !documentId });
+  const [updateDocument] = useUpdateDocumentMutation();
+
   if (!id) {
     return <div className="alert alert-danger">No document ID provided.</div>;
   }
-  const documentId = id;
-
-  const { data: document, error: docError, isLoading: docIsLoading } = useGetDocumentQuery(documentId);
-  const { data: documentBlob, error: fileError, isLoading: fileIsLoading } = useGetDocumentFileQuery(documentId);
-  const [updateDocument] = useUpdateDocumentMutation();
 
   const handleSave = async (editedBlob: Blob) => {
     const formData = new FormData();
@@ -23,7 +24,7 @@ const PaperlessDocumentDetails: React.FC = () => {
     formData.append('title', document.title);
     
     try {
-      await updateDocument({ id: documentId, document: formData }).unwrap();
+      await updateDocument({ id: documentId!, document: formData }).unwrap();
       alert('Document saved successfully!');
     } catch (error) {
       console.error('Failed to save document:', error);

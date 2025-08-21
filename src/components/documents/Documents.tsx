@@ -88,19 +88,19 @@ const Documents = () => {
             <nav aria-label="Page navigation example">
               <div className="pagination job-pagination mb-0 justify-content-center">
                 <li className="page-item">
-                  <a onClick={() => goToPage('back')} className={`page-link ' ${0 === query.page ? 'disabled' : undefined}`}>
+                  <button onClick={() => goToPage('back')} className={`page-link ' ${0 === query.page ? 'disabled' : undefined}`} style={{ background: 'none', border: 'none' }}>
                     <i className="bi bi-chevron-double-left"></i>
-                  </a>
+                  </button>
                 </li>
-                {[...Array(documentData?.data?.documents.totalPages).keys()].map((page, index) =>
+                {[...Array(documentData?.data?.documents.totalPages).keys()].map((page) =>
                   <li key={page} className='page-item'>
-                    <a onClick={() => setQuery((prev) => { return { ...prev, page } })} className={`page-link ' ${page === query.page ? 'active' : undefined}`}>{page + 1}</a>
+                    <button onClick={() => setQuery((prev) => { return { ...prev, page } })} className={`page-link ' ${page === query.page ? 'active' : undefined}`} style={{ background: 'none', border: 'none' }}>{page + 1}</button>
                   </li>
                 )}
                 <li className="page-item">
-                  <a onClick={() => goToPage('forward')} className={`page-link ' ${documentData?.data?.documents.totalPages === query.page + 1 ? 'disabled' : undefined}`}>
+                  <button onClick={() => goToPage('forward')} className={`page-link ' ${documentData?.data?.documents.totalPages === query.page + 1 ? 'disabled' : undefined}`} style={{ background: 'none', border: 'none' }}>
                     <i className="bi bi-chevron-double-right"></i>
-                  </a>
+                  </button>
                 </li>
               </div>
             </nav>

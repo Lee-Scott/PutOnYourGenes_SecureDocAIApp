@@ -41,7 +41,7 @@ const Register = () => {
   // Reset form on successful registration
   React.useEffect(() => {
     if (isSuccess) reset();
-  }, [isSuccess]);
+  }, [isSuccess, reset]);
 
   return (
     <div className="container">

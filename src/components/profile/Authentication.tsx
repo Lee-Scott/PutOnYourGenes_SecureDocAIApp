@@ -1,8 +1,8 @@
 import { userAPI } from '../../service/UserService';
-import Loader from './Loader';
 import { useOutletContext } from 'react-router-dom';
+import { IUser } from '../../models/IUser';
 
-function formatLastLogin(dateString?: string) {
+function formatLastLogin(dateString?: string | number | Date) {
   if (!dateString) return 'Never';
   return new Intl.DateTimeFormat('en-US', {
     weekday: 'long',
@@ -16,13 +16,14 @@ function formatLastLogin(dateString?: string) {
 }
 
 const Authentication = () => {
-  const { user, refetch } = useOutletContext<any>();
-  const [enableMfa, { data: qrData, isLoading: enableLoading, isSuccess: qrCodeSuccess }] = userAPI.useEnableMfaMutation();
+  type UserContext = { user: { data: { user: IUser } } };
+  const { user } = useOutletContext<UserContext>();
+  const [enableMfa, { isLoading: enableLoading, isSuccess: qrCodeSuccess }] = userAPI.useEnableMfaMutation();
   const [disableMfa, { isLoading: disableLoading }] = userAPI.useDisableMfaMutation();
 
   const toggleMfa = async () => {
     if (user && user.data && user.data.user && typeof user.data.user.mfa !== 'undefined') {
-      user.data.user.mfa ? await disableMfa() : await enableMfa();
+      if (user.data.user.mfa) { await disableMfa(); } else { await enableMfa(); }
     }
   }
   return (
@@ -31,7 +32,7 @@ const Authentication = () => {
         <hr />
         <div className="row g-3">
           <div className="col-12 mb-2">
-            <label className="form-label d-block mb-1">Multi Factor Authentication</label>
+            <h6 className="form-label d-block mb-1">Multi Factor Authentication</h6>
             <p className="small text-muted">Two-factor authentication adds an additional layer of security to your account by requiring more than just a password to log in.</p>
             <button onClick={toggleMfa} disabled={disableLoading || enableLoading} className={`btn border btn-${user?.data.user.mfa ? 'light' : 'primary'} mt-2`} type="button">{user?.data.user.mfa ? 'Disable' : 'Enable'} Two-Factor Authentication
               {(disableLoading || enableLoading) && <div className={`spinner-border text-${user?.data.user.mfa ? 'primary' : 'light'}`} role="status" style={{ height: '20px', width: '20px', marginLeft: '10px' }}></div>}
@@ -55,7 +56,7 @@ const Authentication = () => {
           </div>
           <hr className="my-2" />
           <div className="col-12">
-            <label className="form-label">Last Login Session:</label>
+            <h6 className="form-label">Last Login Session:</h6>
             <ul className="list-group list-group-sm">
               <li className="list-group-item">
                 <div>

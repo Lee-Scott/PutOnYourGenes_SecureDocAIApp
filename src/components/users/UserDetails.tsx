@@ -29,7 +29,7 @@ const UserDetails = () => {
   
   const { data: currentUser } = userAPI.useFetchUserQuery();
   
-  const { data: userData, isLoading, error, isSuccess } = userAPI.useFetchUserByIdQuery(userId ?? '');
+  const { data: userData, isLoading, error, isSuccess: _isSuccess } = userAPI.useFetchUserByIdQuery(userId ?? '');
   
   const [updateUser, { isLoading: updateLoading }] = userAPI.useUpdateUserByAdminMutation();
   const [updateRole, { isLoading: roleLoading }] = userAPI.useUpdateRoleByAdminMutation();

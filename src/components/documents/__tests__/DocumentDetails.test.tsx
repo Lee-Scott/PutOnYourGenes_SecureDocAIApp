@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { vi, describe, test, expect, beforeEach, Mock } from 'vitest';
+import { vi, describe, test, expect, beforeEach } from 'vitest';
 import DocumentDetails from '../DocumentDetails';
 import { documentAPI } from '../../../service/DocumentService';
 import { userAPI } from '../../../service/UserService';

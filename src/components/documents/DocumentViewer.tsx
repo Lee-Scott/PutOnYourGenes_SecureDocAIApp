@@ -1,9 +1,16 @@
 import React from 'react';
 import NutrientDocumentEditor from './NutrientDocumentEditor';
 import GenericFileViewer from './GenericFileViewer';
+import { IDocument } from '../../models/IDocument';
+
+type DocumentViewerType = IDocument & {
+  id: string;
+  title: string;
+  original_file_name: string;
+};
 
 interface DocumentViewerProps {
-  document: any;
+  document: DocumentViewerType;
   documentBlob: Blob;
   onSave: (editedBlob: Blob) => void;
 }

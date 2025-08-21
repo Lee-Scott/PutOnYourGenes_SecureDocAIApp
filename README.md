@@ -1,15 +1,18 @@
-# SecureDocAI
+SecureDocAI
+SecureDocAI is an all-in-one platform designed to eliminate digital chaos and act as your single source of truth. It provides a secure, intelligent hub for individuals and teams to manage, edit, and gain insights from all their files—from business contracts and financial receipts to medical records and creative projects. Interact with your documents via an AI-powered chat to get summaries, find answers, and automate your workflow.
 
-SecureDocAI is a secure healthcare document AI application designed to streamline patient onboarding, document management, and personalized health assessments. This platform allows patients to complete health questionnaires, upload medical documents, and interact with an AI-powered chat for insights.
+Key Features
+Universal Document Hub: Upload files of any type or connect to existing services like Google Drive and Dropbox to manage everything in one place.
 
-## Key Features
+AI-Powered Intelligence: Chat with your documents, get instant summaries, extract key data, and let the AI automatically tag and organize your entire library.
 
-- **Document Management**: Upload, view, and manage medical documents securely.
-- **AI Chat**: An interactive chat interface for discussing document contents with AI.
-- **Health Questionnaires**: A flexible system for creating and completing patient questionnaires.
-- **User Management**: Robust authentication, user profiles, and role-based access control.
-- **Report Generation**: Dynamically generate and view patient reports.
-- **Partner Integrations**: Seamlessly connect with healthcare partners like Fullscript and PureInsight.
+Real-Time Collaborative Editor: Edit documents with your team in real-time using a powerful and intuitive editor, similar to Notion or Google Docs.
+
+Team Workspaces: Create secure spaces for teams to collaborate, chat, and share knowledge around your documents.
+
+Smart Questionnaires: Build and deploy intelligent forms for client onboarding, research, health assessments, and more.
+
+Privacy and Security First: Designed to give you complete control and ownership of your data with robust security and self-hosting options.
 
 ## Tech Stack
 

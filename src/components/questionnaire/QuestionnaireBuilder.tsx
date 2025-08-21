@@ -36,15 +36,21 @@ const QuestionnaireBuilder: React.FC = () => {
   const [message, setMessage] = useState('');
   const [createQuestionnaire, { isLoading }] = useCreateQuestionnaireMutation();
 
-  const handlePageChange = (idx: number, field: keyof IQuestionPageRequest, value: any) => {
+  const handlePageChange = (idx: number, field: keyof IQuestionPageRequest, value: string | boolean) => {
     const newPages = [...pages];
-    (newPages[idx] as any)[field] = value;
+    const page = newPages[idx];
+    if (field in page) {
+      (page[field] as string | boolean) = value;
+    }
     setPages(newPages);
   };
 
-  const handleQuestionChange = (pageIdx: number, qIdx: number, field: keyof IQuestionRequest, value: any) => {
+  const handleQuestionChange = (pageIdx: number, qIdx: number, field: keyof IQuestionRequest, value: string | boolean | QuestionType) => {
     const newPages = [...pages];
-    (newPages[pageIdx].questions[qIdx] as any)[field] = value;
+    const question = newPages[pageIdx].questions[qIdx];
+    if (field in question) {
+      (question[field] as string | boolean | QuestionType) = value;
+    }
     setPages(newPages);
   };
 
@@ -135,7 +141,7 @@ const QuestionnaireBuilder: React.FC = () => {
                 <input id={`page-description-${pageIdx}`} value={page.description} onChange={e => handlePageChange(pageIdx, 'description', e.target.value)} required style={{ background: '#fff', color: '#222' }} />
               </div>
               <div>
-                <label>Questions:</label>
+                <h6>Questions:</h6>
                 {page.questions.map((q, qIdx) => (
                   <div key={qIdx} className="question-section">
                     <h4>Question {qIdx + 1}</h4>
@@ -161,7 +167,7 @@ const QuestionnaireBuilder: React.FC = () => {
                     {/* Options for SINGLE_CHOICE and MULTIPLE_CHOICE */}
                     {(q.questionType === 'SINGLE_CHOICE' || q.questionType === 'MULTIPLE_CHOICE') && (
                       <div className="options-section">
-                        <label>Options:</label>
+                        <h6>Options:</h6>
                         {q.options && q.options.length > 0 ? (
                           q.options.map((opt, optIdx) => (
                             <div key={optIdx} style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>

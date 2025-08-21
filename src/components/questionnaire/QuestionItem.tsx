@@ -78,10 +78,10 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
               };
 
               return (
-                <div
+                <button
                   key={option.id || option.optionValue}
                   className={`option-item ${isChecked ? 'selected' : ''}`}
-                  onClick={handleChange}
+                  onClick={handleChange} style={{ background: 'none', border: 'none', textAlign: 'left', padding: '0' }}
                 >
                   <input
                     id={`${question.id}-${option.id || option.optionValue}`}
@@ -95,7 +95,7 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
                   <label className="option-label" htmlFor={`${question.id}-${option.id || option.optionValue}`}>
                     {option.optionText}
                   </label>
-                </div>
+                </button>
               );
             })}
           </div>

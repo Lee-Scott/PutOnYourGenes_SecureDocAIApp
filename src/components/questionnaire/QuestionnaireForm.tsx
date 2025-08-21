@@ -8,7 +8,8 @@ import { toastSuccess, toastError, toastWarning } from '../../utils/ToastUtils';
 import { useDispatch } from 'react-redux';
 import { setSelectedIntegrations } from '../../store/slices/integrationSlice';
 import personalHealthQuestionnaire from '../../data/personalHealthQuestionnaire.json';
-import { IQuestionnaire } from '../../models/IQuestionnaire';
+import { IQuestionnaire, IQuestionPage } from '../../models/IQuestionnaire';
+import { IQuestion } from '../../models/IQuestion';
 
 /**
  * QuestionnaireForm Component
@@ -60,7 +61,7 @@ const QuestionnaireForm: React.FC = () => {
     if (!questionnaire) return false;
     
     const currentPageData = questionnaire.pages[currentPage];
-    const requiredQuestions = currentPageData.questions.filter((q: any) => q.isRequired);
+    const requiredQuestions = currentPageData.questions.filter((q) => q.isRequired);
     
     for (const question of requiredQuestions) {
       const response = responses.get(question.id);
@@ -77,7 +78,7 @@ const QuestionnaireForm: React.FC = () => {
 
     for (let i = 0; i < questionnaire.pages.length; i++) {
       const page = questionnaire.pages[i];
-      const requiredQuestions = page.questions.filter((q: any) => q.isRequired);
+      const requiredQuestions = page.questions.filter((q) => q.isRequired);
 
       for (const question of requiredQuestions) {
         const response = responses.get(question.id);
@@ -138,15 +139,15 @@ const QuestionnaireForm: React.FC = () => {
       toastSuccess('Questionnaire submitted successfully!');
 
       if (isPersonalHealthQuestionnaire) {
-        const serviceInterestPage = questionnaire.pages.find((p: any) => p.title === 'Service Interest');
+        const serviceInterestPage = questionnaire.pages.find((p: IQuestionPage) => p.title === 'Service Interest');
         if (serviceInterestPage) {
           const interestedIntegrations = serviceInterestPage.questions
-            .filter((q: any) => responses.get(q.id)?.answerValue === 'interested')
-            .map((q: any) => q.questionText.split(':')[0]);
+            .filter((q: IQuestion) => responses.get(q.id)?.answerValue === 'interested')
+            .flatMap((q: IQuestion) => q.questionText.split(':'));
           dispatch(setSelectedIntegrations(interestedIntegrations));
         }
         
-        const uploadQuestion = questionnaire.pages.flatMap((p: any) => p.questions).find((q: any) => q.questionText.includes('upload'));
+        const uploadQuestion = questionnaire.pages.flatMap((p: IQuestionPage) => p.questions).find((q: IQuestion) => q.questionText.includes('upload'));
         if (uploadQuestion && responses.get(uploadQuestion.id)?.answerValue === 'Yes') {
           navigate('/documents');
         } else {

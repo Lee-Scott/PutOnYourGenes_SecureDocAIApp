@@ -1,7 +1,14 @@
 import React from 'react';
+import { IDocument } from '../../models/IDocument';
+
+type DocumentViewerType = IDocument & {
+  id: string;
+  title: string;
+  original_file_name: string;
+};
 
 interface GenericFileViewerProps {
-  document: any;
+  document: DocumentViewerType;
   documentBlob: Blob;
 }
 

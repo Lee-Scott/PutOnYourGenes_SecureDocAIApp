@@ -14,18 +14,23 @@ interface NutrientDocumentEditorProps {
 
 const NutrientDocumentEditor: React.FC<NutrientDocumentEditorProps> = ({ document, documentBlob, onSave }) => {
   const viewerContainerRef = useRef<HTMLDivElement>(null);
-  const viewerInstanceRef = useRef<any | null>(null);
+  interface NutrientViewerInstance {
+    addAnnotation(annotation: { type: string; text: string; pageNumber: number; rect: { x: number; y: number; width: number; height: number; }; }): Promise<void>;
+    save(): Promise<Blob>;
+  }
+  const viewerInstanceRef = useRef<NutrientViewerInstance | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lockId, setLockId] = useState<string | null>(null);
   const [baseVersion, setBaseVersion] = useState<number>(0);
-  const [selectedVersion, setSelectedVersion] = useState<any | null>(null);
+  type Version = { version: number; timestamp: string };
+  const [selectedVersion, setSelectedVersion] = useState<Version | null>(null);
   const [showConflictModal, setShowConflictModal] = useState(false);
  
-   const [checkoutDocument, { isLoading: isCheckingOut }] = documentAPI.useCheckoutDocumentMutation();
-   const [checkinDocument, { isLoading: isCheckingIn }] = documentAPI.useCheckinDocumentMutation();
-  const { data: status, error: statusError, isLoading: isStatusLoading } = documentAPI.useGetDocumentStatusQuery(document.id, { pollingInterval: 30000 });
-  const { data: versions, error: versionsError, isLoading: isVersionsLoading } = documentAPI.useGetVersionsQuery(document.id);
+   const [checkoutDocument, { isLoading: _isCheckingOut }] = documentAPI.useCheckoutDocumentMutation();
+   const [checkinDocument, { isLoading: _isCheckingIn }] = documentAPI.useCheckinDocumentMutation();
+  const { data: status, error: _statusError, isLoading: isStatusLoading } = documentAPI.useGetDocumentStatusQuery(document.id, { pollingInterval: 30000 });
+  const { data: versions, error: _versionsError, isLoading: isVersionsLoading } = documentAPI.useGetVersionsQuery(document.id);
  
    useEffect(() => {
      const checkout = async () => {
@@ -35,7 +40,7 @@ const NutrientDocumentEditor: React.FC<NutrientDocumentEditorProps> = ({ documen
            setLockId(response.data.lockId);
            setBaseVersion(response.data.version);
          }
-       } catch (err) {
+       } catch (_err) {
          toast.error('Failed to checkout document for editing.');
          setError('Could not obtain an exclusive lock for editing.');
        }
@@ -50,7 +55,7 @@ const NutrientDocumentEditor: React.FC<NutrientDocumentEditorProps> = ({ documen
     }
 
     const container = viewerContainerRef.current;
-    let instance: any = null;
+    let instance: unknown = null;
 
     const initializeViewer = async () => {
       if (window.NutrientViewer) {
@@ -63,7 +68,7 @@ const NutrientDocumentEditor: React.FC<NutrientDocumentEditorProps> = ({ documen
             document: blobUrl,
           });
 
-          viewerInstanceRef.current = instance;
+          viewerInstanceRef.current = instance as NutrientViewerInstance;
         } catch (err) {
           console.error('NutrientDocumentEditor: Failed to initialize Nutrient Viewer:', err);
           const errorMessage = err instanceof Error ? err.message : String(err);
@@ -123,7 +128,7 @@ const NutrientDocumentEditor: React.FC<NutrientDocumentEditorProps> = ({ documen
       toast.success('Document saved successfully!');
     } catch (err) {
       console.error('Failed to save document:', err);
-      if ((err as any).data?.message?.includes('conflict')) {
+      if ((err as { data: { message: string } }).data?.message?.includes('conflict')) {
        setShowConflictModal(true);
       } else {
        setError('Failed to save the document. Please try again.');
@@ -143,6 +148,7 @@ const NutrientDocumentEditor: React.FC<NutrientDocumentEditorProps> = ({ documen
 
    setIsSaving(true);
    try {
+     if (!viewerInstanceRef.current) return;
      const editedBlob = await viewerInstanceRef.current.save();
      
      if (resolution === 'keep') {
@@ -203,14 +209,14 @@ const NutrientDocumentEditor: React.FC<NutrientDocumentEditorProps> = ({ documen
         <h5>Version History</h5>
         {isVersionsLoading && <p>Loading versions...</p>}
         <ul className="list-group">
-          {versions?.data?.map((version: any) => (
-            <li
+          {versions?.data?.map((version: Version) => (
+            <button
               key={version.version}
               className={`list-group-item ${selectedVersion?.version === version.version ? 'active' : ''}`}
-              onClick={() => setSelectedVersion(version)}
+              onClick={() => setSelectedVersion(version)} style={{ background: 'none', border: 'none' }}
             >
               Version {version.version} ({new Date(version.timestamp).toLocaleString()})
-            </li>
+            </button>
           ))}
         </ul>
       </div>
