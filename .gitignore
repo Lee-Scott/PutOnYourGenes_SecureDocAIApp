@@ -34,3 +34,6 @@ storageState.json
 paperless-ngx-dev/
 
 SecureDocAIApp - Investor Pitch.html
+
+# E2E auth files
+tests/e2e/.auth/user.json
