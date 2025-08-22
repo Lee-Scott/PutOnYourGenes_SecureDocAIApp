@@ -108,6 +108,7 @@ const DocumentDetails = () => {
                       <div className="row mt-3">
                         <div className="col-md-12">
                           <button type="button" onClick={() => onDownloadDocument(documentData.data.document.documentId, documentData.data.document.name)} className="btn btn-primary downloadb"><i className="bi bi-download"></i> Download</button>
+                          <Link to={`/viewdoc/${documentData.data.document.documentId}`} className="btn btn-success"><i className="bi bi-eye"></i> View Document</Link>
                           {documentData.data.document.referenceId && (
                             <Link to={`/editdoc/${documentData.data.document.referenceId}`} className="btn btn-info"><i className="bi bi-pencil"></i> Open in Editor</Link>
                           )}

@@ -1,17 +1,32 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import { useFetchDocumentQuery } from '../../service/DocumentService';
 import UriPdfViewer from './UriPdfViewer';
-import { documentsApiBaseUrl } from '../../utils/RequestUtils';
+import DocumentLoader from './DocumentLoader';
+import PdfLibViewer from './PdfLibViewer';
 
 const DocumentViewerPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { documentId } = useParams<{ documentId: string }>();
+  const { data: documentResponse, error, isLoading } = useFetchDocumentQuery(documentId!);
 
-  const documentUrl = id ? `${documentsApiBaseUrl}/${id}/download` : '';
+  if (isLoading) {
+    return <DocumentLoader />;
+  }
+
+  if (error) {
+    return <div className="alert alert-danger">Error loading document</div>;
+  }
+
+  if (!documentResponse || !documentResponse.data) {
+    return <div className="alert alert-warning">Document not found</div>;
+  }
+
+  const document = documentResponse.data;
 
   return (
-    <div>
-      <h1>Document Viewer</h1>
-      {documentUrl && <UriPdfViewer uri={documentUrl} />}
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <UriPdfViewer uri={document.uri} />
+      <PdfLibViewer />
     </div>
   );
 };

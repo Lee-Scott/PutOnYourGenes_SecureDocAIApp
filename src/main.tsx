@@ -72,9 +72,9 @@ const router = createBrowserRouter(
         <Route path="questionnaires/results/:responseId" element={<QuestionnaireResults />} />
         <Route path="dashboard" element={<UserDashboard />} />
         <Route path="documents" element={<Documents />} />
-        <Route path="documents/:documentId" element={<DocumentDetails />} />
+        <Route path="documents/details/:documentId" element={<DocumentDetails />} />
         <Route path="editdoc/:id" element={<PaperlessDocumentDetails />} />
-        <Route path="viewdoc/:id" element={<DocumentViewerPage />} />
+        <Route path="viewdoc/:documentId" element={<DocumentViewerPage />} />
         <Route path="chat" element={<ChatRooms />} />
         <Route path="chat/:chatRoomId" element={<ChatRooms />} />
         <Route element={<Restricted />}>

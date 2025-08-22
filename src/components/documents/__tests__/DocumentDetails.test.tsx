@@ -58,13 +58,13 @@ describe('DocumentDetails', () => {
   });
 
   test('renders document details', () => {
-    render(<MemoryRouter initialEntries={['/documents/doc1']}><Routes><Route path="/documents/:documentId" element={<DocumentDetails />} /></Routes></MemoryRouter>);
+    render(<MemoryRouter initialEntries={['/documents/details/doc1']}><Routes><Route path="/documents/details/:documentId" element={<DocumentDetails />} /></Routes></MemoryRouter>);
     expect(screen.getByText('Test Document')).toBeInTheDocument();
     expect(screen.getByDisplayValue('A test document description.')).toBeInTheDocument();
   });
 
   test('handles document update', async () => {
-    render(<MemoryRouter initialEntries={['/documents/doc1']}><Routes><Route path="/documents/:documentId" element={<DocumentDetails />} /></Routes></MemoryRouter>);
+    render(<MemoryRouter initialEntries={['/documents/details/doc1']}><Routes><Route path="/documents/details/:documentId" element={<DocumentDetails />} /></Routes></MemoryRouter>);
     fireEvent.change(screen.getByDisplayValue('A test document description.'), { target: { value: 'Updated description.' } });
     fireEvent.click(screen.getByRole('button', { name: /Update/i }));
     await waitFor(() => {
@@ -75,7 +75,7 @@ describe('DocumentDetails', () => {
   });
 
   test('handles document download', async () => {
-    render(<MemoryRouter initialEntries={['/documents/doc1']}><Routes><Route path="/documents/:documentId" element={<DocumentDetails />} /></Routes></MemoryRouter>);
+    render(<MemoryRouter initialEntries={['/documents/details/doc1']}><Routes><Route path="/documents/details/:documentId" element={<DocumentDetails />} /></Routes></MemoryRouter>);
     fireEvent.click(screen.getByRole('button', { name: /Download/i }));
     await waitFor(() => {
       expect(downloadDocumentFn).toHaveBeenCalledWith('doc1');
@@ -83,10 +83,16 @@ describe('DocumentDetails', () => {
   });
 
   test('handles document deletion', async () => {
-    render(<MemoryRouter initialEntries={['/documents/doc1']}><Routes><Route path="/documents/:documentId" element={<DocumentDetails />} /></Routes></MemoryRouter>);
+    render(<MemoryRouter initialEntries={['/documents/details/doc1']}><Routes><Route path="/documents/details/:documentId" element={<DocumentDetails />} /></Routes></MemoryRouter>);
     fireEvent.click(screen.getByRole('button', { name: /Delete/i }));
     await waitFor(() => {
       expect(deleteDocumentFn).toHaveBeenCalledWith('doc1');
     });
+  });
+
+  test('"View Document" button links to the correct viewer page', () => {
+    render(<MemoryRouter initialEntries={['/documents/details/doc1']}><Routes><Route path="/documents/details/:documentId" element={<DocumentDetails />} /></Routes></MemoryRouter>);
+    const viewButton = screen.getByRole('link', { name: /View Document/i });
+    expect(viewButton).toHaveAttribute('href', '/viewdoc/doc1');
   });
 });
