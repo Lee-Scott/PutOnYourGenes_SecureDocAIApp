@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { userAPI } from '../service/UserService';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { IResponse } from '../models/IResponse';
 
 const Restricted = () => {
     const { data: userData, error, isLoading } = userAPI.useFetchUserQuery(undefined, { refetchOnFocus: true, refetchOnReconnect: true });
 
-    if (isLoading || !userData) {
+    console.log('userData in Restricted.tsx:', userData);
+
+    if (isLoading) {
         return (
             <div className="container py-5" style={{ marginTop: '100px' }}>
                 <div className="row">
@@ -20,7 +22,7 @@ const Restricted = () => {
 
     // Show error and navigation options if there is an error
     if (error) {
-        const isLoggedIn = !!userData?.data?.user;
+        const isLoggedIn = !!userData;
         return (
             <div className="container py-5" style={{ marginTop: '100px' }}>
                 <div className="row">
@@ -42,7 +44,19 @@ const Restricted = () => {
         );
     }
 
-    if (userData.data.user.role === 'ADMIN' || userData.data.user.role === 'SUPER_ADMIN') {
+    if (!userData) {
+        return (
+            <div className="container py-5" style={{ marginTop: '100px' }}>
+                <div className="row">
+                    <div className="col text-center">
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (userData.data.user && (userData.data.user.role === 'ADMIN' || userData.data.user.role === 'SUPER_ADMIN')) {
         return <Outlet />;
     } else {
         return (
