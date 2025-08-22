@@ -10,7 +10,7 @@ import { ILock } from '../models/ILock';
 export const documentAPI = createApi({
   reducerPath: 'documentAPI',
   baseQuery: createBaseQueryWithAuth(documentsApiBaseUrl, isJsonContentType),
-  tagTypes: ['Documents'],
+  tagTypes: ['Document'],
   endpoints: (builder) => ({
     fetchDocuments: builder.query<IResponse<Page>, Query>({
       query: (query) => ({
@@ -20,7 +20,7 @@ export const documentAPI = createApi({
       keepUnusedDataFor: 120,
       //transformResponse: processResponse<Page>,
       transformErrorResponse: processError,
-      providesTags: () => ['Documents']
+      providesTags: ['Document']
     }),
     uploadDocuments: builder.mutation<IResponse<Documents>, FormData>({
       query: (formData) => ({
@@ -30,7 +30,7 @@ export const documentAPI = createApi({
       }),
       transformResponse: processResponse<Documents>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['Documents']
+      invalidatesTags: (result, error) => error ? [] : ['Document']
     }),
 
     fetchDocument: builder.query<IResponse<Document>, string>({
@@ -40,7 +40,7 @@ export const documentAPI = createApi({
       }),
       //transformResponse: processResponse<Page>,
       transformErrorResponse: processError,
-      providesTags: () => ['Documents']
+      providesTags: ['Document']
     }),
 
     updateDocument: builder.mutation<IResponse<Document>, DocumentForm>({
@@ -51,7 +51,7 @@ export const documentAPI = createApi({
       }),
       // transformResponse: processResponse<Document>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['Documents']
+      invalidatesTags: (result, error) => error ? [] : ['Document']
     }),
 
     downloadDocument: builder.mutation<Blob, string>({
@@ -72,7 +72,7 @@ export const documentAPI = createApi({
       }),
       transformResponse: processResponse<void>,
       transformErrorResponse: processError,
-      invalidatesTags: (result, error) => error ? [] : ['Documents']
+      invalidatesTags: (result, error) => error ? [] : ['Document']
     }),
     
     checkoutDocument: builder.mutation<IResponse<ILock>, string>({

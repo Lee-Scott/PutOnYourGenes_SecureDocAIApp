@@ -1,5 +1,6 @@
 import React from 'react';
 import { documentAPI } from '../../service/DocumentService';
+import { userAPI } from '../../service/UserService';
 import { Query } from '../../models/IDocument';
 import DocumentLoader from './DocumentLoader';
 import Document from './Document';
@@ -9,7 +10,7 @@ import Document from './Document';
 const Documents = () => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [query, setQuery] = React.useState<Query>({ page: 0, size: 4, name: '' });
-
+  const { data: userData } = userAPI.useFetchUserQuery();
   const { data: documentData, isLoading } = documentAPI.useFetchDocumentsQuery(query);
   const [uploadDocuments] = documentAPI.useUploadDocumentsMutation();
 
@@ -24,8 +25,9 @@ const Documents = () => {
   }
 
   const onUploadDocuments = async (documents: FileList) => {
-    if(documents){
+    if(documents && userData?.data){
       const formData = new FormData();
+      formData.append('userId', userData.data.user.userId);
       Array.from(documents).forEach((document) => {
         formData.append('files', document, document.name);
       });
