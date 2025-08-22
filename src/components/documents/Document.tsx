@@ -4,7 +4,7 @@ import { IDocument } from '../../models/IDocument';
 
 const Document = (document: IDocument) => {
   return (
-    <Link to={`/documents/details/${document.documentId}`} className="candidate-list-box card mt-4">
+    <Link to={`/documents/${document.documentId}`} className="candidate-list-box card mt-4">
       <div className="card-body">
         <div className="align-items-center row">
           <div className="col-auto">

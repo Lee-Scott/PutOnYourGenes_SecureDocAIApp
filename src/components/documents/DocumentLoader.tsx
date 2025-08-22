@@ -1,4 +1,4 @@
-//TODO: pass in a property and loop over that number so its dynamic also column size
+
 const DocumentLoader = () => {
   return (
     <div className="container mtb">

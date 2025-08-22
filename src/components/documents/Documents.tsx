@@ -1,42 +1,33 @@
-import React from 'react';
-import { documentAPI } from '../../service/DocumentService';
-import { userAPI } from '../../service/UserService';
+import React from 'react'
 import { Query } from '../../models/IDocument';
+import { documentAPI } from '../../services/DocumentService';
 import DocumentLoader from './DocumentLoader';
 import Document from './Document';
 
-//TODO: make per page size dynamic
-
 const Documents = () => {
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>();
   const [query, setQuery] = React.useState<Query>({ page: 0, size: 4, name: '' });
-  const { data: userData } = userAPI.useFetchUserQuery();
-  const { data: documentData, isLoading } = documentAPI.useFetchDocumentsQuery(query);
-  const [uploadDocuments] = documentAPI.useUploadDocumentsMutation();
-
-  const selectDocuments = () => inputRef.current?.click();
+  const { data: documentData, error, isSuccess, isLoading, refetch } = documentAPI.useFetchDocumentsQuery(query);
+  const [uploadDocuments, { data: uploadData, isLoading: uploadLoading, error: uploadError, isSuccess: uploadSuccess }] = documentAPI.useUploadDocumentsMutation();
+  
+  const selectDocuments = () => inputRef.current.click();
 
   const goToPage = async (direction: string) => {
-    if (direction === 'back') {
-      setQuery((prev: Query) => ({ ...prev, page: prev.page - 1 }));
-    } else {
-      setQuery((prev: Query) => ({ ...prev, page: prev.page + 1 }));
-    }
-  }
+    direction === 'back' ? setQuery((prev) => { return { ...prev, page: prev.page - 1 }}) : setQuery((prev) => { return { ...prev, page: prev.page + 1 }});
+  };
 
   const onUploadDocuments = async (documents: FileList) => {
-    if(documents && userData?.data){
-      const formData = new FormData();
-      formData.append('userId', userData.data.user.userId);
-      Array.from(documents).forEach((document) => {
-        formData.append('files', document, document.name);
-      });
-      await uploadDocuments(formData);
+    if(documents) {
+      const form = new FormData();
+      Array.from(documents).forEach(document => form.append('files', document, document.name));
+      await uploadDocuments(form);
     }
-  }
-  if(isLoading){
+  };
+
+  if(isLoading) {
     return <DocumentLoader />
   }
+
   return (
     <div className="container mtb">
       <div className="row">
@@ -44,8 +35,8 @@ const Documents = () => {
           <div className="align-items-center row">
             <div className="col-lg-4">
               <div className="mb-3 mb-lg-0">
-                { (documentData?.data.documents.content?.length ?? 0) > 0 &&
-                <h6 className="fs-16 mb-0">{`Showing ${((documentData?.data?.documents?.number ?? 0) * (documentData?.data?.documents?.size ?? 0)) + 1} - ${((documentData?.data?.documents?.number ?? 0) * (documentData?.data?.documents?.size ?? 0)) + (documentData?.data.documents.content?.length ?? 0)} of ${documentData?.data?.documents?.totalElements ?? 0} results`}</h6>}
+                { documentData?.data.documents.content?.length > 0 && 
+                <h6 className="fs-16 mb-0">{`Showing ${(documentData?.data?.documents.number * documentData?.data?.documents.size) + 1} - ${((documentData?.data?.documents.number * documentData?.data?.documents.size)) + documentData?.data.documents.content?.length} of ${documentData?.data?.documents.totalElements} results`}</h6>}
               </div>
             </div>
             <div className="col-lg-8">
@@ -84,32 +75,32 @@ const Documents = () => {
           </div>
         </div>
       </div>
-      {(documentData?.data.documents.content?.length ?? 0) > 0 && (documentData?.data?.documents.totalPages ?? 0) > 1 &&
+      {documentData?.data.documents.content?.length > 0 && documentData?.data?.documents.totalPages > 1 &&
         <div className="row">
           <div className="mt-4 pt-2 col-lg-12">
             <nav aria-label="Page navigation example">
               <div className="pagination job-pagination mb-0 justify-content-center">
                 <li className="page-item">
-                  <button onClick={() => goToPage('back')} className={`page-link ' ${0 === query.page ? 'disabled' : undefined}`} style={{ background: 'none', border: 'none' }}>
+                  <a onClick={() => goToPage('back')} className={`page-link ' ${0 === query.page ? 'disabled' : undefined}`}>
                     <i className="bi bi-chevron-double-left"></i>
-                  </button>
+                  </a>
                 </li>
-                {[...Array(documentData?.data?.documents.totalPages).keys()].map((page) =>
+                {[...Array(documentData?.data?.documents.totalPages).keys()].map((page, index) =>
                   <li key={page} className='page-item'>
-                    <button onClick={() => setQuery((prev) => { return { ...prev, page } })} className={`page-link ' ${page === query.page ? 'active' : undefined}`} style={{ background: 'none', border: 'none' }}>{page + 1}</button>
+                    <a onClick={() => setQuery((prev) => { return { ...prev, page } })} className={`page-link ' ${page === query.page ? 'active' : undefined}`}>{page + 1}</a>
                   </li>
                 )}
                 <li className="page-item">
-                  <button onClick={() => goToPage('forward')} className={`page-link ' ${documentData?.data?.documents.totalPages === query.page + 1 ? 'disabled' : undefined}`} style={{ background: 'none', border: 'none' }}>
+                  <a onClick={() => goToPage('forward')} className={`page-link ' ${documentData?.data?.documents.totalPages === query.page + 1 ? 'disabled' : undefined}`}>
                     <i className="bi bi-chevron-double-right"></i>
-                  </button>
+                  </a>
                 </li>
               </div>
             </nav>
           </div>
         </div>}
       <div style={{ display: 'none' }}>
-        <input type='file' ref={inputRef} onChange={(event) => { if (event.target.files) onUploadDocuments(event.target.files); }} name='file' accept='*' multiple />
+        <input type='file' ref={inputRef} onChange={(event) => onUploadDocuments(event.target.files)} name='file' accept='*' multiple />
       </div>
     </div>
   )
