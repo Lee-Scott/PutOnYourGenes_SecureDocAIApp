@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IResponse, IRawResponse } from '../models/IResponse';
-import { isJsonContentType, processError, processResponse } from '../utils/requestutils';
+import { isJsonContentType, processError, processResponse } from '../utils/RequestUtils';
 import { Http } from '../enum/http.method';
 import { createBaseQueryWithAuth } from './baseQueryWithAuth';
 import type {

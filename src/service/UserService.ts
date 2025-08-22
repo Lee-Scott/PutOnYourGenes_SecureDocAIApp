@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IResponse } from '../models/IResponse';
-import { userApiBaseUrl, isJsonContentType, processError, processResponse } from '../utils/requestutils';
+import { userApiBaseUrl, isJsonContentType, processError, processResponse } from '../utils/RequestUtils';
 import type { QrCodeRequest, Role, User } from '../models/IUser';
 import type { EmailAddress, IRegisterRequest, IUserRequest, UpdateNewPassword, UpdatePassword } from '../models/ICredentials';
 import { Http } from '../enum/http.method';

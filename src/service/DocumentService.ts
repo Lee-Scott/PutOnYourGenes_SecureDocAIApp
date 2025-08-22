@@ -1,6 +1,6 @@
 import { createApi, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import type { IResponse } from '../models/IResponse';
-import { isJsonContentType, processError, processResponse, documentsApiBaseUrl } from '../utils/requestutils';
+import { isJsonContentType, processError, processResponse, documentsApiBaseUrl } from '../utils/RequestUtils';
 import { Http } from '../enum/http.method';
 import { Document, DocumentForm, Documents, Query } from '../models/IDocument';
 import { Page } from '../models/IPage';
@@ -49,9 +49,9 @@ export const documentAPI = createApi({
         method: Http.PATCH,
         body: documentForm
       }),
-      transformResponse: processResponse<Document>,
+      // transformResponse: processResponse<Document>,
       transformErrorResponse: processError,
-      invalidatesTags: (result: IResponse<Document> | undefined, error: FetchBaseQueryError | undefined) => error ? [] : ['Documents']
+      invalidatesTags: (result, error) => error ? [] : ['Documents']
     }),
 
     downloadDocument: builder.mutation<Blob, string>({

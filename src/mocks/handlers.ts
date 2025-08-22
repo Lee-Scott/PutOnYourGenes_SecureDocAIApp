@@ -114,15 +114,16 @@ export const handlers = [
       path: `/documents/${id}`,
     });
   }),
-  http.patch('http://localhost:8085/documents', async ({ request }) => {
-    const doc = await request.json() as { id: string, name: string };
+  http.patch('http://localhost:8085/documents/:id', async ({ request, params }) => {
+    const { id } = params;
+    const doc = await request.json() as { name: string, description: string };
     return HttpResponse.json({
       status: 'success',
-      data: { ...doc, url: `http://example.com/${doc.name}` },
+      data: { id, name: doc.name, description: doc.description, documentId: id, url: `http://example.com/${doc.name}` },
       message: 'Document updated successfully',
       timeStamp: new Date().toISOString(),
       code: 200,
-      path: '/documents',
+      path: `/documents/${id}`,
     });
   }),
   http.get('http://localhost:8085/documents/:id/download', () => {

@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import type { IResponse } from '../models/IResponse';
-import { isJsonContentType, processError, processResponse } from '../utils/requestutils';
+import { isJsonContentType, processError, processResponse } from '../utils/RequestUtils';
 import type { IChatRoom } from '../models/IChatRoom';
 import type { IChatRoomRequest } from '../models/IChatRoomRequest';
 import { Http } from '../enum/http.method';

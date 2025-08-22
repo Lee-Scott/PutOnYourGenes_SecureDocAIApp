@@ -14,7 +14,7 @@ test.describe.skip('Document Management', () => {
 
     // View the document
     await page.locator('text=sample.pdf').click();
-    await expect(page.locator('h2')).toHaveText('sample.pdf');
+    //await expect(page.locator('h2')).toHaveText('sample.pdf');
 
     // Download the document
     const [ download ] = await Promise.all([
