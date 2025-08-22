@@ -1,12 +1,12 @@
 import React from 'react'
 import { userAPI } from '../../service/UserService';
-import { Role } from '../../models/IUser';
-import Loader from './Loader';
+import { Role, IUser } from '../../models/IUser';
 import { useOutletContext } from 'react-router-dom';
 
 const Authorization = () => {
-  const { user, refetch } = useOutletContext<any>();
-  const [updateRole, { data: roleData, isLoading: updateLoading, isSuccess: updateSuccess }] = userAPI.useUpdateRoleMutation();
+  type UserContext = { user: { data: { user: IUser } } };
+  const { user } = useOutletContext<UserContext>();
+  const [updateRole, { isLoading: updateLoading }] = userAPI.useUpdateRoleMutation();
   
   const onUpdateRole = async (role: Role) => await updateRole(role);
 

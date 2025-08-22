@@ -15,7 +15,7 @@ export interface IUser {
     enabled: boolean;
     mfa: boolean;
     createdAt: string;
-    updateAt: string;
+    updatedAt: string;
     createdBy: number;
     updatedBy: number;
     role: string;
@@ -25,12 +25,12 @@ export interface IUser {
 export type Role = { role: string };
 
 export type User = {
-    user: any; userL: IUser 
+    user: IUser;
 };
 
-export type Users = { userL: IUser[] };
+export type Users = { users: IUser[] };
 
-export type QrCodeRequest = Pick<IUser, "userId"> & 
-    { qrCode?: string, qrCode1: string, qrCode2: string,  qrCode3: string, qrCode4: string, qrCode5: string, qrCode6: string,}
-
+export type QrCodeRequest = Pick<IUser, "userId"> & {
+    qrCode?: string;
+};
   

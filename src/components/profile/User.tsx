@@ -5,8 +5,8 @@ import { userAPI } from '../../service/UserService';
 
 const User = () => {
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const { data: userData, error, isSuccess, isLoading, refetch } = userAPI.useFetchUserQuery();
-  const [updatePhoto, { data: photoData, error: photoError, isLoading: photoLoading, isSuccess: photoSuccess }] = userAPI.useUpdatePhotoMutation();
+  const { data: userData, isSuccess, isLoading, refetch } = userAPI.useFetchUserQuery();
+  const [updatePhoto, { isLoading: photoLoading }] = userAPI.useUpdatePhotoMutation();
 
   const selectImage = () => {
     if (inputRef.current) {
@@ -15,9 +15,9 @@ const User = () => {
   };
 
   const uploadPhoto = async (file: File) => {
-    if(file) {
+    if (file && userData?.data.user.userId) {
       const form = new FormData();
-      form.append('userId', userData?.data.user.userId);
+      form.append('userId', userData.data.user.userId);
       form.append('file', file, file.name);
       await updatePhoto(form);
     }
@@ -58,11 +58,11 @@ const User = () => {
             <div className="card text-center mb-3">
               <div className="card-body">
                 <img src={userData?.data.user.imageUrl} className="img-fluid mx-auto user-photo" alt={userData.data.user.firstName} />
-                <a onClick={selectImage} className="btn btn-light border btn-sm card-text mb-2 opacity-80" style={{ fontSize: '12px' }}>
+                <button onClick={selectImage} className="btn btn-light border btn-sm card-text mb-2 opacity-80" style={{ fontSize: '12px' }}>
                   {!photoLoading && <i className="bi bi-camera-fill" style={{ marginRight: '5px' }}></i>}
                   {photoLoading && <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>}
                     <span role="status">{photoLoading ? 'Changing...' : 'Change Photo'}</span>
-                </a>
+                </button>
                 <p className="h6">{userData?.data.user.firstName} {userData?.data.user.lastName}</p>
                 <p className="card-text">
                   <i className="bi bi-shield-exclamation">

@@ -1,5 +1,6 @@
 import React from 'react';
 import { documentAPI } from '../../service/DocumentService';
+import { userAPI } from '../../service/UserService';
 import { Query } from '../../models/IDocument';
 import DocumentLoader from './DocumentLoader';
 import Document from './Document';
@@ -9,7 +10,7 @@ import Document from './Document';
 const Documents = () => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [query, setQuery] = React.useState<Query>({ page: 0, size: 4, name: '' });
-
+  const { data: userData } = userAPI.useFetchUserQuery();
   const { data: documentData, isLoading } = documentAPI.useFetchDocumentsQuery(query);
   const [uploadDocuments] = documentAPI.useUploadDocumentsMutation();
 
@@ -24,8 +25,9 @@ const Documents = () => {
   }
 
   const onUploadDocuments = async (documents: FileList) => {
-    if(documents){
+    if(documents && userData?.data){
       const formData = new FormData();
+      formData.append('userId', userData.data.user.userId);
       Array.from(documents).forEach((document) => {
         formData.append('files', document, document.name);
       });
@@ -88,19 +90,19 @@ const Documents = () => {
             <nav aria-label="Page navigation example">
               <div className="pagination job-pagination mb-0 justify-content-center">
                 <li className="page-item">
-                  <a onClick={() => goToPage('back')} className={`page-link ' ${0 === query.page ? 'disabled' : undefined}`}>
+                  <button onClick={() => goToPage('back')} className={`page-link ' ${0 === query.page ? 'disabled' : undefined}`} style={{ background: 'none', border: 'none' }}>
                     <i className="bi bi-chevron-double-left"></i>
-                  </a>
+                  </button>
                 </li>
-                {[...Array(documentData?.data?.documents.totalPages).keys()].map((page, index) =>
+                {[...Array(documentData?.data?.documents.totalPages).keys()].map((page) =>
                   <li key={page} className='page-item'>
-                    <a onClick={() => setQuery((prev) => { return { ...prev, page } })} className={`page-link ' ${page === query.page ? 'active' : undefined}`}>{page + 1}</a>
+                    <button onClick={() => setQuery((prev) => { return { ...prev, page } })} className={`page-link ' ${page === query.page ? 'active' : undefined}`} style={{ background: 'none', border: 'none' }}>{page + 1}</button>
                   </li>
                 )}
                 <li className="page-item">
-                  <a onClick={() => goToPage('forward')} className={`page-link ' ${documentData?.data?.documents.totalPages === query.page + 1 ? 'disabled' : undefined}`}>
+                  <button onClick={() => goToPage('forward')} className={`page-link ' ${documentData?.data?.documents.totalPages === query.page + 1 ? 'disabled' : undefined}`} style={{ background: 'none', border: 'none' }}>
                     <i className="bi bi-chevron-double-right"></i>
-                  </a>
+                  </button>
                 </li>
               </div>
             </nav>

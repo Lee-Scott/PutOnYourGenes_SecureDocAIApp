@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ResetPassword from '../ResetPassword';
 import { userAPI } from '../../service/UserService';
-import { vi, describe, test, expect, beforeEach, Mock } from 'vitest';
+import { vi, describe, test, expect, beforeEach } from 'vitest';
 
 // Mock the userAPI
 // No longer mocking the entire module

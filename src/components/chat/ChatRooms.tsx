@@ -228,7 +228,7 @@ const ChatRooms = () => {
                         <p className="mt-2">Error loading chat room</p>
                         <small className="text-muted">
                           {chatRoomError && 'data' in chatRoomError 
-                            ? `Error: ${(chatRoomError as any).data?.message || 'Unknown error'}`
+                            ? `Error: ${(chatRoomError as { data: { message: string } }).data?.message || 'Unknown error'}`
                             : 'Failed to load chat room data'
                           }
                         </small>

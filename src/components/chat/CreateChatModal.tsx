@@ -127,10 +127,10 @@ const CreateChatModal = ({ isOpen, onClose }: CreateChatModalProps) => {
   return (
     <>
       {/* Modal Backdrop */}
-      <div 
-        className="modal-backdrop fade show" 
+      <button
+        className="modal-backdrop fade show"
         onClick={onClose}
-        style={{ zIndex: 1040 }}
+        style={{ zIndex: 1040, background: 'none', border: 'none' }}
       />
       
       {/* Modal */}
@@ -175,7 +175,6 @@ const CreateChatModal = ({ isOpen, onClose }: CreateChatModalProps) => {
                     placeholder="Search by name or email..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    autoFocus
                   />
                 </div>
               </div>
@@ -238,7 +237,7 @@ const CreateChatModal = ({ isOpen, onClose }: CreateChatModalProps) => {
                 ) : searchTerm ? (
                   <div className="text-center text-muted p-4">
                     <i className="bi bi-search" style={{ fontSize: '2rem' }}></i>
-                    <p className="mt-2 mb-0">No users found matching "{searchTerm}"</p>
+                    <p className="mt-2 mb-0">No users found matching &quot;{searchTerm}&quot;</p>
                   </div>
                 ) : (
                   <div className="text-center text-muted p-4">

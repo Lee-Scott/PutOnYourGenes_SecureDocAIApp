@@ -1,12 +1,9 @@
-import { render, screen, fireEvent, waitFor } from '../../../utils/test-utils';
+import { render, screen, fireEvent, waitFor } from '../../../utils/Test-utils';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { vi, describe, test, expect, beforeEach, beforeAll, Mock } from 'vitest';
+import { vi, describe, test, expect, beforeEach, Mock } from 'vitest';
 import * as QuestionnaireService from '../../../service/QuestionnaireService';
 import QuestionnaireForm from '../QuestionnaireForm';
-import { useGetQuestionnaireByIdQuery, useSubmitQuestionnaireResponseMutation } from '../../../service/QuestionnaireService';
-
-// Mock the service
-// No longer mocking the entire module
+import { useGetQuestionnaireByIdQuery } from '../../../service/QuestionnaireService';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -32,7 +29,8 @@ const mockQuestionnaire = {
 describe('QuestionnaireForm', () => {
   const submitResponseFn = vi.fn();
 
-  beforeAll(() => {
+  beforeEach(() => {
+    vi.clearAllMocks();
     vi.spyOn(QuestionnaireService, 'useGetQuestionnaireByIdQuery').mockReturnValue({
       data: mockQuestionnaire,
       isLoading: false,
@@ -40,10 +38,6 @@ describe('QuestionnaireForm', () => {
       refetch: vi.fn(),
     });
     vi.spyOn(QuestionnaireService, 'useSubmitQuestionnaireResponseMutation').mockReturnValue([submitResponseFn, { isLoading: false, reset: vi.fn() }]);
-  });
-
-  beforeEach(() => {
-    vi.clearAllMocks();
     submitResponseFn.mockReturnValue({ unwrap: () => Promise.resolve() });
   });
 

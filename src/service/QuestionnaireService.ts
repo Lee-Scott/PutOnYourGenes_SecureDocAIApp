@@ -1,25 +1,26 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import type { IResponse } from '../models/IResponse';
+import type { IResponse, IRawResponse } from '../models/IResponse';
 import { isJsonContentType, processError, processResponse } from '../utils/RequestUtils';
 import { Http } from '../enum/http.method';
-import { createBaseQueryWithAuth } from './BaseQueryWithAuth';
-import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { 
-  IQuestionnaire, 
-  IQuestionnaireRequest, 
-  IQuestionnaireList 
+import { createBaseQueryWithAuth } from './baseQueryWithAuth';
+import type {
+  IQuestionnaire,
+  IQuestionnaireRequest,
+  IQuestionnaireList,
+  IQuestionPage
 } from '../models/IQuestionnaire';
-import type { 
-  IQuestionnaireResponse, 
+import type {
+  IQuestionnaireResponse,
   IQuestionnaireResponseRequest,
-  IQuestionnaireAnalytics 
+  IQuestionnaireAnalytics
 } from '../models/IQuestionnaireResponse';
+import type { IQuestion } from '../models/IQuestion';
 
 // Transform functions to handle backend response structure
-const transformQuestionnaireListResponse = (response: any): IResponse<IQuestionnaireList> => {
+const transformQuestionnaireListResponse = (response: IRawResponse): IResponse<IQuestionnaireList> => {
   return {
     status: response.status,
-    data: response.data, // Backend already returns the correct structure
+    data: response.data as IQuestionnaireList, // Backend already returns the correct structure
     message: response.message,
     timeStamp: response.time,
     time: response.time,
@@ -28,15 +29,19 @@ const transformQuestionnaireListResponse = (response: any): IResponse<IQuestionn
   };
 };
 
-const transformQuestionnaireResponse = (response: any): IResponse<IQuestionnaire> => {
+const transformQuestionnaireResponse = (response: IRawResponse): IResponse<IQuestionnaire> => {
   const questionnaire = response.data.questionnaire;
+
+  if (!questionnaire) {
+    throw new Error('Questionnaire data is missing in the response');
+  }
   
   // Transform validation rules from strings to numbers
-  const transformedQuestionnaire = {
+  const transformedQuestionnaire: IQuestionnaire = {
     ...questionnaire,
-    pages: questionnaire.pages.map((page: any) => ({
+    pages: questionnaire.pages.map((page: IQuestionPage) => ({
       ...page,
-      questions: page.questions.map((question: any) => ({
+      questions: page.questions.map((question: IQuestion) => ({
         ...question,
         validationRules: question.validationRules ? {
           ...question.validationRules,
@@ -60,10 +65,13 @@ const transformQuestionnaireResponse = (response: any): IResponse<IQuestionnaire
   };
 };
 
-const transformQuestionnaireResponseData = (response: any): IResponse<IQuestionnaireResponse> => {
+const transformQuestionnaireResponseData = (response: IRawResponse): IResponse<IQuestionnaireResponse> => {
+  if (!response.data.response) {
+    throw new Error('Questionnaire response data is missing in the response');
+  }
   return {
     status: response.status,
-    data: response.data.response,
+    data: response.data.response as IQuestionnaireResponse,
     message: response.message,
     timeStamp: response.time,
     time: response.time,
@@ -72,10 +80,13 @@ const transformQuestionnaireResponseData = (response: any): IResponse<IQuestionn
   };
 };
 
-const transformQuestionnaireResponseListData = (response: any): IResponse<IQuestionnaireResponse[]> => {
+const transformQuestionnaireResponseListData = (response: IRawResponse): IResponse<IQuestionnaireResponse[]> => {
+  if (!response.data.responses) {
+    throw new Error('Questionnaire response list data is missing in the response');
+  }
   return {
     status: response.status,
-    data: response.data.responses,
+    data: response.data.responses as IQuestionnaireResponse[],
     message: response.message,
     timeStamp: response.time,
     time: response.time,
@@ -84,10 +95,13 @@ const transformQuestionnaireResponseListData = (response: any): IResponse<IQuest
   };
 };
 
-const transformAnalyticsResponse = (response: any): IResponse<IQuestionnaireAnalytics> => {
+const transformAnalyticsResponse = (response: IRawResponse): IResponse<IQuestionnaireAnalytics> => {
+  if (!response.data.analytics) {
+    throw new Error('Analytics data is missing in the response');
+  }
   return {
     status: response.status,
-    data: response.data.analytics,
+    data: response.data.analytics as unknown as IQuestionnaireAnalytics,
     message: response.message,
     timeStamp: response.time,
     time: response.time,
@@ -122,7 +136,7 @@ const questionnaireApiBaseUrl = 'http://localhost:8085/api/questionnaires';
  */
 export const questionnaireAPI = createApi({
   reducerPath: 'questionnaireAPI',
-  baseQuery: createBaseQueryWithAuth(questionnaireApiBaseUrl, isJsonContentType),
+  baseQuery: createBaseQueryWithAuth(questionnaireApiBaseUrl, (headers) => isJsonContentType(headers)),
   tagTypes: ['Questionnaire', 'QuestionnaireResponse', 'QuestionnaireList'],
   endpoints: (builder) => ({
     getQuestionnaires: builder.query<IResponse<IQuestionnaireList>, { page?: number; size?: number; category?: string }>({
@@ -277,7 +291,7 @@ export const questionnaireAPI = createApi({
 
     deleteQuestionnaireResponse: builder.mutation<IResponse<void>, string>({
       query: (responseId) => ({
-        url: `/${responseId}`,
+        url: `/responses/${responseId}`,
         method: Http.DELETE
       }),
       transformResponse: processResponse<void>,

@@ -8,7 +8,7 @@ const VerifyAccount = () => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const key = searchParams.get('key');
-    const [verifyAccount, { data: accountData, error: accountError, isLoading: accountLoading, isSuccess: accountSuccess }] = userAPI.useVerifyAccountMutation();
+    const [verifyAccount, { error: accountError, isLoading: accountLoading, isSuccess: accountSuccess }] = userAPI.useVerifyAccountMutation();
 
     // Prevent double call in React 18 StrictMode
     const calledRef = React.useRef(false);

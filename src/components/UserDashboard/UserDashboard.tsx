@@ -3,7 +3,6 @@ import ReportWidget from './widgets/ReportWidget';
 import QuestionnaireWidget from './widgets/QuestionnaireWidget';
 import IntegrationWidget from './widgets/IntegrationWidget';
 import ChatWidget from './widgets/ChatWidget';
-import DocumentWidget from './widgets/DocumentWidget';
 import PaperlessWidget from './widgets/PaperlessWidget';
 import './UserDashboard.css';
 
@@ -23,9 +22,6 @@ const UserDashboard: React.FC = () => {
         </div>
         <div className="dashboard-widget-large">
           <ChatWidget />
-        </div>
-        <div className="dashboard-widget-large">
-          <DocumentWidget />
         </div>
         <div className="dashboard-widget-large">
           <PaperlessWidget />

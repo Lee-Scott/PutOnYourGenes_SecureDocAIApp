@@ -1,13 +1,10 @@
 
-import { IRegisterRequest, UpdatePassword } from '../../models/ICredentials';
+import { UpdatePassword } from '../../models/ICredentials';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import Loader from './Loader';
 import { userAPI } from '../../service/UserService';
-import ResetPassword from '../ResetPassword';
 import React from 'react';
-import { useOutletContext } from 'react-router-dom';
 
 const schema = z.object({
     newPassword: z.string().min(4, { message: 'New password is required' }),
@@ -25,7 +22,7 @@ const schema = z.object({
 
 const Password = () => {
     const { register, handleSubmit, reset, formState: form, getFieldState } = useForm<UpdatePassword>({ resolver: zodResolver(schema), mode: 'onTouched' });
-    const [updatePassword, { data: updateData, isLoading: updateLoading, isSuccess: updateSuccess }] = userAPI.useUpdatePasswordMutation();
+    const [updatePassword, { isLoading: updateLoading, isSuccess: updateSuccess }] = userAPI.useUpdatePasswordMutation();
 
   
     const isFieldValid = (fieldName: keyof UpdatePassword): boolean => getFieldState(fieldName, form).isTouched && !getFieldState(fieldName, form).invalid;
@@ -33,7 +30,7 @@ const Password = () => {
     const onUpdatePassword = async (request: UpdatePassword) => await updatePassword(request);
 
     // To reset the form
-    React.useEffect(() => reset(), [updateSuccess]);
+    React.useEffect(() => { if (updateSuccess) { reset(); } }, [updateSuccess, reset]);
 
     return (
     <>

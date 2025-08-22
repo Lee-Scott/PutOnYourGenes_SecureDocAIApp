@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { IPaperlessDocument, IPaperlessDocuments } from '../models/IPaperless';
 
 // The base URL will be handled by the Vite proxy
 const PAPERLESS_API_URL = '/api';
@@ -8,7 +9,7 @@ export const paperlessApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: PAPERLESS_API_URL,
     prepareHeaders: (headers) => {
-      const token = import.meta.env.VITE_PAPERLESS_TOKEN;
+      const token = process.env.VITE_PAPERLESS_TOKEN;
       if (token) {
         headers.set('authorization', `Token ${token}`);
       }
@@ -16,27 +17,27 @@ export const paperlessApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getDocuments: builder.query<any, void>({
+    getDocuments: builder.query<IPaperlessDocuments, void>({
       query: () => 'documents/',
     }),
-    getDocument: builder.query<any, number>({
+    getDocument: builder.query<IPaperlessDocument, string>({
       query: (id) => `documents/${id}/`,
     }),
-    uploadDocument: builder.mutation<any, FormData>({
+    uploadDocument: builder.mutation<IPaperlessDocument, FormData>({
       query: (formData) => ({
         url: 'documents/post_document/',
         method: 'POST',
         body: formData,
       }),
     }),
-    updateDocument: builder.mutation<any, { id: number; title: string; content: string }>({
-      query: ({ id, ...patch }) => ({
+    updateDocument: builder.mutation<IPaperlessDocument, { id: string; document: FormData }>({
+      query: ({ id, document }) => ({
         url: `documents/${id}/`,
         method: 'PATCH',
-        body: patch,
+        body: document,
       }),
     }),
-    getDocumentFile: builder.query<Blob, number>({
+    getDocumentFile: builder.query<Blob, string>({
       query: (id) => ({
         url: `documents/${id}/download/`,
         responseHandler: (response) => response.blob(),

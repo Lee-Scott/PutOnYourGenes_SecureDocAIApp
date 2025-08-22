@@ -33,6 +33,8 @@ const qrCodeSchema = z.object({
   userId: z.string().min(5, 'User ID is required')
 });
 
+type QrCodeFormValues = z.infer<typeof qrCodeSchema>;
+
 /**
  * Login component for authenticating the user and handling optional 2FA via QR code
  */
@@ -42,7 +44,6 @@ const Login = () => {
   /**
    * Retrieve login status from localStorage
    */
-  const isLoggedIn: boolean = JSON.parse(localStorage.getItem(Key.LOGGEDIN)!) as boolean || false;
 
   /**
    * RTK Query mutation hook for logging in the user
@@ -52,7 +53,7 @@ const Login = () => {
   /**
    * RTK Query mutation hook for verifying QR code if MFA is enabled
    */
-  const [verifyQrCode, { data: qrCodeData, error: qrCodeError, isLoading: qrCodeLoading, isSuccess: qrCodeSuccess }] =
+  const [verifyQrCode, { error: qrCodeError, isLoading: qrCodeLoading, isSuccess: qrCodeSuccess }] =
     userAPI.useVerifyQrCodeMutation();
 
   /**
@@ -76,7 +77,7 @@ const Login = () => {
     handleSubmit: submitQrCode,
     formState: qrCodeForm,
     getFieldState: getQrCodeField
-  } = useForm<QrCodeRequest>({
+  } = useForm<QrCodeFormValues>({
     resolver: zodResolver(qrCodeSchema),
     mode: 'onTouched'
   });
@@ -92,7 +93,7 @@ const Login = () => {
   /**
    * Helper: Determine if a QR code field is valid
    */
-  const isQrCodeFieldValid = (fieldName: keyof QrCodeRequest): boolean =>
+  const isQrCodeFieldValid = (fieldName: keyof QrCodeFormValues): boolean =>
     getQrCodeField(fieldName, qrCodeForm).isTouched && !getQrCodeField(fieldName, qrCodeForm).invalid;
 
   /**
@@ -103,12 +104,12 @@ const Login = () => {
   /**
    * Handler: Submit concatenated QR code digits + userId to the backend
    */
-  const onVerifyQrCode = async (qrCode: QrCodeRequest) => {
-    qrCode = {
-      ...qrCode,
-      qrCode: `${qrCode.qrCode1}${qrCode.qrCode2}${qrCode.qrCode3}${qrCode.qrCode4}${qrCode.qrCode5}${qrCode.qrCode6}`
+  const onVerifyQrCode = async (values: QrCodeFormValues) => {
+    const qrCodeRequest: QrCodeRequest = {
+      userId: values.userId,
+      qrCode: `${values.qrCode1}${values.qrCode2}${values.qrCode3}${values.qrCode4}${values.qrCode5}${values.qrCode6}`
     };
-    await verifyQrCode(qrCode);
+    await verifyQrCode(qrCodeRequest);
   };
 
 
@@ -119,7 +120,7 @@ const Login = () => {
     localStorage.setItem(Key.LOGGEDIN, 'true');
     return location?.state?.from?.pathname
       ? <Navigate to={location.state.from.pathname} replace />
-      : <Navigate to="/dashboard" replace />;
+      : <Navigate to="/documents" replace />;
   }
 
   /**
@@ -129,7 +130,7 @@ const Login = () => {
     localStorage.setItem(Key.LOGGEDIN, 'true');
     return location?.state?.from?.pathname
       ? <Navigate to={location.state.from.pathname} replace />
-      : <Navigate to="/dashboard" replace />;
+      : <Navigate to="/documents" replace />;
   }
 
     /**
@@ -167,7 +168,7 @@ const Login = () => {
 
                 {/* QR Code Input Form */}
                 <form onSubmit={submitQrCode(onVerifyQrCode)} className="needs-validation" noValidate>
-                  <label className="form-label">Please enter QR code</label>
+                  <label className="form-label" htmlFor="qrCode1">Please enter QR code</label>
 
                   <div className="row mt-4 pt-2">
                     {/* Hidden input for userId */}
@@ -185,16 +186,15 @@ const Login = () => {
                       <div className="col" key={i}>
                         <input
                           type="text"
-                          {...qrCodeRegister(`qrCode${i}` as keyof QrCodeRequest)}
+                          {...qrCodeRegister(`qrCode${i}` as keyof QrCodeFormValues)}
                           name={`qrCode${i}`}
                           className={`form-control text-center
-                            ${qrCodeForm.errors[`qrCode${i}` as keyof QrCodeRequest] ? 'is-invalid' : ''}
-                            ${isQrCodeFieldValid(`qrCode${i}` as keyof QrCodeRequest) ? 'is-valid' : ''}`}
+                            ${qrCodeForm.errors[`qrCode${i}` as keyof QrCodeFormValues] ? 'is-invalid' : ''}
+                            ${isQrCodeFieldValid(`qrCode${i}` as keyof QrCodeFormValues) ? 'is-valid' : ''}`}
                           id={`qrCode${i}`}
                           data-testid={`qrCode${i}`}
                           maxLength={1}
                           required
-                          autoFocus={i === 1}
                         />
                       </div>
                     ))}

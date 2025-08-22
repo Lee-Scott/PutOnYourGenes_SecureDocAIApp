@@ -4,9 +4,9 @@ import { IRegisterRequest } from '../../models/ICredentials';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import Loader from './Loader';
 import { userAPI } from '../../service/UserService';
 import { useOutletContext } from 'react-router-dom';
+import { IUser } from '../../models/IUser';
 
 const schema = z.object({
   email: z.string().min(3, 'Email is required').email('Invalid email address'),
@@ -19,9 +19,10 @@ const schema = z.object({
 });
 
 const Profile = () => {
-  const { user, refetch } = useOutletContext<any>();
+  type UserContext = { user: { data: { user: IUser } } };
+  const { user } = useOutletContext<UserContext>();
   const { register, handleSubmit, formState: form, getFieldState, reset } = useForm<IRegisterRequest>({ resolver: zodResolver(schema), mode: 'onTouched' });
-  const [update, { data: updateData, isLoading: updateLoading }] = userAPI.useUpdateUserMutation();
+  const [update, { isLoading: updateLoading }] = userAPI.useUpdateUserMutation();
 
   const updateUser = async (formData: IRegisterRequest) => {
     try {

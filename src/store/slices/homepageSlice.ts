@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
 
-interface HomepageState {
+export interface HomepageState {
   visitMetrics: {
     visitTimestamp: string;
     referralSource: string | null;

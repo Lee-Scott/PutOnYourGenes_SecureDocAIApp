@@ -1,13 +1,11 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import type { Reducer } from "redux";
 import { userAPI } from "../service/UserService";
-import logger from 'redux-logger';
 import { paperlessApi } from "../service/PaperlessService";
 import { documentAPI } from "../service/DocumentService";
 import { chatRoomAPI } from "../service/ChatRoomService";
 import { questionnaireAPI } from "../service/QuestionnaireService";
-import homepageReducer from './slices/homepageSlice';
-import integrationReducer from './slices/integrationSlice';
+import homepageReducer, { HomepageState } from './slices/homepageSlice';
+import integrationReducer, { IntegrationState } from './slices/integrationSlice';
 
 // Combine all reducers into a single root reducer
 // The computed property name [userAPI.reducerPath] dynamically assigns the reducer
@@ -20,7 +18,7 @@ const rootReducer = combineReducers({
     [questionnaireAPI.reducerPath]: questionnaireAPI.reducer,
     homepage: homepageReducer,
     integration: integrationReducer,
-}) as unknown as Reducer;
+});
 
 /**
  * Creates and configures the Redux store
@@ -38,18 +36,23 @@ export const setupStore = () => {
             .concat(paperlessApi.middleware)
             .concat(chatRoomAPI.middleware)
             .concat(questionnaireAPI.middleware)
-            // Add logger middleware for debugging actions and state changes
-            // .concat(logger)
     })
 };
-
-// Extract the root state type from the rootReducer using TypeScript utility type ReturnType
-// This provides proper typing for useSelector hooks
-export type RootState = ReturnType<typeof rootReducer>;
 
 // Extract the store type from the setupStore function
 // This is useful for creating typed hooks and testing utilities
 export type AppStore = ReturnType<typeof setupStore>;
+
+// This provides proper typing for useSelector hooks
+export type RootState = {
+    [userAPI.reducerPath]: ReturnType<typeof userAPI.reducer>;
+    [documentAPI.reducerPath]: ReturnType<typeof documentAPI.reducer>;
+    [paperlessApi.reducerPath]: ReturnType<typeof paperlessApi.reducer>;
+    [chatRoomAPI.reducerPath]: ReturnType<typeof chatRoomAPI.reducer>;
+    [questionnaireAPI.reducerPath]: ReturnType<typeof questionnaireAPI.reducer>;
+    homepage: HomepageState;
+    integration: IntegrationState;
+  };
 
 // Extract the dispatch type from the store
 // This provides proper typing for useDispatch hook and dispatch calls

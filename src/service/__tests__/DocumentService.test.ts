@@ -45,15 +45,15 @@ describe('DocumentService', () => {
 
   it('fetchDocument should return a single document', async () => {
     const { data } = await store.dispatch(
-      documentAPI.endpoints.fetchDocument.initiate('1' as any)
+      documentAPI.endpoints.fetchDocument.initiate('1')
     );
     expect(data?.data.name).toBe('Test Document 1');
   });
 
   it('updateDocument should update a document', async () => {
-    const doc = { id: '1', name: 'updated-document.pdf' };
+    const doc = { documentId: '1', name: 'updated-document.pdf', description: 'updated description' };
     const { data } = await store.dispatch(
-      documentAPI.endpoints.updateDocument.initiate(doc as any)
+      documentAPI.endpoints.updateDocument.initiate(doc)
     );
     expect(data?.data.name).toBe('updated-document.pdf');
   });

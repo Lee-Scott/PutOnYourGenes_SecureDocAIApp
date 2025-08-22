@@ -16,6 +16,10 @@ export interface IDocument {
     ownerName: string;
     ownerEmail: string;
     ownerPhone: string;
+    version: number;
+    lockStatus: string;
+    lockedBy: string;
+    timestamp: string;
 }
 
 export type Document = IDocument;

@@ -27,7 +27,7 @@ const PaperlessWidget: React.FC = () => {
         await uploadDocument(formData).unwrap();
         setSelectedFile(null);
         refetch();
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to upload document: ', err);
       }
     }

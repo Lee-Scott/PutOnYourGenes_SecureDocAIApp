@@ -30,7 +30,7 @@ const VerifyPassword = () => {
     const key = searchParams.get('key');
     const { register, handleSubmit, reset, formState, getFieldState } = useForm<UpdateNewPassword>({ resolver: zodResolver(schema), mode: 'onTouched', defaultValues: { password: '', newPassword: '', confirmNewPassword: '' } });
     const [verifyPassword, { data, error, isLoading, isSuccess }] = userAPI.useVerifyPasswordMutation();
-    const [resetpassword, {  data: resetData, error: resetError, isLoading: resetLoading, isSuccess: resetSuccess }] = userAPI.useDoResetPasswordMutation();
+    const [resetpassword, {  data: resetData, error: resetError, isSuccess: resetSuccess }] = userAPI.useDoResetPasswordMutation();
 
     const isFieldValid = (fieldName: keyof UpdateNewPassword): boolean => getFieldState(fieldName, formState).isTouched && !getFieldState(fieldName, formState).invalid;
 
@@ -43,7 +43,7 @@ const VerifyPassword = () => {
         if (key && location.pathname.includes('/verify/password')) {
             verifyPassword(key);
         }
-    }, []);
+    }, [key, location.pathname, verifyPassword]);
 
     if (!key) {
         return (

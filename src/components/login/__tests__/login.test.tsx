@@ -151,13 +151,7 @@ describe('Login', () => {
     await waitFor(() => {
       expect(verifyQrCodeFn).toHaveBeenCalledWith({
         userId: '12345',
-        qrCode: '123456',
-        qrCode1: '1',
-        qrCode2: '2',
-        qrCode3: '3',
-        qrCode4: '4',
-        qrCode5: '5',
-        qrCode6: '6',
+        qrCode: '123456'
       });
     });
   });

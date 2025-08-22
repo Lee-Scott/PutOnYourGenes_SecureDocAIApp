@@ -6,9 +6,7 @@ import { useCreateChatRoomMutation } from '../../service/ChatRoomService';
 import { useGetUsersQuery, useFetchUserQuery } from '../../service/UserService';
 import { toastSuccess, toastError, toastInfo } from '../../utils/ToastUtils';
 import { generateQuestionnaireResultsPDF } from '../../utils/PDFUtils';
-import type { IQuestionnaireResponse, ICategoryScore } from '../../models/IQuestionnaireResponse';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+import type { IQuestionnaireResponse } from '../../models/IQuestionnaireResponse';
 
 /**
  * QuestionnaireResults Component
@@ -59,8 +57,6 @@ const QuestionnaireResults: React.FC = () => {
   const [deleteQuestionnaireResponse] = useDeleteQuestionnaireResponseMutation();
   const { data: currentUserResponse } = useFetchUserQuery();
   const [createChatRoom] = useCreateChatRoomMutation();
-  const [selectedResponse, setSelectedResponse] = useState<IQuestionnaireResponse | null>(null);
-  const [showEmailModal, setShowEmailModal] = useState(false);
   const [showProviderModal, setShowProviderModal] = useState(false);
 
   // Helper function to generate results summary
@@ -167,9 +163,8 @@ This summary was generated from your health questionnaire responses. Please cons
   };
 
   // Messaging functionality
-  const handleShareWithProvider = async (response: IQuestionnaireResponse) => {
+  const handleShareWithProvider = async () => {
     try {
-      setSelectedResponse(response);
       setShowProviderModal(true);
     } catch (error) {
       console.error('Failed to open provider selection:', error);
@@ -231,7 +226,7 @@ This summary was generated from your health questionnaire responses. Please cons
         await deleteQuestionnaireResponse(userResponses.data.questionnaireId).unwrap();
         toastSuccess('Questionnaire deleted successfully.');
         navigate('/questionnaires');
-      } catch (error) {
+      } catch {
         toastError('Failed to delete questionnaire.');
       }
     }
@@ -322,15 +317,15 @@ This summary was generated from your health questionnaire responses. Please cons
 
   // Healthcare Provider Selection Modal
   const ProviderSelectionModal: React.FC = () => {
-    const { data: usersResponse, isLoading: loadingProviders, error: providersError } = useGetUsersQuery();
+    const { data: usersResponse, isLoading: loadingProviders } = useGetUsersQuery();
 
-    const providers = usersResponse?.data?.users?.filter((user: any) => user.role === 'DOCTOR') || [];
+    const providers = usersResponse?.data?.users?.filter((user) => user.user.role === 'DOCTOR') || [];
 
     if (!showProviderModal) return null;
 
     return (
-      <div className="modal-overlay" onClick={() => setShowProviderModal(false)}>
-        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-overlay" onClick={() => setShowProviderModal(false)} onKeyDown={() => setShowProviderModal(false)} role="button" tabIndex={0}>
+        <div className="modal-content" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="button" tabIndex={0}>
           <div className="modal-header">
             <h3>Select Healthcare Provider</h3>
             <button 
@@ -349,14 +344,14 @@ This summary was generated from your health questionnaire responses. Please cons
               <div className="loading">Loading healthcare providers...</div>
             ) : (
               <div className="provider-list">
-                {providers.map((provider: any) => (
+                {providers.map((provider) => (
                   <div 
-                    key={provider.userId}
+                    key={provider.user.userId}
                     className={`provider-item`}
                   >
                     <div className="provider-info">
-                      <h4>{provider.firstName} {provider.lastName}</h4>
-                      <p className="provider-email">{provider.email}</p>
+                      <h4>{provider.user.firstName} {provider.user.lastName}</h4>
+                      <p className="provider-email">{provider.user.email}</p>
                       <span className={`provider-status available`}>
                         ● Available
                       </span>
@@ -365,7 +360,7 @@ This summary was generated from your health questionnaire responses. Please cons
                     <button
                       className={`btn btn-primary`}
                       onClick={() => {
-                        handleSelectProvider(provider.userId);
+                        handleSelectProvider(provider.user.userId);
                         setShowProviderModal(false);
                       }}
                     >
@@ -467,7 +462,7 @@ This summary was generated from your health questionnaire responses. Please cons
                   <button className="btn btn-outline btn-small" onClick={() => handleEmailResults(userResponses.data!)}>
                     📧 Email
                   </button>
-                  <button className="btn btn-outline btn-small" onClick={() => handleShareWithProvider(userResponses.data!)}>
+                  <button className="btn btn-outline btn-small" onClick={() => handleShareWithProvider()}>
                     💬 Message Provider
                   </button>
                   <button className="btn btn-outline btn-small" onClick={() => handleExportPDF(userResponses.data!)}>
@@ -524,7 +519,7 @@ This summary was generated from your health questionnaire responses. Please cons
           <div className="secondary-actions">
             <button 
               className="btn btn-outline"
-              onClick={() => userResponses?.data && handleShareWithProvider(userResponses.data)}
+              onClick={() => userResponses?.data && handleShareWithProvider()}
               disabled={!userResponses?.data}
             >
               💬 Message Healthcare Provider

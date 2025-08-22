@@ -1,8 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { questionnaireAPI } from '../QuestionnaireService';
 import { setupStore } from '../../store/store';
-import { http, HttpResponse } from 'msw';
-import { server } from '../../mocks/server';
 
 const store = setupStore();
 
